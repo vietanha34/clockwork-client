@@ -31,10 +31,10 @@ Implement Rust-side logic for tray icon click → toggle popover window, positio
 
 ### Tasks
 
-- [ ] Task 2.1: Update `lib.rs` — add tray icon event handler: left-click toggles main window visibility, positions window near tray icon (macOS)
-- [ ] Task 2.2: Add `hide-on-blur` behavior — listen for window `blur` event via Tauri and hide the window
-- [ ] Task 2.3: Create Tauri command `get_settings` / `save_settings` in `lib.rs` — read/write a JSON settings file (`settings.json`) in the Tauri app data directory
-- [ ] Task 2.4: Register commands in `invoke_handler` and update `capabilities/default.json` if needed
+- [x] Task 2.1: Update `lib.rs` — add tray icon event handler: left-click toggles main window visibility, positions window near tray icon (macOS)
+- [x] Task 2.2: Add `hide-on-blur` behavior — listen for window `blur` event via Tauri and hide the window
+- [x] Task 2.3: Create Tauri command `get_settings` / `save_settings` in `lib.rs` — read/write a JSON settings file (`settings.json`) in the Tauri app data directory
+- [x] Task 2.4: Register commands in `invoke_handler` and update `capabilities/default.json` if needed
 
 ### Verification
 
