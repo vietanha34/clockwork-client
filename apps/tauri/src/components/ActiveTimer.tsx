@@ -4,6 +4,8 @@ import { useSettings } from "../lib/settings-context";
 import { useActiveTimers } from "../hooks/useActiveTimers";
 import { useStopTimer } from "../hooks/useTimerActions";
 import { ElapsedTime } from "./ElapsedTime";
+import { ErrorCard } from "./ErrorCard";
+import { TimerSkeleton } from "./Skeleton";
 
 export function ActiveTimer() {
   const { data, isLoading, error } = useActiveTimers();
@@ -21,24 +23,8 @@ export function ActiveTimer() {
     staleTime: 60_000,
   });
 
-  if (isLoading) {
-    return (
-      <div className="p-4">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-          <div className="h-3 bg-gray-200 rounded w-1/2" />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="px-4 py-3 text-xs text-red-600">
-        Failed to load timer data
-      </div>
-    );
-  }
+  if (isLoading) return <TimerSkeleton />;
+  if (error) return <ErrorCard message="Failed to load timer data" />;
 
   if (!activeTimer) {
     return (

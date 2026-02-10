@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { SettingsProvider, useSettings } from "./lib/settings-context";
 import { MainView } from "./views/MainView";
@@ -10,10 +10,12 @@ function AppContent() {
   const [view, setView] = useState<View>("main");
   const { settings, isLoaded } = useSettings();
 
-  // On first load, if no email configured → go straight to settings
-  if (isLoaded && !settings.userEmail) {
-    if (view !== "settings") setView("settings");
-  }
+  // On first load, if no email is configured, redirect to settings
+  useEffect(() => {
+    if (isLoaded && !settings.userEmail) {
+      setView("settings");
+    }
+  }, [isLoaded, settings.userEmail]);
 
   return (
     <AppShell

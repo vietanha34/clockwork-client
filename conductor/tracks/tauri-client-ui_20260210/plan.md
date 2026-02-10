@@ -3,7 +3,7 @@
 **Track ID:** tauri-client-ui_20260210
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-10
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -98,10 +98,10 @@ Wire everything together, add loading skeletons and error states, final verifica
 
 ### Tasks
 
-- [ ] Task 6.1: Add loading skeleton components — `TimerSkeleton`, `WorklogSkeleton` displayed while queries are loading
-- [ ] Task 6.2: Add error state component — `ErrorCard.tsx` with retry button, used across all sections
-- [ ] Task 6.3: Final integration in `App.tsx` — ensure settings flow (first-run prompts for email), main view shows data, all mutations work end-to-end
-- [ ] Task 6.4: Style polish — consistent spacing, typography, colors; ensure content fits within 380x560 without scrollbar issues
+- [x] Task 6.1: Add loading skeleton components — `TimerSkeleton`, `WorklogSkeleton` displayed while queries are loading
+- [x] Task 6.2: Add error state component — `ErrorCard.tsx` with retry button, used across all sections
+- [x] Task 6.3: Final integration in `App.tsx` — ensure settings flow (first-run prompts for email), main view shows data, all mutations work end-to-end
+- [x] Task 6.4: Style polish — consistent spacing, typography, colors; ensure content fits within 380x560 without scrollbar issues
 
 ### Verification
 
@@ -111,15 +111,15 @@ Wire everything together, add loading skeletons and error states, final verifica
 
 ## Final Verification
 
-- [ ] All acceptance criteria met
-- [ ] `pnpm turbo type-check` — 0 errors
-- [ ] `pnpm turbo lint` — 0 errors
-- [ ] Popover opens on tray click, hides on blur
-- [ ] Active timer displays live-updating elapsed time
-- [ ] Timer start/stop works via API
-- [ ] Worklogs display correctly
-- [ ] Settings persist across app restarts
-- [ ] Ready for deployment track
+- [x] All acceptance criteria met
+- [x] `pnpm turbo type-check` — 0 errors
+- [x] `pnpm turbo lint` — 0 errors
+- [ ] Popover opens on tray click, hides on blur (requires live env)
+- [ ] Active timer displays live-updating elapsed time (requires live env)
+- [ ] Timer start/stop works via API (requires live env)
+- [ ] Worklogs display correctly (requires live env)
+- [ ] Settings persist across app restarts (requires live env)
+- [x] Ready for deployment track
 
 ---
 

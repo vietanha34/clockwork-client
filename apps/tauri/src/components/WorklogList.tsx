@@ -1,29 +1,13 @@
 import { formatSeconds, totalWorklogSeconds } from "../lib/api-client";
 import { useWorklogs } from "../hooks/useWorklogs";
+import { ErrorCard } from "./ErrorCard";
+import { WorklogSkeleton } from "./Skeleton";
 
 export function WorklogList() {
   const { data, isLoading, error } = useWorklogs();
 
-  if (isLoading) {
-    return (
-      <div className="px-4 py-3 space-y-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse flex gap-3">
-            <div className="h-3 bg-gray-200 rounded w-16 shrink-0" />
-            <div className="h-3 bg-gray-200 rounded flex-1" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="px-4 py-2 text-xs text-red-600">
-        Failed to load worklogs
-      </div>
-    );
-  }
+  if (isLoading) return <WorklogSkeleton />;
+  if (error) return <ErrorCard message="Failed to load worklogs" />;
 
   const worklogs = data?.worklogs ?? [];
   const totalSeconds = totalWorklogSeconds(worklogs);
