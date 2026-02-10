@@ -1,0 +1,43 @@
+{
+  "status": "complete",
+  "project_type": "greenfield",
+  "current_section": "complete",
+  "current_question": 0,
+  "completed_sections": ["product", "guidelines", "tech_stack", "workflow", "styleguides"],
+  "answers": {
+    "project_name": "Clockwork Menubar",
+    "description": "A cross-platform menu bar / system tray app that displays Clockwork Pro timer status and worklogs from Jira, with a Vercel backend proxy and Inngest-powered data sync.",
+    "problem_statement": "Users have to open Jira in a browser tab to check their Clockwork Pro timer status and worklogs, causing context-switching and friction in daily time tracking.",
+    "target_users": "Any Jira user with Clockwork Pro who wants a native desktop experience",
+    "key_goals": [
+      "Provide real-time timer visibility in the menu bar",
+      "Enable timer start/stop without leaving the desktop",
+      "Show daily worklog summary at a glance"
+    ],
+    "voice_tone": "Concise and direct",
+    "design_principles": ["Performance first", "Simplicity over features"],
+    "languages": ["Rust", "TypeScript"],
+    "frontend": "React",
+    "monorepo_tool": "Turborepo",
+    "backend": "Vercel API Routes + Inngest",
+    "database": "Upstash Redis",
+    "infrastructure": "Vercel + Upstash",
+    "tdd_strictness": "Flexible",
+    "commit_strategy": "Conventional Commits",
+    "code_review": "Optional / self-review",
+    "verification_checkpoints": "After each phase",
+    "style_guides": ["TypeScript", "Rust"]
+  },
+  "files_created": [
+    "conductor/index.md",
+    "conductor/product.md",
+    "conductor/product-guidelines.md",
+    "conductor/tech-stack.md",
+    "conductor/workflow.md",
+    "conductor/tracks.md",
+    "conductor/code_styleguides/typescript.md",
+    "conductor/code_styleguides/rust.md"
+  ],
+  "started_at": "2026-02-10T09:30:00.000Z",
+  "last_updated": "2026-02-10T09:40:00.000Z"
+}
