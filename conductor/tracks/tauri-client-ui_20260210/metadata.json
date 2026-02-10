@@ -1,0 +1,19 @@
+{
+  "id": "tauri-client-ui_20260210",
+  "title": "Tauri Client UI",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-02-10T12:00:00.000Z",
+  "updated": "2026-02-10T12:30:00.000Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 6,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 23,
+    "completed": 0
+  },
+  "commits": []
+}
