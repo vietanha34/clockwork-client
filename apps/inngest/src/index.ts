@@ -15,6 +15,8 @@ app.use(
 );
 
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Inngest server listening on port ${port}`);
+  // eslint-disable-next-line no-console
   console.log(`Inngest endpoint: http://localhost:${port}/api/inngest`);
 });
