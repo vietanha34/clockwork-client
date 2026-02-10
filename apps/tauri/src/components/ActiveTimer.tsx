@@ -7,6 +7,15 @@ import { ElapsedTime } from "./ElapsedTime";
 import { ErrorCard } from "./ErrorCard";
 import { TimerSkeleton } from "./Skeleton";
 
+function formatStartTime(startedAt: string): string {
+  const date = new Date(startedAt);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function ActiveTimer() {
   const { data, isLoading, error } = useActiveTimers();
   const stopTimer = useStopTimer();
@@ -52,6 +61,9 @@ export function ActiveTimer() {
           {issue?.project && (
             <p className="text-xs text-gray-400">{issue.project.name}</p>
           )}
+          <p className="text-xs text-gray-400 mt-1">
+            Started at {formatStartTime(activeTimer.startedAt)}
+          </p>
         </div>
         <div className="text-right shrink-0">
           <ElapsedTime

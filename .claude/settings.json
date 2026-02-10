@@ -1,0 +1,9 @@
+{
+  "enabledPlugins": {
+    "backend-development@claude-code-workflows": true,
+    "full-stack-orchestration@claude-code-workflows": true,
+    "systems-programming@claude-code-workflows": true,
+    "code-review-ai@claude-code-workflows": true,
+    "conductor@claude-code-workflows": true
+  }
+}
