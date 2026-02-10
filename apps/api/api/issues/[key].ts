@@ -27,6 +27,7 @@ export default async function handler(
     const issue = await getIssue(key);
     sendSuccess(res, { issue });
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(`[GET /api/issues/${key}] Error:`, err);
     sendInternalError(res, `Failed to fetch issue ${key}`);
   }

@@ -35,6 +35,7 @@ export default async function handler(
 
     sendSuccess(res, response);
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error("[GET /api/timers/active] Error:", err);
     sendInternalError(res, "Failed to fetch active timers");
   }

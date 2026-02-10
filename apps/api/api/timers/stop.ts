@@ -27,6 +27,7 @@ export default async function handler(
     const timer = await stopTimer(timerId);
     sendSuccess(res, { timer });
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error("[POST /api/timers/stop] Error:", err);
     sendInternalError(res, "Failed to stop timer");
   }

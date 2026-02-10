@@ -30,6 +30,7 @@ export default async function handler(
     const timer = await startTimer(issueKey, comment);
     sendSuccess(res, { timer }, 201);
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error("[POST /api/timers/start] Error:", err);
     sendInternalError(res, "Failed to start timer");
   }

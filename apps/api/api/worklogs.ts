@@ -41,6 +41,7 @@ export default async function handler(
 
     sendSuccess(res, response);
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error("[GET /api/worklogs] Error:", err);
     sendInternalError(res, "Failed to fetch worklogs");
   }
