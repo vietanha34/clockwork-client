@@ -80,11 +80,11 @@ Build the three main UI sections: active timer display, worklog list, and start 
 
 ### Tasks
 
-- [ ] Task 5.1: Create `apps/tauri/src/components/ActiveTimer.tsx` — displays issue key, project name (fetched via `fetchIssue`), live-updating elapsed time (computed from `startedAt`), and a stop button; shows "No active timer" empty state
-- [ ] Task 5.2: Create `apps/tauri/src/components/ElapsedTime.tsx` — small component using `useEffect` + `setInterval` (1s) to display live `HH:MM:SS` from a `startedAt` timestamp
-- [ ] Task 5.3: Create `apps/tauri/src/components/WorklogList.tsx` — renders today's worklogs as a list (issue key, time spent formatted, comment preview), total time at top; shows "No worklogs today" empty state
-- [ ] Task 5.4: Create `apps/tauri/src/components/StartTimerForm.tsx` — input for issue key, optional comment, start button; calls `startTimer` mutation, shows success/error feedback
-- [ ] Task 5.5: Create `apps/tauri/src/views/MainView.tsx` — composes `ActiveTimer`, `WorklogList`, and `StartTimerForm` into the main popover view with section dividers
+- [x] Task 5.1: Create `apps/tauri/src/components/ActiveTimer.tsx` — displays issue key, project name (fetched via `fetchIssue`), live-updating elapsed time (computed from `startedAt`), and a stop button; shows "No active timer" empty state
+- [x] Task 5.2: Create `apps/tauri/src/components/ElapsedTime.tsx` — small component using `useEffect` + `setInterval` (1s) to display live `HH:MM:SS` from a `startedAt` timestamp
+- [x] Task 5.3: Create `apps/tauri/src/components/WorklogList.tsx` — renders today's worklogs as a list (issue key, time spent formatted, comment preview), total time at top; shows "No worklogs today" empty state
+- [x] Task 5.4: Create `apps/tauri/src/components/StartTimerForm.tsx` — input for issue key, optional comment, start button; calls `startTimer` mutation, shows success/error feedback
+- [x] Task 5.5: Create `apps/tauri/src/views/MainView.tsx` — composes `ActiveTimer`, `WorklogList`, and `StartTimerForm` into the main popover view with section dividers
 
 ### Verification
 
