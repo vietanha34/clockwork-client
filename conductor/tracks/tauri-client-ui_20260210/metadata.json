@@ -2,18 +2,25 @@
   "id": "tauri-client-ui_20260210",
   "title": "Tauri Client UI",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-02-10T12:00:00.000Z",
-  "updated": "2026-02-10T12:30:00.000Z",
-  "current_phase": 1,
-  "current_task": "1.1",
+  "updated": "2026-02-10T14:00:00.000Z",
+  "current_phase": 6,
+  "current_task": "6.4",
   "phases": {
     "total": 6,
-    "completed": 0
+    "completed": 6
   },
   "tasks": {
     "total": 23,
-    "completed": 0
+    "completed": 23
   },
-  "commits": []
+  "commits": [
+    "e41b557: feat(tauri): setup dependencies, Tailwind v4, React Query, and shared types (phase 1)",
+    "beaeb01: feat(tauri): implement Rust tray toggle, hide-on-blur, and get/save_settings commands (phase 2)",
+    "e0e6f3c: feat(tauri): add app shell, settings context, settings view, and view router (phase 3)",
+    "06ad1a2: feat(tauri): add API client and React Query hooks for timers, worklogs, and mutations (phase 4)",
+    "ba149a5: feat(tauri): implement core UI components — ActiveTimer, ElapsedTime, WorklogList, StartTimerForm, MainView (phase 5)",
+    "a0a8292: feat(tauri): add Skeleton/ErrorCard components, fix App.tsx settings redirect, html polish (phase 6)"
+  ]
 }
