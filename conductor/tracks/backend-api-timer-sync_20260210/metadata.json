@@ -1,0 +1,27 @@
+{
+  "id": "backend-api-timer-sync_20260210",
+  "title": "Backend API & Inngest Timer Sync",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-02-10T10:20:00.000Z",
+  "updated": "2026-02-10T11:30:00.000Z",
+  "current_phase": 6,
+  "current_task": "6.3",
+  "phases": {
+    "total": 6,
+    "completed": 6
+  },
+  "tasks": {
+    "total": 21,
+    "completed": 21
+  },
+  "commits": [
+    "ded81eb: feat(api): add shared types, env accessors, and response helpers (phase 1)",
+    "82699e8: feat(api): add Redis cache layer and GET /api/timers/active route (phase 2)",
+    "4915e4d: feat(api): add Clockwork Pro API client and timer/worklog routes (phase 3)",
+    "89bf0ab: feat(api): add Atlassian API client and GET /api/issues/:key route (phase 4)",
+    "7d2b7e4: feat(inngest): implement full sync-active-timers function with JWT, fetch, and Redis cache (phase 5)",
+    "fc7480e: chore(env): add .env.example files for api and inngest apps (phase 6)",
+    "5e19695: fix(api): suppress no-console warnings in API route error handlers"
+  ]
+}

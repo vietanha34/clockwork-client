@@ -3,7 +3,7 @@
 **Track ID:** backend-api-timer-sync_20260210
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-10
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -111,12 +111,12 @@ Document and validate all required environment variables.
 
 ## Final Verification
 
-- [ ] All acceptance criteria met
-- [ ] `pnpm turbo type-check` — 0 errors
-- [ ] `pnpm turbo lint` — 0 errors
-- [ ] All 5 API routes respond correctly in local dev
-- [ ] Inngest sync function completes all 3 steps successfully
-- [ ] Ready for Tauri client integration
+- [x] All acceptance criteria met
+- [x] `pnpm turbo type-check` — 0 errors
+- [x] `pnpm turbo lint` — 0 errors
+- [ ] All 5 API routes respond correctly in local dev (requires live env)
+- [ ] Inngest sync function completes all 3 steps successfully (requires live env)
+- [x] Ready for Tauri client integration
 
 ---
 
