@@ -1,0 +1,56 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+dist-ssr
+build
+out
+.next
+.output
+
+# Tauri / Rust
+apps/tauri/src-tauri/target/
+apps/tauri/src-tauri/WixTools/
+
+# Turborepo
+.turbo
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Editor / OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/settings.json
+.idea
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage
+*.lcov
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
