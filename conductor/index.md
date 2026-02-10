@@ -15,6 +15,7 @@ Navigation hub for project context.
 - [x] [Monorepo Scaffolding](./tracks/monorepo-scaffolding_20260210/index.md) - `monorepo-scaffolding_20260210`
 - [x] [Backend API & Inngest Timer Sync](./tracks/backend-api-timer-sync_20260210/index.md) - `backend-api-timer-sync_20260210`
 - [x] [Tauri Client UI](./tracks/tauri-client-ui_20260210/index.md) - `tauri-client-ui_20260210`
+- [x] [Vercel Deployment](./tracks/vercel-deployment_20260210/index.md) - `vercel-deployment_20260210`
 
 <!-- Auto-populated by /conductor:new-track -->
 

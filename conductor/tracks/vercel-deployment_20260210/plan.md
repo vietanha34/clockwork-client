@@ -48,7 +48,7 @@ Run `pnpm turbo type-check lint` to ensure everything still passes.
 
 **Goal:** Create deployment documentation with environment variable checklists and step-by-step instructions.
 
-### Task 3.1 — Create deployment guide
+### ~~Task 3.1~~ — [x] Create deployment guide
 
 Create `docs/deployment.md` with:
 - Prerequisites (Vercel account, Inngest account, Upstash Redis)
@@ -58,11 +58,11 @@ Create `docs/deployment.md` with:
 
 **Files:** `docs/deployment.md`
 
-### Task 3.2 — Final verification and track completion
+### ~~Task 3.2~~ — [x] Final verification and track completion
 
 Run full type-check and lint. Verify all files are committed.
 
-**Verification:** `pnpm turbo type-check lint` — 0 errors, 0 warnings.
+**Verification:** `pnpm turbo type-check lint` — 6/6 successful, 0 errors, 0 warnings. ✓
 
 ---
 

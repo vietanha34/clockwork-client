@@ -2,20 +2,21 @@
   "id": "vercel-deployment_20260210",
   "title": "Vercel Deployment",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-02-10T11:30:00.000Z",
-  "updated": "2026-02-10T11:30:00.000Z",
-  "current_phase": 2,
-  "current_task": "2.1",
+  "updated": "2026-02-10T11:45:00.000Z",
+  "current_phase": 3,
+  "current_task": "3.2",
   "phases": {
     "total": 3,
-    "completed": 1
+    "completed": 3
   },
   "tasks": {
     "total": 7,
-    "completed": 3
+    "completed": 7
   },
   "commits": [
-    "304c2b9: feat(inngest): add Vercel serverless handler and vercel.json config (phase 1)"
+    "304c2b9: feat(inngest): add Vercel serverless handler and vercel.json config (phase 1)",
+    "d8267c6: docs: add Vercel deployment guide with env var checklist (phase 3)"
   ]
 }
