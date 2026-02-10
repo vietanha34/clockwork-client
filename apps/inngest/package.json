@@ -21,6 +21,7 @@
     "@clockwork-menubar/typescript-config": "workspace:*",
     "@types/express": "^4.17.21",
     "@types/node": "^20.0.0",
+    "@vercel/node": "^5.0.0",
     "eslint": "^9.0.0",
     "typescript": "^5.5.4"
   }
