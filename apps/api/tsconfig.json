@@ -2,7 +2,7 @@
   "extends": "@clockwork-menubar/typescript-config/node",
   "compilerOptions": {
     "outDir": "dist",
-    "noEmit": true
+    "noEmit": false
   },
   "include": ["api/**/*", "lib/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev --listen 3000",
-    "build": "tsc --noEmit",
+    "build": "tsc",
     "lint": "eslint api",
     "type-check": "tsc --noEmit"
   },
