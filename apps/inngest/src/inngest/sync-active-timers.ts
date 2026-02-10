@@ -1,41 +1,85 @@
 import { inngest } from "./client.js";
+import { acquireClockworkJwt } from "../lib/jira-jwt.js";
+import { fetchActiveTimers } from "../lib/clockwork-report.js";
+import { cacheTimers, type CachedTimerEntry } from "../lib/redis.js";
+
+interface SyncTimersEvent {
+  data: {
+    userEmail: string;
+    jiraDomain?: string;
+  };
+}
+
+function getEnvRequired(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing required env var: ${name}`);
+  return value;
+}
 
 /**
- * Placeholder function for syncing active Clockwork timers.
- * Will be implemented in the backend-api track.
+ * Inngest function: sync-active-timers
  *
- * This function:
- * 1. Acquires a JWT from the Jira servlet endpoint (cookie -> JWT exchange)
- * 2. Fetches active timers from Clockwork Report API using the JWT
- * 3. Stores the results in Upstash Redis for fast client retrieval
+ * Triggered by event: "clockwork/timers.sync.requested"
+ * Payload: { userEmail: string, jiraDomain?: string }
+ *
+ * Steps:
+ *   1. acquire-jwt: Exchange Jira session cookie for Clockwork JWT
+ *   2. fetch-timers: Fetch active timers from Clockwork Report API
+ *   3. cache-timers: Store results in Upstash Redis
  */
 export const syncActiveTimers = inngest.createFunction(
   {
     id: "sync-active-timers",
     name: "Sync Active Clockwork Timers",
+    retries: 2,
   },
   { event: "clockwork/timers.sync.requested" },
   async ({ event, step }) => {
-    const { userEmail } = event.data as { userEmail: string };
+    const { userEmail, jiraDomain: eventDomain } =
+      (event as SyncTimersEvent).data;
 
-    // Step 1: Acquire JWT (placeholder)
+    const jiraDomain = eventDomain ?? getEnvRequired("JIRA_DOMAIN");
+
+    // Step 1: Acquire Clockwork JWT from Jira servlet
     const jwt = await step.run("acquire-jwt", async () => {
-      // TODO: implement in backend-api track
-      return { jwt: "placeholder", userEmail };
+      const jiraFullCookie = getEnvRequired("JIRA_FULL_COOKIE");
+      const token = await acquireClockworkJwt(jiraDomain, jiraFullCookie);
+      return { jwt: token };
     });
 
-    // Step 2: Fetch timers (placeholder)
-    const timers = await step.run("fetch-timers", async () => {
-      // TODO: implement in backend-api track
-      return { timers: [], jwt: jwt.jwt };
+    // Step 2: Fetch active timers from Clockwork Report API
+    const fetchResult = await step.run("fetch-timers", async () => {
+      const response = await fetchActiveTimers(jwt.jwt, jiraDomain);
+      return {
+        timers: response.timers,
+        total: response.total,
+      };
     });
 
-    // Step 3: Cache in Redis (placeholder)
-    await step.run("cache-timers", async () => {
-      // TODO: implement in backend-api track
-      return { cached: true, count: timers.timers.length };
+    // Step 3: Transform and cache timers in Upstash Redis
+    const cacheResult = await step.run("cache-timers", async () => {
+      const entries: CachedTimerEntry[] = fetchResult.timers.map((t) => ({
+        id: t.id,
+        startedAt: t.started_at,
+        finishedAt: t.finished_at,
+        comment: t.comment,
+        runningFor: t.running_for,
+        tillNow: t.till_now,
+        worklogCount: t.worklog_count,
+        issue: { key: t.issue.key, id: t.issue.id },
+      }));
+
+      await cacheTimers(userEmail, entries);
+
+      return { cached: true, count: entries.length };
     });
 
-    return { success: true, userEmail };
+    return {
+      success: true,
+      userEmail,
+      jiraDomain,
+      timersCount: fetchResult.total,
+      cached: cacheResult.cached,
+    };
   }
 );
