@@ -52,6 +52,11 @@ pub fn run() {
                 .get_webview_window("main")
                 .expect("main window not found");
 
+            #[cfg(target_os = "macos")]
+            {
+                let _ = app.handle().set_dock_visibility(false);
+            }
+
             // Tray icon left-click → toggle window visibility + position near cursor
             if let Some(tray) = app.tray_by_id("main") {
                 let win = window.clone();
@@ -79,16 +84,18 @@ pub fn run() {
                 });
             }
 
-            // Hide window on focus loss (skip in debug so devtools don't close it)
-            #[cfg(not(debug_assertions))]
-            {
-                let win = window.clone();
-                window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::Focused(false) = event {
-                        let _ = win.hide();
-                    }
-                });
-            }
+            let win = window.clone();
+            window.on_window_event(move |event| match event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    api.prevent_close();
+                    let _ = win.hide();
+                }
+                #[cfg(not(debug_assertions))]
+                tauri::WindowEvent::Focused(false) => {
+                    let _ = win.hide();
+                }
+                _ => {}
+            });
 
             #[cfg(debug_assertions)]
             {

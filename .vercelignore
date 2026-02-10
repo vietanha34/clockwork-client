@@ -1,0 +1,17 @@
+# Vercel Ignore File
+# Loại bỏ thư mục build nặng của Rust/Tauri
+**/target
+src-tauri/target
+apps/tauri/src-tauri/target
+
+# Loại bỏ các thư mục dependency và build khác
+node_modules
+dist
+.turbo
+.next
+out
+
+# Các file hệ thống/IDE
+.DS_Store
+.vscode
+.idea

@@ -27,9 +27,18 @@ export interface CachedTimerData {
 }
 
 function getRedisClient(): Redis {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.KV_REST_API_URL ||
+    getEnvRequired("UPSTASH_REDIS_REST_URL");
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.KV_REST_API_TOKEN ||
+    getEnvRequired("UPSTASH_REDIS_REST_TOKEN");
+
   return new Redis({
-    url: getEnvRequired("UPSTASH_REDIS_REST_URL"),
-    token: getEnvRequired("UPSTASH_REDIS_REST_TOKEN"),
+    url,
+    token,
   });
 }
 

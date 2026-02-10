@@ -14,7 +14,7 @@ Luồng dữ liệu active timer:
 
 1. Inngest nhận event sync (`clockwork/timers.sync.requested`)
 2. Inngest exchange Jira cookie -> Clockwork JWT
-3. Inngest gọi Clockwork Report API (`timers.json`)
+3. Inngest gọi Clockwork Report API (`timers.json`)¨¨¨
 4. Inngest cache kết quả vào Upstash Redis
 5. Tauri client gọi `GET /api/timers/active` để lấy dữ liệu cache
 

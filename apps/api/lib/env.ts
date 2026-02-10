@@ -19,10 +19,18 @@ function optional(name: string, fallback = ""): string {
 export const env = {
   // Upstash Redis
   get UPSTASH_REDIS_REST_URL(): string {
-    return required("UPSTASH_REDIS_REST_URL");
+    return (
+      process.env.UPSTASH_REDIS_REST_URL ||
+      process.env.KV_REST_API_URL ||
+      required("UPSTASH_REDIS_REST_URL")
+    );
   },
   get UPSTASH_REDIS_REST_TOKEN(): string {
-    return required("UPSTASH_REDIS_REST_TOKEN");
+    return (
+      process.env.UPSTASH_REDIS_REST_TOKEN ||
+      process.env.KV_REST_API_TOKEN ||
+      required("UPSTASH_REDIS_REST_TOKEN")
+    );
   },
 
   // Clockwork Pro API
