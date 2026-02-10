@@ -47,11 +47,11 @@ Build the app layout frame, simple view navigation, and settings screen.
 
 ### Tasks
 
-- [ ] Task 3.1: Create `apps/tauri/src/components/AppShell.tsx` — fixed header with app title and settings gear icon, scrollable content area, Tailwind styling matching 380px width
-- [ ] Task 3.2: Create `apps/tauri/src/lib/settings.ts` — TypeScript helpers to invoke `get_settings`/`save_settings` Tauri commands, type `AppSettings { userEmail: string; apiBaseUrl: string }`
-- [ ] Task 3.3: Create `apps/tauri/src/views/SettingsView.tsx` — form with email input, API base URL input, save button; reads/writes via settings helpers
-- [ ] Task 3.4: Create simple view router in `App.tsx` — state-based navigation between `MainView` and `SettingsView`, pass settings context down
-- [ ] Task 3.5: Create `apps/tauri/src/lib/settings-context.tsx` — React context providing `settings` and `updateSettings` to the component tree
+- [x] Task 3.1: Create `apps/tauri/src/components/AppShell.tsx` — fixed header with app title and settings gear icon, scrollable content area, Tailwind styling matching 380px width
+- [x] Task 3.2: Create `apps/tauri/src/lib/settings.ts` — TypeScript helpers to invoke `get_settings`/`save_settings` Tauri commands, type `AppSettings { userEmail: string; apiBaseUrl: string }`
+- [x] Task 3.3: Create `apps/tauri/src/views/SettingsView.tsx` — form with email input, API base URL input, save button; reads/writes via settings helpers
+- [x] Task 3.4: Create simple view router in `App.tsx` — state-based navigation between `MainView` and `SettingsView`, pass settings context down
+- [x] Task 3.5: Create `apps/tauri/src/lib/settings-context.tsx` — React context providing `settings` and `updateSettings` to the component tree
 
 ### Verification
 
