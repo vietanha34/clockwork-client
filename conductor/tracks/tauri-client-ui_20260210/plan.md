@@ -64,10 +64,10 @@ Create typed fetch wrappers and React Query hooks for all API endpoints.
 
 ### Tasks
 
-- [ ] Task 4.1: Create `apps/tauri/src/lib/api-client.ts` — base fetch helper using `apiBaseUrl` from settings, typed functions: `fetchActiveTimers(userEmail)`, `fetchWorklogs(userEmail, date?)`, `startTimer(issueKey, comment?)`, `stopTimer(timerId)`, `fetchIssue(issueKey)`
-- [ ] Task 4.2: Create `apps/tauri/src/hooks/useActiveTimers.ts` — React Query hook wrapping `fetchActiveTimers`, polling every 5 seconds via `refetchInterval`, enabled only when `userEmail` is set
-- [ ] Task 4.3: Create `apps/tauri/src/hooks/useWorklogs.ts` — React Query hook wrapping `fetchWorklogs` for today's date
-- [ ] Task 4.4: Create `apps/tauri/src/hooks/useTimerActions.ts` — React Query mutation hooks for `startTimer` and `stopTimer`, with cache invalidation of active timers query on success
+- [x] Task 4.1: Create `apps/tauri/src/lib/api-client.ts` — base fetch helper using `apiBaseUrl` from settings, typed functions: `fetchActiveTimers(userEmail)`, `fetchWorklogs(userEmail, date?)`, `startTimer(issueKey, comment?)`, `stopTimer(timerId)`, `fetchIssue(issueKey)`
+- [x] Task 4.2: Create `apps/tauri/src/hooks/useActiveTimers.ts` — React Query hook wrapping `fetchActiveTimers`, polling every 5 seconds via `refetchInterval`, enabled only when `userEmail` is set
+- [x] Task 4.3: Create `apps/tauri/src/hooks/useWorklogs.ts` — React Query hook wrapping `fetchWorklogs` for today's date
+- [x] Task 4.4: Create `apps/tauri/src/hooks/useTimerActions.ts` — React Query mutation hooks for `startTimer` and `stopTimer`, with cache invalidation of active timers query on success
 
 ### Verification
 
