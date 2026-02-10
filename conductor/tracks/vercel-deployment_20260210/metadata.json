@@ -1,0 +1,21 @@
+{
+  "id": "vercel-deployment_20260210",
+  "title": "Vercel Deployment",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-02-10T11:30:00.000Z",
+  "updated": "2026-02-10T11:30:00.000Z",
+  "current_phase": 2,
+  "current_task": "2.1",
+  "phases": {
+    "total": 3,
+    "completed": 1
+  },
+  "tasks": {
+    "total": 7,
+    "completed": 3
+  },
+  "commits": [
+    "304c2b9: feat(inngest): add Vercel serverless handler and vercel.json config (phase 1)"
+  ]
+}
