@@ -1,0 +1,17 @@
+{
+  "name": "@clockwork-menubar/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./base": "./base.js",
+    "./react": "./react.js",
+    "./node": "./node.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.0.0"
+  }
+}
