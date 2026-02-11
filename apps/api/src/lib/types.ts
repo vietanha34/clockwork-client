@@ -59,7 +59,7 @@ export interface Project {
 export interface ActiveTimersResponse {
   timers: Timer[];
   cachedAt: string | null;
-  userEmail: string;
+  accountId: string;
 }
 
 export interface WorklogsResponse {

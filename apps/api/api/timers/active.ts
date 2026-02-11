@@ -10,15 +10,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const userEmail = typeof req.query.userEmail === 'string' ? req.query.userEmail : 'all';
+  const accountId = typeof req.query.accountId === 'string' ? req.query.accountId : 'all';
 
   try {
-    const cached = await getActiveTimers(userEmail);
+    const cached = await getActiveTimers(accountId);
 
     const response: ActiveTimersResponse = {
       timers: cached?.timers ?? [],
       cachedAt: cached?.cachedAt ?? null,
-      userEmail,
+      accountId,
     };
 
     sendSuccess(res, response);

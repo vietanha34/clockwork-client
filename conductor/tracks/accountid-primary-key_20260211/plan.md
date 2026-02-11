@@ -24,7 +24,7 @@ Add the low-level pieces needed by all other phases.
 
 ### Verification
 
-- [ ] `pnpm type-check` passes in `apps/api`
+- [x] `pnpm type-check` passes in `apps/api`
 
 ---
 
