@@ -2,15 +2,21 @@
   "id": "accountid-primary-key_20260211",
   "title": "Switch Primary Key from Email to accountId",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-02-11T00:00:00.000Z",
-  "updated": "2026-02-11T06:00:00.000Z",
+  "updated": "2026-02-11T07:00:00.000Z",
   "phases": {
     "total": 4,
-    "completed": 0
+    "completed": 4
   },
   "tasks": {
     "total": 13,
-    "completed": 0
-  }
+    "completed": 13
+  },
+  "commits": [
+    "8a6ce4d: feat(api): add server-side helpers for accountId primary key migration",
+    "3d530ea: feat(api): add email→accountId resolve endpoint and update timers/active",
+    "e088ccb: feat(inngest): group timers by accountId instead of emailAddress",
+    "df1a3f2: feat(tauri): store and use userAccountId for timer queries"
+  ]
 }

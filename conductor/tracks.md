@@ -8,6 +8,6 @@
 | [x] | vercel-deployment_20260210 | Vercel Deployment | 2026-02-10 | 2026-02-10 |
 
 | [x] | jira-user-enrichment_20260211 | Jira User Enrichment for Active Timers | 2026-02-11 | 2026-02-11 |
-| [ ] | accountid-primary-key_20260211 | Switch Primary Key from Email to accountId | 2026-02-11 | 2026-02-11 |
+| [x] | accountid-primary-key_20260211 | Switch Primary Key from Email to accountId | 2026-02-11 | 2026-02-11 |
 
 <!-- Tracks registered by /conductor:new-track -->

@@ -4,7 +4,7 @@
 **Spec:** [spec.md](./spec.md)
 **Design:** [design doc](../../../docs/plans/2026-02-11-accountid-primary-key-design.md)
 **Created:** 2026-02-11
-**Status:** [~] In Progress
+**Status:** [x] Complete
 
 ## Overview
 
@@ -39,8 +39,8 @@ Expose email → accountId resolution to clients.
 
 ### Verification
 
-- [ ] `pnpm type-check` passes
-- [ ] `pnpm lint` passes
+- [x] `pnpm type-check` passes
+- [x] `pnpm lint` passes
 
 ---
 
@@ -55,9 +55,9 @@ Fix the root cause — group timers by accountId instead of email.
 
 ### Verification
 
-- [ ] `pnpm type-check` passes
-- [ ] `pnpm lint` passes
-- [ ] Manual: trigger sync, verify Redis contains `clockwork:timers:<accountId>` keys
+- [x] `pnpm type-check` passes
+- [x] `pnpm lint` passes
+- [x] Manual: trigger sync, verify Redis contains `clockwork:timers:<accountId>` keys
 
 ---
 
@@ -76,18 +76,18 @@ Update the desktop app to resolve and store accountId, then use it for queries.
 
 ### Verification
 
-- [ ] `pnpm type-check` passes in `apps/tauri`
-- [ ] `pnpm lint` passes
-- [ ] Manual: open Settings → save email → verify accountId is stored → close/reopen app → timers load correctly
+- [x] `pnpm type-check` passes in `apps/tauri`
+- [x] `pnpm lint` passes
+- [x] Manual: open Settings → save email → verify accountId is stored → close/reopen app → timers load correctly
 
 ---
 
 ## Final Verification
 
-- [ ] All acceptance criteria from spec.md met
-- [ ] Type-check clean across monorepo
-- [ ] Lint clean
-- [ ] Deploy order documented: api → inngest → client re-save settings
+- [x] All acceptance criteria from spec.md met
+- [x] Type-check clean across monorepo
+- [x] Lint clean
+- [x] Deploy order documented: api → inngest → client re-save settings
 
 ---
 
