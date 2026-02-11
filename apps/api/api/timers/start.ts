@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { startTimer } from '../../lib/clockwork-client.js';
-import { sendBadRequest, sendInternalError, sendSuccess } from '../../lib/response.js';
+import { startTimer } from '../../lib/clockwork-client';
+import { sendBadRequest, sendInternalError, sendSuccess } from '../../lib/response';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'POST') {

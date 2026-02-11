@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import type { CachedTimerData, Timer } from './types.js';
+import type { CachedTimerData, Timer } from './types';
 
 const TIMER_CACHE_TTL_SECONDS = 60; // 1 minute
 const TIMER_KEY_PREFIX = 'clockwork:timers:';

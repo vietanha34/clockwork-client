@@ -1,5 +1,5 @@
-import { env } from './env.js';
-import type { Issue, Project } from './types.js';
+import { env } from './env';
+import type { Issue, Project } from './types';
 
 // ─── Raw Atlassian REST API types ─────────────────────────────────────────────
 

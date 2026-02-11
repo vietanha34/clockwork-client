@@ -1,10 +1,10 @@
 import { Redis } from '@upstash/redis';
 
-// function getEnvRequired(name: string): string {
-//   const value = process.env[name];
-//   if (!value) throw new Error(`Missing required env var: ${name}`);
-//   return value;
-// }
+export function getEnvRequired(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing required env var: ${name}`);
+  return value;
+}
 
 const TIMER_KEY_PREFIX = 'clockwork:timers:';
 const TIMER_CACHE_TTL_SECONDS = 60;

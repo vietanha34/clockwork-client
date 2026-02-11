@@ -1,5 +1,5 @@
-import { env } from './env.js';
-import type { RawClockworkTimer, RawClockworkTimersResponse, Timer, Worklog } from './types.js';
+import { env } from './env';
+import type { RawClockworkTimer, RawClockworkTimersResponse, Timer, Worklog } from './types';
 
 // ─── Raw Clockwork Pro REST API types ─────────────────────────────────────────
 

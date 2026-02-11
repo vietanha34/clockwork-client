@@ -2,7 +2,8 @@
   "extends": "@clockwork-menubar/typescript-config/node",
   "compilerOptions": {
     "outDir": "dist",
-    "noEmit": true
+    "module": "CommonJS",
+    "moduleResolution": "Node"
   },
   "include": ["src/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist"]

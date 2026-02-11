@@ -1,7 +1,7 @@
-import { fetchActiveTimers } from '../lib/clockwork-report.js';
-import { acquireClockworkJwt } from '../lib/jira-jwt.js';
-import { type CachedTimerEntry, cacheTimers } from '../lib/redis.js';
-import { inngest } from './client.js';
+import { fetchActiveTimers } from '../lib/clockwork-report';
+import { acquireClockworkJwt } from '../lib/jira-jwt';
+import { type CachedTimerEntry, cacheTimers } from '../lib/redis';
+import { inngest } from './client';
 
 interface SyncTimersEvent {
   data: {
@@ -37,32 +37,32 @@ export const syncActiveTimers = inngest.createFunction(
     name: 'Sync Active Clockwork Timers',
     retries: 2,
   },
-  [{ event: 'clockwork/timers.sync.requested' }, { cron: '*/5 * * * *' }],
+  [{ event: 'clockwork/timers.sync.requested' }, { cron: '*/2 * * * *' }],
   async ({ event, step }) => {
     const eventData = (event as SyncTimersEvent).data;
     const eventDomain = eventData?.jiraDomain;
 
     const jiraDomain = eventDomain ?? getEnvRequired('JIRA_DOMAIN');
 
-    // Step 1: Acquire Clockwork JWT from Jira servlet
-    const jwt = await step.run('acquire-jwt', async () => {
+    // Single step: Sync logic (Acquire JWT -> Fetch -> Cache)
+    const result = await step.run('sync-process', async () => {
+      console.log(`[sync-process] Starting sync for domain: ${jiraDomain}`);
+
+      // 1. Acquire JWT
+      console.log('[sync-process] Acquiring Clockwork JWT...');
       const jiraFullCookie = getEnvRequired('JIRA_FULL_COOKIE');
-      const token = await acquireClockworkJwt(jiraDomain, jiraFullCookie);
-      return { jwt: token };
-    });
+      const jwt = await acquireClockworkJwt(jiraDomain, jiraFullCookie);
+      console.log('[sync-process] JWT acquired successfully.');
 
-    // Step 2: Fetch ALL active timers from Clockwork Report API
-    const fetchResult = await step.run('fetch-timers', async () => {
-      const response = await fetchActiveTimers(jwt.jwt, jiraDomain);
-      return {
-        timers: response.timers,
-        total: response.total,
-      };
-    });
+      // 2. Fetch active timers
+      console.log('[sync-process] Fetching active timers from Clockwork API...');
+      const fetchResponse = await fetchActiveTimers(jwt, jiraDomain);
+      const timers = fetchResponse.timers;
+      const total = fetchResponse.total;
+      console.log(`[sync-process] Fetched ${total} timers.`);
 
-    // Step 3: Transform and cache timers in Upstash Redis
-    const cacheResult = await step.run('cache-timers', async () => {
-      const allEntries: CachedTimerEntry[] = fetchResult.timers.map((t) => ({
+      // 3. Transform and Group
+      const allEntries: CachedTimerEntry[] = timers.map((t) => ({
         id: t.id,
         startedAt: t.started_at,
         finishedAt: t.finished_at,
@@ -74,9 +74,7 @@ export const syncActiveTimers = inngest.createFunction(
         author: t.author,
       }));
 
-      // Group by user email
       const byUser: Record<string, CachedTimerEntry[]> = {};
-
       for (const entry of allEntries) {
         if (entry.author?.emailAddress) {
           const email = entry.author.emailAddress;
@@ -85,26 +83,28 @@ export const syncActiveTimers = inngest.createFunction(
         }
       }
 
+      const usersCount = Object.keys(byUser).length;
+      console.log(`[sync-process] Grouped timers into ${usersCount} users.`);
+
+      // 4. Cache to Redis
+      console.log('[sync-process] Caching to Redis...');
       // Cache for each user
       await Promise.all(
-        Object.entries(byUser).map(([email, timers]) => cacheTimers(email, timers)),
+        Object.entries(byUser).map(([email, userTimers]) => cacheTimers(email, userTimers)),
       );
 
       // Cache ALL timers (global view)
       await cacheTimers('all', allEntries);
+      console.log('[sync-process] Caching complete.');
 
       return {
-        cached: true,
-        totalCount: allEntries.length,
-        usersCount: Object.keys(byUser).length,
+        success: true,
+        jiraDomain,
+        timersCount: total,
+        cachedUsers: usersCount,
       };
     });
 
-    return {
-      success: true,
-      jiraDomain,
-      timersCount: fetchResult.total,
-      cachedUsers: cacheResult.usersCount,
-    };
+    return result;
   },
 );
