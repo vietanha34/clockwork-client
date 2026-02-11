@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getWorklogs } from '../lib/clockwork-client';
-import { sendBadRequest, sendInternalError, sendSuccess } from '../lib/response';
-import type { WorklogsResponse } from '../lib/types';
+import { getWorklogs } from '../src/lib/clockwork-client';
+import { sendBadRequest, sendInternalError, sendSuccess } from '../src/lib/response';
+import type { WorklogsResponse } from '../src/lib/types';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'GET') {

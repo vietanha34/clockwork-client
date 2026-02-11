@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getIssue } from '../../lib/atlassian-client';
-import { sendBadRequest, sendInternalError, sendSuccess } from '../../lib/response';
+import { getIssue } from '../../src/lib/atlassian-client';
+import { sendBadRequest, sendInternalError, sendSuccess } from '../../src/lib/response';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'GET') {

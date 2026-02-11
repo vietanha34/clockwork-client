@@ -6,6 +6,6 @@
     "module": "CommonJS",
     "moduleResolution": "Node"
   },
-  "include": ["api/**/*", "lib/**/*"],
+  "include": ["api/**/*", "src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
