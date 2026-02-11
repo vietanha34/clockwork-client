@@ -70,10 +70,11 @@ export const syncActiveTimers = inngest.createFunction(
 
       const byUser: Record<string, Timer[]> = {};
       for (const entry of allEntries) {
-        if (entry.runningFor) {
-          const accountId = entry.runningFor;
-          if (!byUser[accountId]) byUser[accountId] = [];
-          byUser[accountId].push(entry);
+        // Group by displayName (preferred) or runningFor (accountId)
+        const userKey = entry.author?.displayName || entry.runningFor;
+        if (userKey) {
+          if (!byUser[userKey]) byUser[userKey] = [];
+          byUser[userKey].push(entry);
         }
       }
 
@@ -82,10 +83,10 @@ export const syncActiveTimers = inngest.createFunction(
 
       // 4. Cache to Redis
       console.log('[sync-process] Caching to Redis...');
-      // Cache for each user by accountId
+      // Cache for each user by userKey (displayName)
       await Promise.all(
-        Object.entries(byUser).map(([accountId, userTimers]) =>
-          setActiveTimers(accountId, userTimers),
+        Object.entries(byUser).map(([userKey, userTimers]) =>
+          setActiveTimers(userKey, userTimers),
         ),
       );
 

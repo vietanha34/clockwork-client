@@ -99,15 +99,18 @@ export async function getIssue(issueKey: string): Promise<Issue> {
 }
 
 /**
- * Search for a Jira user by email address.
- * Returns the first exact-email-match, or null if not found.
- * @param email - User's email address
+ * Search for a Jira user by email or name.
+ * Returns the first match, or null if not found.
+ * @param query - User's email or name
  */
-export async function searchJiraUserByEmail(email: string): Promise<ClockworkUser | null> {
+export async function searchJiraUser(query: string): Promise<ClockworkUser | null> {
   const data = await atlassianFetch<RawJiraUser[]>(
-    `/user/search?query=${encodeURIComponent(email)}&maxResults=1`,
+    `/user/search?query=${encodeURIComponent(query)}&maxResults=1`,
   );
-  const user = data.find((u) => u.emailAddress === email) ?? data[0] ?? null;
+  // If query is email, try to find exact match first
+  const exactMatch = data.find((u) => u.emailAddress === query);
+  const user = exactMatch ?? data[0] ?? null;
+  
   if (!user) return null;
   return {
     accountId: user.accountId,
@@ -115,6 +118,14 @@ export async function searchJiraUserByEmail(email: string): Promise<ClockworkUse
     displayName: user.displayName,
     avatarUrl: user.avatarUrls?.['48x48'],
   };
+}
+
+/**
+ * Search for a Jira user by email address.
+ * @deprecated Use searchJiraUser instead
+ */
+export async function searchJiraUserByEmail(email: string): Promise<ClockworkUser | null> {
+  return searchJiraUser(email);
 }
 
 /**
@@ -131,4 +142,45 @@ export async function getJiraUser(accountId: string): Promise<ClockworkUser> {
     displayName: data.displayName,
     avatarUrl: data.avatarUrls?.['48x48'],
   };
+}
+
+/**
+ * Fetch details for multiple users from Atlassian Jira.
+ * @param accountIds - List of Jira accountIds
+ */
+export async function getJiraUsersBulk(accountIds: string[]): Promise<ClockworkUser[]> {
+  if (accountIds.length === 0) return [];
+
+  // Jira bulk API might have limits, so chunking is good practice
+  const chunkSize = 50;
+  const chunks = [];
+  
+  for (let i = 0; i < accountIds.length; i += chunkSize) {
+    chunks.push(accountIds.slice(i, i + chunkSize));
+  }
+
+  const results: ClockworkUser[] = [];
+
+  for (const chunk of chunks) {
+    const params = new URLSearchParams();
+    chunk.forEach((id) => params.append('accountId', id));
+    params.append('maxResults', chunk.length.toString());
+
+    const response = await atlassianFetch<{ values: RawJiraUser[] }>(
+      `/user/bulk?${params.toString()}`,
+    );
+    
+    if (response.values) {
+      results.push(
+        ...response.values.map((u) => ({
+          accountId: u.accountId,
+          emailAddress: u.emailAddress,
+          displayName: u.displayName,
+          avatarUrl: u.avatarUrls?.['48x48'],
+        }))
+      );
+    }
+  }
+
+  return results;
 }

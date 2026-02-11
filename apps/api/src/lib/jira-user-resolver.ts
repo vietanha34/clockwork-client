@@ -1,4 +1,4 @@
-import { getJiraUser } from './atlassian-client';
+import { getJiraUser, getJiraUsersBulk } from './atlassian-client';
 import type { ClockworkReportTimersResponse } from './clockwork-report';
 import { getCachedJiraUser, setCachedJiraUser } from './redis';
 import type { ClockworkUser, Timer } from './types';
@@ -30,6 +30,7 @@ export async function resolveTimerAuthor(accountId: string): Promise<ClockworkUs
  *
  * - Deduplicates accountIds before fetching
  * - Uses cache-first resolution (2-day TTL)
+ * - Uses BULK API for efficiency
  * - Falls back gracefully: timers with unresolvable authors get empty email
  */
 export async function resolveTimerAuthors(
@@ -38,15 +39,38 @@ export async function resolveTimerAuthors(
   // Collect unique accountIds from running_for
   const accountIds = [...new Set(rawTimers.map((t) => t.running_for).filter(Boolean))];
 
-  // Resolve all in parallel
-  const resolved = await Promise.all(
+  // Resolve users efficiently
+  const userMap = new Map<string, ClockworkUser | null>();
+  const missingAccountIds: string[] = [];
+
+  // 1. Check Cache
+  await Promise.all(
     accountIds.map(async (accountId) => {
-      const user = await resolveTimerAuthor(accountId);
-      return [accountId, user] as [string, ClockworkUser | null];
-    }),
+      const cached = await getCachedJiraUser(accountId);
+      if (cached) {
+        userMap.set(accountId, cached);
+      } else {
+        missingAccountIds.push(accountId);
+      }
+    })
   );
 
-  const userMap = new Map<string, ClockworkUser | null>(resolved);
+  // 2. Fetch Missing from Jira Bulk API
+  if (missingAccountIds.length > 0) {
+    try {
+      console.log(`[resolveTimerAuthors] Bulk fetching ${missingAccountIds.length} users from Jira...`);
+      const fetchedUsers = await getJiraUsersBulk(missingAccountIds);
+      
+      for (const user of fetchedUsers) {
+        await setCachedJiraUser(user.accountId, user);
+        userMap.set(user.accountId, user);
+      }
+
+      // Mark any still missing as null (so we don't retry immediately if we wanted to, but here just map)
+    } catch (err) {
+      console.error('[resolveTimerAuthors] Failed to bulk fetch users:', err);
+    }
+  }
 
   return rawTimers.map((t) => {
     // Use author from Clockwork response if it already has full info
