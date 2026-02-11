@@ -123,6 +123,18 @@ Or navigate to [app.inngest.com](https://app.inngest.com) → Apps → Sync → 
 
 ---
 
+## Redis Key Reference
+
+| Key Pattern | TTL | Description |
+|---|---|---|
+| `clockwork:timers:<email>` | 10 min | Active timers cached per user email |
+| `clockwork:timers:all` | 10 min | Global active timers list |
+| `jira:user:<accountId>` | 2 days | Jira user info (email, display name, avatar) keyed by Atlassian accountId |
+
+The `jira:user:*` keys are populated automatically during each `sync-active-timers` run. They cache the result of `GET /rest/api/3/user?accountId=<id>` to avoid redundant Jira API calls across sync cycles.
+
+---
+
 ## Monorepo Notes
 
 Both apps are deployed as separate Vercel projects from the same monorepo. Vercel automatically detects `pnpm-workspace.yaml` and runs `pnpm install` from the repository root before building.
