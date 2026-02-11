@@ -4,6 +4,7 @@ import type { AppSettings } from './types';
 export const DEFAULT_SETTINGS: AppSettings = {
   userEmail: '',
   apiBaseUrl: '',
+  userAccountId: '',
 };
 
 export async function loadSettings(): Promise<AppSettings> {

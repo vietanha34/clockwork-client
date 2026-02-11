@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { resolveUserAccountId } from '../lib/api-client';
 import { useSettings } from '../lib/settings-context';
 
 interface SettingsViewProps {
@@ -12,13 +13,26 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [accountIdWarning, setAccountIdWarning] = useState<string | null>(null);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    setAccountIdWarning(null);
     try {
-      await updateSettings({ userEmail, apiBaseUrl });
+      let userAccountId = settings.userAccountId;
+      if (userEmail && apiBaseUrl) {
+        try {
+          const resolved = await resolveUserAccountId(apiBaseUrl, userEmail);
+          userAccountId = resolved.accountId;
+        } catch {
+          setAccountIdWarning(
+            'Could not resolve Jira accountId. Timers may not load until resolved.',
+          );
+        }
+      }
+      await updateSettings({ userEmail, apiBaseUrl, userAccountId });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       if (userEmail && apiBaseUrl) {
@@ -67,6 +81,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
         </div>
 
         {error && <p className="text-xs text-red-600">{error}</p>}
+        {accountIdWarning && <p className="text-xs text-yellow-600">{accountIdWarning}</p>}
 
         <button
           type="submit"

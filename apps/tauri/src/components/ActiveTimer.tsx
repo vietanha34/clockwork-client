@@ -17,7 +17,7 @@ function formatStartTime(startedAt: string): string {
 }
 
 export function ActiveTimer() {
-  const { data, isLoading, error } = useActiveTimers();
+  const { data, isLoading, error, needsAccountId } = useActiveTimers();
   const stopTimer = useStopTimer();
   const { settings } = useSettings();
 
@@ -34,6 +34,12 @@ export function ActiveTimer() {
 
   if (isLoading) return <TimerSkeleton />;
   if (error) return <ErrorCard message="Failed to load timer data" />;
+  if (needsAccountId)
+    return (
+      <div className="px-4 py-4 text-center">
+        <p className="text-sm text-gray-500">Open Settings to link your Jira account.</p>
+      </div>
+    );
 
   if (!activeTimer) {
     return (

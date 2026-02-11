@@ -21,12 +21,19 @@ async function apiFetch<T>(apiBaseUrl: string, path: string, options?: RequestIn
 
 export async function fetchActiveTimers(
   apiBaseUrl: string,
-  userEmail: string,
+  accountId: string,
 ): Promise<ActiveTimersResponse> {
   return apiFetch<ActiveTimersResponse>(
     apiBaseUrl,
-    `/api/timers/active?userEmail=${encodeURIComponent(userEmail)}`,
+    `/api/timers/active?accountId=${encodeURIComponent(accountId)}`,
   );
+}
+
+export async function resolveUserAccountId(
+  apiBaseUrl: string,
+  email: string,
+): Promise<{ accountId: string; emailAddress: string; displayName: string | null }> {
+  return apiFetch(apiBaseUrl, `/api/users/resolve?email=${encodeURIComponent(email)}`);
 }
 
 export async function startTimer(

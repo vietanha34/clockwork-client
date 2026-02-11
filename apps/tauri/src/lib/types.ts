@@ -56,7 +56,7 @@ export interface Issue {
 export interface ActiveTimersResponse {
   timers: Timer[];
   cachedAt: string | null;
-  userEmail: string;
+  accountId: string;
 }
 
 export interface WorklogsResponse {
@@ -77,4 +77,5 @@ export interface ApiError {
 export interface AppSettings {
   userEmail: string;
   apiBaseUrl: string;
+  userAccountId: string;
 }

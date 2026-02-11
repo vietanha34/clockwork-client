@@ -13,6 +13,8 @@ pub struct AppSettings {
     pub user_email: String,
     #[serde(rename = "apiBaseUrl", default)]
     pub api_base_url: String,
+    #[serde(rename = "userAccountId", default)]
+    pub user_account_id: String,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {
