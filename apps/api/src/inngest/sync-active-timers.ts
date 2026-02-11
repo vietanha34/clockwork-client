@@ -29,8 +29,8 @@ function getEnvRequired(name: string): string {
  *   1. acquire-jwt: Exchange Jira session cookie for Clockwork JWT (admin/service account)
  *   2. fetch-timers: Fetch ALL active timers from Clockwork Report API
  *   3. cache-timers:
- *      - Group timers by author.emailAddress
- *      - Store per-user list in Redis (clockwork:timers:<email>)
+ *      - Group timers by runningFor (accountId)
+ *      - Store per-user list in Redis (clockwork:timers:<accountId>)
  *      - Store global list in Redis (clockwork:timers:all)
  */
 export const syncActiveTimers = inngest.createFunction(
@@ -70,10 +70,10 @@ export const syncActiveTimers = inngest.createFunction(
 
       const byUser: Record<string, Timer[]> = {};
       for (const entry of allEntries) {
-        if (entry.author?.emailAddress) {
-          const email = entry.author.emailAddress;
-          if (!byUser[email]) byUser[email] = [];
-          byUser[email].push(entry);
+        if (entry.runningFor) {
+          const accountId = entry.runningFor;
+          if (!byUser[accountId]) byUser[accountId] = [];
+          byUser[accountId].push(entry);
         }
       }
 
@@ -82,9 +82,11 @@ export const syncActiveTimers = inngest.createFunction(
 
       // 4. Cache to Redis
       console.log('[sync-process] Caching to Redis...');
-      // Cache for each user
+      // Cache for each user by accountId
       await Promise.all(
-        Object.entries(byUser).map(([email, userTimers]) => setActiveTimers(email, userTimers)),
+        Object.entries(byUser).map(([accountId, userTimers]) =>
+          setActiveTimers(accountId, userTimers),
+        ),
       );
 
       // Cache ALL timers (global view)
