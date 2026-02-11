@@ -1,0 +1,16 @@
+{
+  "id": "accountid-primary-key_20260211",
+  "title": "Switch Primary Key from Email to accountId",
+  "type": "feature",
+  "status": "pending",
+  "created": "2026-02-11T00:00:00.000Z",
+  "updated": "2026-02-11T00:00:00.000Z",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 13,
+    "completed": 0
+  }
+}
