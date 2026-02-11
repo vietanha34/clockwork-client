@@ -1,0 +1,22 @@
+{
+  "id": "jira-user-enrichment_20260211",
+  "title": "Jira User Enrichment for Active Timers",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-02-11T00:00:00.000Z",
+  "updated": "2026-02-11T02:00:00.000Z",
+  "phases": {
+    "total": 4,
+    "completed": 4
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 9
+  },
+  "commits": [
+    "052d434: feat(api): add Jira user API lookup and Redis user cache helpers",
+    "f2c0c13: feat(api): add jira-user-resolver with cache-first user enrichment",
+    "a65c029: feat(inngest): enrich timer authors via Jira user cache in sync-active-timers",
+    "f652b1b: docs: add Redis key reference and Jira user cache notes to deployment guide"
+  ]
+}

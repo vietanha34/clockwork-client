@@ -16,6 +16,7 @@ Navigation hub for project context.
 - [x] [Backend API & Inngest Timer Sync](./tracks/backend-api-timer-sync_20260210/index.md) - `backend-api-timer-sync_20260210`
 - [x] [Tauri Client UI](./tracks/tauri-client-ui_20260210/index.md) - `tauri-client-ui_20260210`
 - [x] [Vercel Deployment](./tracks/vercel-deployment_20260210/index.md) - `vercel-deployment_20260210`
+- [x] [Jira User Enrichment for Active Timers](./tracks/jira-user-enrichment_20260211/index.md) - `jira-user-enrichment_20260211`
 
 <!-- Auto-populated by /conductor:new-track -->
 
