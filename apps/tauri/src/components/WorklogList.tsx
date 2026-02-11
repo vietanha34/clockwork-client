@@ -1,7 +1,7 @@
-import { formatSeconds, totalWorklogSeconds } from "../lib/api-client";
-import { useWorklogs } from "../hooks/useWorklogs";
-import { ErrorCard } from "./ErrorCard";
-import { WorklogSkeleton } from "./Skeleton";
+import { useWorklogs } from '../hooks/useWorklogs';
+import { formatSeconds, totalWorklogSeconds } from '../lib/api-client';
+import { ErrorCard } from './ErrorCard';
+import { WorklogSkeleton } from './Skeleton';
 
 export function WorklogList() {
   const { data, isLoading, error } = useWorklogs();
@@ -23,9 +23,7 @@ export function WorklogList() {
   return (
     <div className="px-4 py-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-          Today
-        </span>
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Today</span>
         <span className="text-xs font-semibold text-gray-700">
           {formatSeconds(totalSeconds)} total
         </span>
@@ -37,9 +35,7 @@ export function WorklogList() {
               {w.issueKey}
             </span>
             <div className="flex-1 min-w-0">
-              {w.comment && (
-                <p className="text-xs text-gray-700 truncate">{w.comment}</p>
-              )}
+              {w.comment && <p className="text-xs text-gray-700 truncate">{w.comment}</p>}
             </div>
             <span className="text-xs text-gray-500 shrink-0 tabular-nums">
               {formatSeconds(w.timeSpentSeconds)}

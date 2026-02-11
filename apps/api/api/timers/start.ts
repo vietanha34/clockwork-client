@@ -1,18 +1,11 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { startTimer } from "../../lib/clockwork-client.js";
-import {
-  sendBadRequest,
-  sendInternalError,
-  sendSuccess,
-} from "../../lib/response.js";
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { startTimer } from '../../lib/clockwork-client.js';
+import { sendBadRequest, sendInternalError, sendSuccess } from '../../lib/response.js';
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-): Promise<void> {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    res.status(405).json({ error: "METHOD_NOT_ALLOWED" });
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
     return;
   }
 
@@ -21,8 +14,8 @@ export default async function handler(
     comment?: string;
   };
 
-  if (!issueKey || typeof issueKey !== "string") {
-    sendBadRequest(res, "Missing required body field: issueKey");
+  if (!issueKey || typeof issueKey !== 'string') {
+    sendBadRequest(res, 'Missing required body field: issueKey');
     return;
   }
 
@@ -31,7 +24,7 @@ export default async function handler(
     sendSuccess(res, { timer }, 201);
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("[POST /api/timers/start] Error:", err);
-    sendInternalError(res, "Failed to start timer");
+    console.error('[POST /api/timers/start] Error:', err);
+    sendInternalError(res, 'Failed to start timer');
   }
 }

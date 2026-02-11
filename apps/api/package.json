@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vercel dev --listen 3000",
     "build": "tsc",
-    "lint": "eslint api",
+    "lint": "biome check .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -15,12 +15,8 @@
     "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@clockwork-menubar/eslint-config": "workspace:*",
     "@clockwork-menubar/typescript-config": "workspace:*",
     "@types/node": "^20.0.0",
-    "@vercel/node": "^5.0.0",
-    "eslint": "^9.0.0",
-    "typescript": "^5.5.4",
-    "vercel": "^37.0.0"
+    "@vercel/node": "^5.0.0"
   }
 }

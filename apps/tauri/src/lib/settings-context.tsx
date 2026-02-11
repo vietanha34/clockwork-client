@@ -1,13 +1,7 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import type { ReactNode } from "react";
-import type { AppSettings } from "./types";
-import { DEFAULT_SETTINGS, loadSettings, persistSettings } from "./settings";
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { DEFAULT_SETTINGS, loadSettings, persistSettings } from './settings';
+import type { AppSettings } from './types';
 
 interface SettingsContextValue {
   settings: AppSettings;
@@ -42,6 +36,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
 export function useSettings(): SettingsContextValue {
   const ctx = useContext(SettingsContext);
-  if (!ctx) throw new Error("useSettings must be used within SettingsProvider");
+  if (!ctx) throw new Error('useSettings must be used within SettingsProvider');
   return ctx;
 }

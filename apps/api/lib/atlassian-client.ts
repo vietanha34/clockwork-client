@@ -1,5 +1,5 @@
-import { env } from "./env.js";
-import type { Issue, Project } from "./types.js";
+import { env } from './env.js';
+import type { Issue, Project } from './types.js';
 
 // ─── Raw Atlassian REST API types ─────────────────────────────────────────────
 
@@ -14,13 +14,13 @@ interface RawJiraIssue {
       accountId: string;
       emailAddress: string;
       displayName: string;
-      avatarUrls?: { "48x48": string };
+      avatarUrls?: { '48x48': string };
     } | null;
     project: {
       id: string;
       key: string;
       name: string;
-      avatarUrls?: { "48x48": string };
+      avatarUrls?: { '48x48': string };
     };
   };
 }
@@ -29,7 +29,7 @@ interface RawJiraIssue {
 
 function getBasicAuthHeader(): string {
   const credentials = `${env.ATLASSIAN_EMAIL}:${env.ATLASSIAN_API_TOKEN}`;
-  return `Basic ${Buffer.from(credentials).toString("base64")}`;
+  return `Basic ${Buffer.from(credentials).toString('base64')}`;
 }
 
 async function atlassianFetch<T>(path: string): Promise<T> {
@@ -37,16 +37,14 @@ async function atlassianFetch<T>(path: string): Promise<T> {
   const res = await fetch(url, {
     headers: {
       Authorization: getBasicAuthHeader(),
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(
-      `Atlassian API error ${res.status} on ${path}: ${text}`
-    );
+    throw new Error(`Atlassian API error ${res.status} on ${path}: ${text}`);
   }
 
   return res.json() as Promise<T>;
@@ -59,7 +57,7 @@ function transformIssue(raw: RawJiraIssue): Issue {
     id: raw.fields.project.id,
     key: raw.fields.project.key,
     name: raw.fields.project.name,
-    avatarUrl: raw.fields.project.avatarUrls?.["48x48"],
+    avatarUrl: raw.fields.project.avatarUrls?.['48x48'],
   };
 
   return {
@@ -73,7 +71,7 @@ function transformIssue(raw: RawJiraIssue): Issue {
           accountId: raw.fields.assignee.accountId,
           emailAddress: raw.fields.assignee.emailAddress,
           displayName: raw.fields.assignee.displayName,
-          avatarUrl: raw.fields.assignee.avatarUrls?.["48x48"],
+          avatarUrl: raw.fields.assignee.avatarUrls?.['48x48'],
         }
       : null,
     priority: raw.fields.priority?.name ?? null,
@@ -88,9 +86,7 @@ function transformIssue(raw: RawJiraIssue): Issue {
  * @param issueKey - e.g. "KAN-9" or "SAM1-6"
  */
 export async function getIssue(issueKey: string): Promise<Issue> {
-  const fields = "summary,status,priority,assignee,project";
-  const data = await atlassianFetch<RawJiraIssue>(
-    `/issue/${issueKey}?fields=${fields}`
-  );
+  const fields = 'summary,status,priority,assignee,project';
+  const data = await atlassianFetch<RawJiraIssue>(`/issue/${issueKey}?fields=${fields}`);
   return transformIssue(data);
 }

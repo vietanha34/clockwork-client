@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useStartTimer } from "../hooks/useTimerActions";
+import { useState } from 'react';
+import { useStartTimer } from '../hooks/useTimerActions';
 
 export function StartTimerForm() {
-  const [issueKey, setIssueKey] = useState("");
-  const [comment, setComment] = useState("");
+  const [issueKey, setIssueKey] = useState('');
+  const [comment, setComment] = useState('');
   const [expanded, setExpanded] = useState(false);
   const startTimer = useStartTimer();
 
@@ -14,11 +14,11 @@ export function StartTimerForm() {
       { issueKey: issueKey.trim().toUpperCase(), comment: comment.trim() || undefined },
       {
         onSuccess: () => {
-          setIssueKey("");
-          setComment("");
+          setIssueKey('');
+          setComment('');
           setExpanded(false);
         },
-      }
+      },
     );
   }
 
@@ -26,6 +26,7 @@ export function StartTimerForm() {
     <div className="px-4 py-3">
       {!expanded ? (
         <button
+          type="button"
           onClick={() => setExpanded(true)}
           className="w-full py-2 px-3 text-xs font-medium text-blue-700 border border-blue-300 rounded hover:bg-blue-50"
         >
@@ -39,7 +40,6 @@ export function StartTimerForm() {
             onChange={(e) => setIssueKey(e.target.value)}
             placeholder="Issue key (e.g. KAN-42)"
             className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-            autoFocus
             required
           />
           <input
@@ -60,14 +60,14 @@ export function StartTimerForm() {
               disabled={startTimer.isPending || !issueKey.trim()}
               className="flex-1 py-1.5 px-3 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {startTimer.isPending ? "Starting…" : "Start"}
+              {startTimer.isPending ? 'Starting…' : 'Start'}
             </button>
             <button
               type="button"
               onClick={() => {
                 setExpanded(false);
-                setIssueKey("");
-                setComment("");
+                setIssueKey('');
+                setComment('');
                 startTimer.reset();
               }}
               className="py-1.5 px-3 text-xs font-medium text-gray-700 border border-gray-300 rounded hover:bg-gray-50"

@@ -1,13 +1,11 @@
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
 interface SkeletonProps {
   className?: string;
 }
 
 function SkeletonLine({ className }: SkeletonProps) {
-  return (
-    <div className={clsx("animate-pulse bg-gray-200 rounded", className)} />
-  );
+  return <div className={clsx('animate-pulse bg-gray-200 rounded', className)} />;
 }
 
 export function TimerSkeleton() {

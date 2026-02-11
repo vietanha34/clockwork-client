@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchActiveTimers } from "../lib/api-client";
-import { useSettings } from "../lib/settings-context";
-import type { ActiveTimersResponse } from "../lib/types";
+import { useQuery } from '@tanstack/react-query';
+import { fetchActiveTimers } from '../lib/api-client';
+import { useSettings } from '../lib/settings-context';
+import type { ActiveTimersResponse } from '../lib/types';
 
-export const ACTIVE_TIMERS_KEY = "activeTimers";
+export const ACTIVE_TIMERS_KEY = 'activeTimers';
 
 export function useActiveTimers() {
   const { settings } = useSettings();

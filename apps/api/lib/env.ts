@@ -12,7 +12,7 @@ function required(name: string): string {
   return value;
 }
 
-function optional(name: string, fallback = ""): string {
+function optional(name: string, fallback = ''): string {
   return process.env[name] ?? fallback;
 }
 
@@ -22,36 +22,33 @@ export const env = {
     return (
       process.env.UPSTASH_REDIS_REST_URL ||
       process.env.KV_REST_API_URL ||
-      required("UPSTASH_REDIS_REST_URL")
+      required('UPSTASH_REDIS_REST_URL')
     );
   },
   get UPSTASH_REDIS_REST_TOKEN(): string {
     return (
       process.env.UPSTASH_REDIS_REST_TOKEN ||
       process.env.KV_REST_API_TOKEN ||
-      required("UPSTASH_REDIS_REST_TOKEN")
+      required('UPSTASH_REDIS_REST_TOKEN')
     );
   },
 
   // Clockwork Pro API
   get CLOCKWORK_API_BASE_URL(): string {
-    return optional(
-      "CLOCKWORK_API_BASE_URL",
-      "https://api.clockwork.report/v1"
-    );
+    return optional('CLOCKWORK_API_BASE_URL', 'https://api.clockwork.report/v1');
   },
   get CLOCKWORK_API_TOKEN(): string {
-    return required("CLOCKWORK_API_TOKEN");
+    return required('CLOCKWORK_API_TOKEN');
   },
 
   // Atlassian / Jira
   get ATLASSIAN_EMAIL(): string {
-    return required("ATLASSIAN_EMAIL");
+    return required('ATLASSIAN_EMAIL');
   },
   get ATLASSIAN_API_TOKEN(): string {
-    return required("ATLASSIAN_API_TOKEN");
+    return required('ATLASSIAN_API_TOKEN');
   },
   get JIRA_DOMAIN(): string {
-    return required("JIRA_DOMAIN");
+    return required('JIRA_DOMAIN');
   },
 } as const;

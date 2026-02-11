@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchWorklogs, todayDate } from "../lib/api-client";
-import { useSettings } from "../lib/settings-context";
-import type { WorklogsResponse } from "../lib/types";
+import { useQuery } from '@tanstack/react-query';
+import { fetchWorklogs, todayDate } from '../lib/api-client';
+import { useSettings } from '../lib/settings-context';
+import type { WorklogsResponse } from '../lib/types';
 
 export function useWorklogs(date?: string) {
   const { settings } = useSettings();
@@ -10,7 +10,7 @@ export function useWorklogs(date?: string) {
   const targetDate = date ?? todayDate();
 
   return useQuery<WorklogsResponse, Error>({
-    queryKey: ["worklogs", userEmail, targetDate],
+    queryKey: ['worklogs', userEmail, targetDate],
     queryFn: () => fetchWorklogs(apiBaseUrl, userEmail, targetDate),
     enabled,
     staleTime: 30_000,

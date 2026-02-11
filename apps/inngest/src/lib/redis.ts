@@ -1,12 +1,12 @@
-import { Redis } from "@upstash/redis";
+import { Redis } from '@upstash/redis';
 
-function getEnvRequired(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing required env var: ${name}`);
-  return value;
-}
+// function getEnvRequired(name: string): string {
+//   const value = process.env[name];
+//   if (!value) throw new Error(`Missing required env var: ${name}`);
+//   return value;
+// }
 
-const TIMER_KEY_PREFIX = "clockwork:timers:";
+const TIMER_KEY_PREFIX = 'clockwork:timers:';
 const TIMER_CACHE_TTL_SECONDS = 60;
 
 export interface CachedTimerEntry {
@@ -27,25 +27,13 @@ export interface CachedTimerData {
 }
 
 function getRedisClient(): Redis {
-  const url =
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.KV_REST_API_URL ||
-    getEnvRequired("UPSTASH_REDIS_REST_URL");
-  const token =
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.KV_REST_API_TOKEN ||
-    getEnvRequired("UPSTASH_REDIS_REST_TOKEN");
-
-  return new Redis({
-    url,
-    token,
-  });
+  return Redis.fromEnv();
 }
 
 export async function cacheTimers(
   userEmail: string,
   timers: CachedTimerEntry[],
-  ttl = TIMER_CACHE_TTL_SECONDS
+  ttl = TIMER_CACHE_TTL_SECONDS,
 ): Promise<void> {
   const redis = getRedisClient();
   const key = `${TIMER_KEY_PREFIX}${userEmail}`;

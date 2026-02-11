@@ -1,18 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchIssue } from "../lib/api-client";
-import { useSettings } from "../lib/settings-context";
-import { useActiveTimers } from "../hooks/useActiveTimers";
-import { useStopTimer } from "../hooks/useTimerActions";
-import { ElapsedTime } from "./ElapsedTime";
-import { ErrorCard } from "./ErrorCard";
-import { TimerSkeleton } from "./Skeleton";
+import { useQuery } from '@tanstack/react-query';
+import { useActiveTimers } from '../hooks/useActiveTimers';
+import { useStopTimer } from '../hooks/useTimerActions';
+import { fetchIssue } from '../lib/api-client';
+import { useSettings } from '../lib/settings-context';
+import { ElapsedTime } from './ElapsedTime';
+import { ErrorCard } from './ErrorCard';
+import { TimerSkeleton } from './Skeleton';
 
 function formatStartTime(startedAt: string): string {
   const date = new Date(startedAt);
-  if (Number.isNaN(date.getTime())) return "Unknown";
+  if (Number.isNaN(date.getTime())) return 'Unknown';
   return date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
@@ -25,9 +25,9 @@ export function ActiveTimer() {
 
   // Fetch issue details for active timer
   const { data: issue } = useQuery({
-    queryKey: ["issue", activeTimer?.issue.key],
-    queryFn: () =>
-      fetchIssue(settings.apiBaseUrl, activeTimer!.issue.key),
+    queryKey: ['issue', activeTimer?.issue.key],
+    // biome-ignore lint/style/noNonNullAssertion: guaranteed by enabled
+    queryFn: () => fetchIssue(settings.apiBaseUrl, activeTimer!.issue.key),
     enabled: Boolean(activeTimer?.issue.key && settings.apiBaseUrl),
     staleTime: 60_000,
   });
@@ -53,14 +53,8 @@ export function ActiveTimer() {
               {activeTimer.issue.key}
             </span>
           </div>
-          {issue && (
-            <p className="text-xs text-gray-500 truncate mb-1">
-              {issue.summary}
-            </p>
-          )}
-          {issue?.project && (
-            <p className="text-xs text-gray-400">{issue.project.name}</p>
-          )}
+          {issue && <p className="text-xs text-gray-500 truncate mb-1">{issue.summary}</p>}
+          {issue?.project && <p className="text-xs text-gray-400">{issue.project.name}</p>}
           <p className="text-xs text-gray-400 mt-1">
             Started at {formatStartTime(activeTimer.startedAt)}
           </p>
@@ -74,16 +68,15 @@ export function ActiveTimer() {
       </div>
 
       <button
+        type="button"
         onClick={() => stopTimer.mutate({ timerId: activeTimer.id })}
         disabled={stopTimer.isPending}
         className="mt-3 w-full py-1.5 px-3 text-xs font-medium text-red-700 border border-red-300 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {stopTimer.isPending ? "Stopping…" : "Stop Timer"}
+        {stopTimer.isPending ? 'Stopping…' : 'Stop Timer'}
       </button>
       {stopTimer.isError && (
-        <p className="mt-1 text-xs text-red-600">
-          Failed to stop timer. Try again.
-        </p>
+        <p className="mt-1 text-xs text-red-600">Failed to stop timer. Try again.</p>
       )}
     </div>
   );

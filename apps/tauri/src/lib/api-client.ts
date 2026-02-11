@@ -1,28 +1,17 @@
-import type {
-  ActiveTimersResponse,
-  Issue,
-  Timer,
-  Worklog,
-  WorklogsResponse,
-} from "./types";
+import type { ActiveTimersResponse, Issue, Timer, Worklog, WorklogsResponse } from './types';
 
 // ─── Base Fetch ───────────────────────────────────────────────────────────────
 
-async function apiFetch<T>(
-  apiBaseUrl: string,
-  path: string,
-  options?: RequestInit
-): Promise<T> {
-  const url = `${apiBaseUrl.replace(/\/$/, "")}${path}`;
+async function apiFetch<T>(apiBaseUrl: string, path: string, options?: RequestInit): Promise<T> {
+  const url = `${apiBaseUrl.replace(/\/$/, '')}${path}`;
   const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
     ...options,
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(
-      (body as { message?: string }).message ??
-        `Request failed: ${res.status} ${res.statusText}`
+      (body as { message?: string }).message ?? `Request failed: ${res.status} ${res.statusText}`,
     );
   }
   return res.json() as Promise<T>;
@@ -32,35 +21,31 @@ async function apiFetch<T>(
 
 export async function fetchActiveTimers(
   apiBaseUrl: string,
-  userEmail: string
+  userEmail: string,
 ): Promise<ActiveTimersResponse> {
   return apiFetch<ActiveTimersResponse>(
     apiBaseUrl,
-    `/api/timers/active?userEmail=${encodeURIComponent(userEmail)}`
+    `/api/timers/active?userEmail=${encodeURIComponent(userEmail)}`,
   );
 }
 
 export async function startTimer(
   apiBaseUrl: string,
   issueKey: string,
-  comment?: string
+  comment?: string,
 ): Promise<Timer> {
   const body: { issueKey: string; comment?: string } = { issueKey };
   if (comment) body.comment = comment;
-  const res = await apiFetch<{ timer: Timer }>(
-    apiBaseUrl,
-    "/api/timers/start",
-    { method: "POST", body: JSON.stringify(body) }
-  );
+  const res = await apiFetch<{ timer: Timer }>(apiBaseUrl, '/api/timers/start', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
   return res.timer;
 }
 
-export async function stopTimer(
-  apiBaseUrl: string,
-  timerId: number
-): Promise<Timer> {
-  const res = await apiFetch<{ timer: Timer }>(apiBaseUrl, "/api/timers/stop", {
-    method: "POST",
+export async function stopTimer(apiBaseUrl: string, timerId: number): Promise<Timer> {
+  const res = await apiFetch<{ timer: Timer }>(apiBaseUrl, '/api/timers/stop', {
+    method: 'POST',
     body: JSON.stringify({ timerId }),
   });
   return res.timer;
@@ -71,25 +56,19 @@ export async function stopTimer(
 export async function fetchWorklogs(
   apiBaseUrl: string,
   userEmail: string,
-  date?: string
+  date?: string,
 ): Promise<WorklogsResponse> {
   const params = new URLSearchParams({ userEmail });
-  if (date) params.set("date", date);
-  return apiFetch<WorklogsResponse>(
-    apiBaseUrl,
-    `/api/worklogs?${params.toString()}`
-  );
+  if (date) params.set('date', date);
+  return apiFetch<WorklogsResponse>(apiBaseUrl, `/api/worklogs?${params.toString()}`);
 }
 
 // ─── Issue Endpoints ──────────────────────────────────────────────────────────
 
-export async function fetchIssue(
-  apiBaseUrl: string,
-  issueKey: string
-): Promise<Issue> {
+export async function fetchIssue(apiBaseUrl: string, issueKey: string): Promise<Issue> {
   const res = await apiFetch<{ issue: Issue }>(
     apiBaseUrl,
-    `/api/issues/${encodeURIComponent(issueKey)}`
+    `/api/issues/${encodeURIComponent(issueKey)}`,
   );
   return res.issue;
 }
@@ -97,7 +76,7 @@ export async function fetchIssue(
 // ─── Worklog helpers ──────────────────────────────────────────────────────────
 
 export function todayDate(): string {
-  return new Date().toISOString().split("T")[0] ?? "";
+  return new Date().toISOString().split('T')[0] ?? '';
 }
 
 export function formatSeconds(totalSeconds: number): string {

@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { startTimer, stopTimer } from "../lib/api-client";
-import { useSettings } from "../lib/settings-context";
-import { ACTIVE_TIMERS_KEY } from "./useActiveTimers";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { startTimer, stopTimer } from '../lib/api-client';
+import { useSettings } from '../lib/settings-context';
+import { ACTIVE_TIMERS_KEY } from './useActiveTimers';
 
 export function useStartTimer() {
   const queryClient = useQueryClient();
@@ -26,8 +26,7 @@ export function useStopTimer() {
   const { settings } = useSettings();
 
   return useMutation({
-    mutationFn: ({ timerId }: { timerId: number }) =>
-      stopTimer(settings.apiBaseUrl, timerId),
+    mutationFn: ({ timerId }: { timerId: number }) => stopTimer(settings.apiBaseUrl, timerId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [ACTIVE_TIMERS_KEY] });
     },

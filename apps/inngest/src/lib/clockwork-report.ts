@@ -5,7 +5,7 @@
  * Endpoint: GET https://app.clockwork.report/timers.json
  */
 
-const CLOCKWORK_REPORT_BASE = "https://app.clockwork.report";
+const CLOCKWORK_REPORT_BASE = 'https://app.clockwork.report';
 
 interface RawTimer {
   id: number;
@@ -42,11 +42,11 @@ export interface ClockworkReportTimersResponse {
 export async function fetchActiveTimers(
   jwt: string,
   jiraDomain: string,
-  page = 1
+  page = 1,
 ): Promise<ClockworkReportTimersResponse> {
   const params = new URLSearchParams([
-    ["page", String(page)],
-    ["xdm_e", `https://${jiraDomain}`],
+    ['page', String(page)],
+    ['xdm_e', `https://${jiraDomain}`],
   ]);
 
   const url = `${CLOCKWORK_REPORT_BASE}/timers.json?${params.toString()}`;
@@ -54,15 +54,13 @@ export async function fetchActiveTimers(
   const res = await fetch(url, {
     headers: {
       Authorization: `JWT ${jwt}`,
-      Accept: "application/json",
+      Accept: 'application/json',
     },
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(
-      `Clockwork Report API returned ${res.status}: ${text}`
-    );
+    throw new Error(`Clockwork Report API returned ${res.status}: ${text}`);
   }
 
   return res.json() as Promise<ClockworkReportTimersResponse>;

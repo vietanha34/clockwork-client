@@ -1,6 +1,6 @@
-import { ActiveTimer } from "../components/ActiveTimer";
-import { StartTimerForm } from "../components/StartTimerForm";
-import { WorklogList } from "../components/WorklogList";
+import { ActiveTimer } from '../components/ActiveTimer';
+import { StartTimerForm } from '../components/StartTimerForm';
+import { WorklogList } from '../components/WorklogList';
 
 export function MainView() {
   return (
@@ -23,9 +23,7 @@ export function MainView() {
       {/* Today's worklogs */}
       <section>
         <div className="px-4 pt-3 pb-0">
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-            Worklogs
-          </h3>
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide">Worklogs</h3>
         </div>
         <WorklogList />
       </section>

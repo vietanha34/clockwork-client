@@ -7,10 +7,13 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format",
+    "check": "biome check .",
     "clean": "turbo clean"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "turbo": "^2.3.0",
+    "@biomejs/biome": "1.9.4",
+    "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {

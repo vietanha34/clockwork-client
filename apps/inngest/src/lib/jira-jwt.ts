@@ -9,7 +9,7 @@
  */
 
 const SERVLET_PATH =
-  "/plugins/servlet/ac/clockwork-cloud/clockwork-timers?classifier=json&project.id=10001&project.key=KAN";
+  '/plugins/servlet/ac/clockwork-cloud/clockwork-timers?classifier=json&project.id=10001&project.key=KAN';
 
 interface ServletResponse {
   contextJwt?: string;
@@ -26,32 +26,30 @@ interface ServletResponse {
  */
 export async function acquireClockworkJwt(
   jiraDomain: string,
-  jiraFullCookie: string
+  jiraFullCookie: string,
 ): Promise<string> {
   const url = `https://${jiraDomain}${SERVLET_PATH}`;
 
   const res = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
       Cookie: jiraFullCookie,
-      "Content-Type": "application/json",
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      'Content-Type': 'application/json',
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     },
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(
-      `Jira servlet returned ${res.status}: ${text}`
-    );
+    throw new Error(`Jira servlet returned ${res.status}: ${text}`);
   }
 
   const data = (await res.json()) as ServletResponse;
 
-  if (!data.contextJwt || typeof data.contextJwt !== "string") {
+  if (!data.contextJwt || typeof data.contextJwt !== 'string') {
     throw new Error(
-      `contextJwt not found in servlet response. Keys: ${Object.keys(data).join(", ")}`
+      `contextJwt not found in servlet response. Keys: ${Object.keys(data).join(', ')}`,
     );
   }
 
