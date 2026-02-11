@@ -99,6 +99,25 @@ export async function getIssue(issueKey: string): Promise<Issue> {
 }
 
 /**
+ * Search for a Jira user by email address.
+ * Returns the first exact-email-match, or null if not found.
+ * @param email - User's email address
+ */
+export async function searchJiraUserByEmail(email: string): Promise<ClockworkUser | null> {
+  const data = await atlassianFetch<RawJiraUser[]>(
+    `/user/search?query=${encodeURIComponent(email)}&maxResults=1`,
+  );
+  const user = data.find((u) => u.emailAddress === email) ?? data[0] ?? null;
+  if (!user) return null;
+  return {
+    accountId: user.accountId,
+    emailAddress: user.emailAddress,
+    displayName: user.displayName,
+    avatarUrl: user.avatarUrls?.['48x48'],
+  };
+}
+
+/**
  * Fetch user details from Atlassian Jira by accountId.
  * @param accountId - Jira accountId (e.g. from running_for field)
  */

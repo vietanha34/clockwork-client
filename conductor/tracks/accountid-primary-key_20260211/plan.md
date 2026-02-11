@@ -4,7 +4,7 @@
 **Spec:** [spec.md](./spec.md)
 **Design:** [design doc](../../../docs/plans/2026-02-11-accountid-primary-key-design.md)
 **Created:** 2026-02-11
-**Status:** [ ] Not Started
+**Status:** [~] In Progress
 
 ## Overview
 
@@ -18,9 +18,9 @@ Add the low-level pieces needed by all other phases.
 
 ### Tasks
 
-- [ ] Task 1.1: Add `searchJiraUserByEmail(email)` to `atlassian-client.ts` — calls `GET /rest/api/3/user/search?query=<email>&maxResults=1`, returns first exact-email-match as `ClockworkUser`
-- [ ] Task 1.2: Add `getCachedEmailToAccountId(email)` and `setCachedEmailToAccountId(email, accountId)` to `redis.ts` — key `jira:email:<email>`, TTL 172800 s (2 days)
-- [ ] Task 1.3: Update `TIMER_KEY_PREFIX` usage in `redis.ts` — change timer key from `clockwork:timers:<email>` to `clockwork:timers:<accountId>` (rename param from `userEmail` to `userKey` or `accountId`)
+- [x] Task 1.1: Add `searchJiraUserByEmail(email)` to `atlassian-client.ts` — calls `GET /rest/api/3/user/search?query=<email>&maxResults=1`, returns first exact-email-match as `ClockworkUser`
+- [x] Task 1.2: Add `getCachedEmailToAccountId(email)` and `setCachedEmailToAccountId(email, accountId)` to `redis.ts` — key `jira:email:<email>`, TTL 172800 s (2 days)
+- [x] Task 1.3: Update `TIMER_KEY_PREFIX` usage in `redis.ts` — change timer key from `clockwork:timers:<email>` to `clockwork:timers:<accountId>` (rename param from `userEmail` to `userKey` or `accountId`)
 
 ### Verification
 

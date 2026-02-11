@@ -113,5 +113,5 @@ export interface RawClockworkTimersResponse {
 export interface CachedTimerData {
   timers: Timer[];
   cachedAt: string;
-  userEmail: string;
+  userKey: string;
 }

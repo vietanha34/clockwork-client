@@ -6,6 +6,7 @@ const TIMER_KEY_PREFIX = 'clockwork:timers:';
 
 const JIRA_USER_CACHE_TTL_SECONDS = 172_800; // 2 days
 const JIRA_USER_KEY_PREFIX = 'jira:user:';
+const JIRA_EMAIL_KEY_PREFIX = 'jira:email:';
 
 let redisClient: RedisClientType | undefined;
 
@@ -30,14 +31,14 @@ async function getRedisClient(): Promise<RedisClientType> {
   return redisClient;
 }
 
-function getTimerKey(userEmail: string): string {
-  return `${TIMER_KEY_PREFIX}${userEmail}`;
+function getTimerKey(userKey: string): string {
+  return `${TIMER_KEY_PREFIX}${userKey}`;
 }
 
-export async function getActiveTimers(userEmail: string): Promise<CachedTimerData | null> {
+export async function getActiveTimers(userKey: string): Promise<CachedTimerData | null> {
   try {
     const redis = await getRedisClient();
-    const key = getTimerKey(userEmail);
+    const key = getTimerKey(userKey);
     const data = await redis.get(key);
     return data ? (JSON.parse(data) as CachedTimerData) : null;
   } catch (err) {
@@ -47,18 +48,18 @@ export async function getActiveTimers(userEmail: string): Promise<CachedTimerDat
 }
 
 export async function setActiveTimers(
-  userEmail: string,
+  userKey: string,
   timers: Timer[],
   ttl = TIMER_CACHE_TTL_SECONDS,
 ): Promise<void> {
-  console.log(`[setActiveTimers] Caching ${timers.length} timers for ${userEmail}`);
+  console.log(`[setActiveTimers] Caching ${timers.length} timers for ${userKey}`);
   try {
     const redis = await getRedisClient();
-    const key = getTimerKey(userEmail);
+    const key = getTimerKey(userKey);
     const payload: CachedTimerData = {
       timers,
       cachedAt: new Date().toISOString(),
-      userEmail,
+      userKey,
     };
     await redis.set(key, JSON.stringify(payload), {
       EX: ttl,
@@ -68,10 +69,10 @@ export async function setActiveTimers(
   }
 }
 
-export async function deleteActiveTimers(userEmail: string): Promise<void> {
+export async function deleteActiveTimers(userKey: string): Promise<void> {
   try {
     const redis = await getRedisClient();
-    const key = getTimerKey(userEmail);
+    const key = getTimerKey(userKey);
     await redis.del(key);
   } catch (err) {
     console.error('Redis deleteActiveTimers error:', err);
@@ -105,5 +106,30 @@ export async function setCachedJiraUser(
     await redis.set(getJiraUserKey(accountId), JSON.stringify(user), { EX: ttl });
   } catch (err) {
     console.error('Redis setCachedJiraUser error:', err);
+  }
+}
+
+// ─── Email → accountId Cache ───────────────────────────────────────────────────
+
+function getEmailKey(email: string): string {
+  return `${JIRA_EMAIL_KEY_PREFIX}${email}`;
+}
+
+export async function getCachedEmailToAccountId(email: string): Promise<string | null> {
+  try {
+    const redis = await getRedisClient();
+    return await redis.get(getEmailKey(email));
+  } catch (err) {
+    console.error('Redis getCachedEmailToAccountId error:', err);
+    return null;
+  }
+}
+
+export async function setCachedEmailToAccountId(email: string, accountId: string): Promise<void> {
+  try {
+    const redis = await getRedisClient();
+    await redis.set(getEmailKey(email), accountId, { EX: JIRA_USER_CACHE_TTL_SECONDS });
+  } catch (err) {
+    console.error('Redis setCachedEmailToAccountId error:', err);
   }
 }
