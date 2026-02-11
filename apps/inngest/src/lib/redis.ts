@@ -18,6 +18,12 @@ export interface CachedTimerEntry {
   tillNow: number;
   worklogCount: number;
   issue: { key: string; id: number };
+  author?: {
+    accountId: string;
+    displayName: string;
+    emailAddress?: string;
+    avatarUrl?: string;
+  };
 }
 
 export interface CachedTimerData {

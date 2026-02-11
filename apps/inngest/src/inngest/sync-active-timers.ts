@@ -5,7 +5,7 @@ import { inngest } from './client.js';
 
 interface SyncTimersEvent {
   data: {
-    userEmail: string;
+    userEmail?: string;
     jiraDomain?: string;
   };
 }
@@ -19,13 +19,17 @@ function getEnvRequired(name: string): string {
 /**
  * Inngest function: sync-active-timers
  *
- * Triggered by event: "clockwork/timers.sync.requested"
- * Payload: { userEmail: string, jiraDomain?: string }
+ * Triggered by:
+ *  - event: "clockwork/timers.sync.requested"
+ *  - cron: "every 5 minutes"
  *
  * Steps:
- *   1. acquire-jwt: Exchange Jira session cookie for Clockwork JWT
- *   2. fetch-timers: Fetch active timers from Clockwork Report API
- *   3. cache-timers: Store results in Upstash Redis
+ *   1. acquire-jwt: Exchange Jira session cookie for Clockwork JWT (admin/service account)
+ *   2. fetch-timers: Fetch ALL active timers from Clockwork Report API
+ *   3. cache-timers:
+ *      - Group timers by author.emailAddress
+ *      - Store per-user list in Redis (clockwork:timers:<email>)
+ *      - Store global list in Redis (clockwork:timers:all)
  */
 export const syncActiveTimers = inngest.createFunction(
   {
@@ -33,9 +37,10 @@ export const syncActiveTimers = inngest.createFunction(
     name: 'Sync Active Clockwork Timers',
     retries: 2,
   },
-  { event: 'clockwork/timers.sync.requested' },
+  [{ event: 'clockwork/timers.sync.requested' }, { cron: '*/5 * * * *' }],
   async ({ event, step }) => {
-    const { userEmail, jiraDomain: eventDomain } = (event as SyncTimersEvent).data;
+    const eventData = (event as SyncTimersEvent).data;
+    const eventDomain = eventData?.jiraDomain;
 
     const jiraDomain = eventDomain ?? getEnvRequired('JIRA_DOMAIN');
 
@@ -46,7 +51,7 @@ export const syncActiveTimers = inngest.createFunction(
       return { jwt: token };
     });
 
-    // Step 2: Fetch active timers from Clockwork Report API
+    // Step 2: Fetch ALL active timers from Clockwork Report API
     const fetchResult = await step.run('fetch-timers', async () => {
       const response = await fetchActiveTimers(jwt.jwt, jiraDomain);
       return {
@@ -57,7 +62,7 @@ export const syncActiveTimers = inngest.createFunction(
 
     // Step 3: Transform and cache timers in Upstash Redis
     const cacheResult = await step.run('cache-timers', async () => {
-      const entries: CachedTimerEntry[] = fetchResult.timers.map((t) => ({
+      const allEntries: CachedTimerEntry[] = fetchResult.timers.map((t) => ({
         id: t.id,
         startedAt: t.started_at,
         finishedAt: t.finished_at,
@@ -66,19 +71,40 @@ export const syncActiveTimers = inngest.createFunction(
         tillNow: t.till_now,
         worklogCount: t.worklog_count,
         issue: { key: t.issue.key, id: t.issue.id },
+        author: t.author,
       }));
 
-      await cacheTimers(userEmail, entries);
+      // Group by user email
+      const byUser: Record<string, CachedTimerEntry[]> = {};
 
-      return { cached: true, count: entries.length };
+      for (const entry of allEntries) {
+        if (entry.author?.emailAddress) {
+          const email = entry.author.emailAddress;
+          if (!byUser[email]) byUser[email] = [];
+          byUser[email].push(entry);
+        }
+      }
+
+      // Cache for each user
+      await Promise.all(
+        Object.entries(byUser).map(([email, timers]) => cacheTimers(email, timers)),
+      );
+
+      // Cache ALL timers (global view)
+      await cacheTimers('all', allEntries);
+
+      return {
+        cached: true,
+        totalCount: allEntries.length,
+        usersCount: Object.keys(byUser).length,
+      };
     });
 
     return {
       success: true,
-      userEmail,
       jiraDomain,
       timersCount: fetchResult.total,
-      cached: cacheResult.cached,
+      cachedUsers: cacheResult.usersCount,
     };
   },
 );

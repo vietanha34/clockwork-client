@@ -17,6 +17,12 @@ interface RawTimer {
   started_within_working_hours: boolean | null;
   within_working_hours: boolean | null;
   issue: { key: string; id: number };
+  author?: {
+    accountId: string;
+    displayName: string;
+    emailAddress?: string;
+    avatarUrl?: string;
+  };
   till_now: number;
   worklog_count: number;
 }

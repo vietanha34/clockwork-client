@@ -16,6 +16,7 @@ export interface Timer {
   tillNow: number; // seconds elapsed
   worklogCount: number;
   issue: TimerIssueRef;
+  author?: ClockworkUser;
 }
 
 export interface TimerIssueRef {

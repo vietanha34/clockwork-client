@@ -10,11 +10,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const userEmail = req.query.userEmail;
-  if (!userEmail || typeof userEmail !== 'string') {
-    sendBadRequest(res, 'Missing required query parameter: userEmail');
-    return;
-  }
+  const userEmail = typeof req.query.userEmail === 'string' ? req.query.userEmail : 'all';
 
   try {
     const cached = await getActiveTimers(userEmail);
