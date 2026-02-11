@@ -1,7 +1,7 @@
 import { getJiraUser } from './atlassian-client';
+import type { ClockworkReportTimersResponse } from './clockwork-report';
 import { getCachedJiraUser, setCachedJiraUser } from './redis';
 import type { ClockworkUser, Timer } from './types';
-import type { ClockworkReportTimersResponse } from './clockwork-report';
 
 /**
  * Resolve a Jira user by accountId using a Redis cache-first strategy.
@@ -54,24 +54,23 @@ export async function resolveTimerAuthors(
     const resolvedUser = userMap.get(t.running_for) ?? null;
 
     // Prefer clockwork author if email is present; otherwise use resolved Jira user
-    const author: ClockworkUser | undefined =
-      clockworkAuthor?.emailAddress
-        ? {
-            accountId: clockworkAuthor.accountId,
-            emailAddress: clockworkAuthor.emailAddress,
-            displayName: clockworkAuthor.displayName,
-            avatarUrl: clockworkAuthor.avatarUrl,
-          }
-        : resolvedUser
-          ? resolvedUser
-          : clockworkAuthor
-            ? {
-                accountId: clockworkAuthor.accountId,
-                emailAddress: '',
-                displayName: clockworkAuthor.displayName,
-                avatarUrl: clockworkAuthor.avatarUrl,
-              }
-            : undefined;
+    const author: ClockworkUser | undefined = clockworkAuthor?.emailAddress
+      ? {
+          accountId: clockworkAuthor.accountId,
+          emailAddress: clockworkAuthor.emailAddress,
+          displayName: clockworkAuthor.displayName,
+          avatarUrl: clockworkAuthor.avatarUrl,
+        }
+      : resolvedUser
+        ? resolvedUser
+        : clockworkAuthor
+          ? {
+              accountId: clockworkAuthor.accountId,
+              emailAddress: '',
+              displayName: clockworkAuthor.displayName,
+              avatarUrl: clockworkAuthor.avatarUrl,
+            }
+          : undefined;
 
     if (!author?.emailAddress) {
       console.warn(

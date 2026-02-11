@@ -65,7 +65,7 @@ export async function setActiveTimers(
     });
   } catch (err) {
     console.error('Redis setActiveTimers error:', err);
-  } 
+  }
 }
 
 export async function deleteActiveTimers(userEmail: string): Promise<void> {

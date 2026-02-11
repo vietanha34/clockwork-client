@@ -103,7 +103,9 @@ export async function getIssue(issueKey: string): Promise<Issue> {
  * @param accountId - Jira accountId (e.g. from running_for field)
  */
 export async function getJiraUser(accountId: string): Promise<ClockworkUser> {
-  const data = await atlassianFetch<RawJiraUser>(`/user?accountId=${encodeURIComponent(accountId)}`);
+  const data = await atlassianFetch<RawJiraUser>(
+    `/user?accountId=${encodeURIComponent(accountId)}`,
+  );
   return {
     accountId: data.accountId,
     emailAddress: data.emailAddress,
