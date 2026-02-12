@@ -14,22 +14,89 @@ function formatDuration(startedAt: string): string {
   return `${mm}:${ss}`;
 }
 
-export function useTrayTimer(startedAt?: string, issueKey?: string) {
+export function useTrayTimer(startedAt?: string, issueKey?: string, progress?: number) {
   useEffect(() => {
-    if (!startedAt) {
-      invoke('update_tray_title', { title: 'No timer' }).catch(console.error);
-      return;
-    }
+    // 1. Create Canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    
+    if (!ctx) return;
 
-    const update = () => {
-        const timeStr = formatDuration(startedAt);
-        const title = issueKey ? `${timeStr} - ${issueKey}` : timeStr;
-        invoke('update_tray_title', { title }).catch(console.error);
+    const render = () => {
+        const timeStr = startedAt ? formatDuration(startedAt) : 'No timer';
+        const displayKey = issueKey || '';
+        const displayText = startedAt && displayKey ? `${timeStr} - ${displayKey}` : timeStr;
+
+        // 2. Measure Text to determine Width
+        // Use system font to match macOS menu bar look
+        const fontSize = 11;
+        const font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+        ctx.font = font;
+        
+        const textMetrics = ctx.measureText(displayText);
+        const textWidth = Math.ceil(textMetrics.width);
+        
+        // Layout Config
+        const paddingX = 0; // minimal padding
+        const barHeight = 11; // Tăng độ cao bar
+        const barY = 0; // Đẩy bar lên sát hơn
+        
+        const totalHeight = 23; // Standard Menu Bar Height
+        const totalWidth = Math.max(textWidth, 40) + (paddingX * 2); // Minimum width 40px
+
+        // 3. Resize Canvas
+        if (canvas.width !== totalWidth || canvas.height !== totalHeight) {
+            canvas.width = totalWidth;
+            canvas.height = totalHeight;
+            // Reset font after resize
+            ctx.font = font; 
+        }
+
+        // 4. Clear
+        ctx.clearRect(0, 0, totalWidth, totalHeight);
+
+        // 5. Draw Progress Bar (Top)
+        if (typeof progress === 'number') {
+            const barTotalWidth = totalWidth;
+            const barFillWidth = Math.floor(barTotalWidth * Math.min(Math.max(progress, 0), 1));
+            
+            // Draw Track (Background) - Semi-transparent White
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.beginPath();
+            ctx.roundRect(0, barY, barTotalWidth, barHeight, 3);
+            ctx.fill();
+
+            // Draw Fill (Progress) - Solid White
+            if (barFillWidth > 0) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+                ctx.beginPath();
+                ctx.roundRect(0, barY, barFillWidth, barHeight, 3);
+                ctx.fill();
+            }
+        }
+
+        // 6. Draw Text (Bottom)
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Chuyển màu chữ sang trắng
+        ctx.textBaseline = 'bottom';
+        ctx.textAlign = 'center';
+        // Đẩy text xuống sát đáy hơn (totalHeight)
+        ctx.fillText(displayText, totalWidth / 2, totalHeight + 2);
+
+        // 7. Get Bytes
+        const imageData = ctx.getImageData(0, 0, totalWidth, totalHeight);
+        const buffer = Array.from(imageData.data);
+
+        // 8. Send to Rust
+        invoke('update_tray_bitmap', { 
+            buffer, 
+            width: totalWidth, 
+            height: totalHeight 
+        }).catch(console.error);
     };
 
-    update(); // Initial update
-    const interval = setInterval(update, 1000);
+    render(); // Initial render
+    const interval = setInterval(render, 1000);
 
     return () => clearInterval(interval);
-  }, [startedAt, issueKey]);
+  }, [startedAt, issueKey, progress]);
 }

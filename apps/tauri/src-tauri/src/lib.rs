@@ -45,9 +45,13 @@ fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn update_tray_title(app: AppHandle, title: String) {
+fn update_tray_bitmap(app: AppHandle, buffer: Vec<u8>, width: u32, height: u32) {
     if let Some(tray) = app.tray_by_id("main") {
-        let _ = tray.set_title(Some(title));
+        // Clear the text title since we are drawing it in the icon now
+        let _ = tray.set_title(Some::<&str>(""));
+        
+        let icon = tauri::image::Image::new(&buffer, width, height);
+        let _ = tray.set_icon(Some(icon));
     }
 }
 
@@ -75,6 +79,7 @@ pub fn run() {
 
             // Tray icon left-click → toggle window visibility + position near cursor
             if let Some(tray) = app.tray_by_id("main") {
+                let _ = tray.set_icon_as_template(true);
                 let win = window.clone();
                 tray.on_tray_icon_event(move |_tray, event| {
                     if let TrayIconEvent::Click {
@@ -120,7 +125,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_title, exit_app])
+        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_bitmap, exit_app])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
