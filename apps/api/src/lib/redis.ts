@@ -1,5 +1,5 @@
 import { type RedisClientType, createClient } from 'redis';
-import type { CachedTimerData, ClockworkUser, Timer } from './types';
+import type { CachedTimerData, ClockworkUser, Issue, Timer } from './types';
 
 const TIMER_CACHE_TTL_SECONDS = 600; // 1 minute
 const TIMER_KEY_PREFIX = 'clockwork:timers:';
@@ -7,6 +7,8 @@ const TIMER_KEY_PREFIX = 'clockwork:timers:';
 const JIRA_USER_CACHE_TTL_SECONDS = 172_800; // 2 days
 const JIRA_USER_KEY_PREFIX = 'jira:user:';
 const JIRA_EMAIL_KEY_PREFIX = 'jira:email:';
+const JIRA_ISSUE_CACHE_TTL_SECONDS = 86_400; // 1 day
+const JIRA_ISSUE_KEY_PREFIX = 'jira:issue:';
 
 let redisClient: RedisClientType | undefined;
 
@@ -131,5 +133,35 @@ export async function setCachedEmailToAccountId(email: string, accountId: string
     await redis.set(getEmailKey(email), accountId, { EX: JIRA_USER_CACHE_TTL_SECONDS });
   } catch (err) {
     console.error('Redis setCachedEmailToAccountId error:', err);
+  }
+}
+
+// ─── Issue Cache ──────────────────────────────────────────────────────────────
+
+function getIssueKey(issueIdOrKey: string): string {
+  return `${JIRA_ISSUE_KEY_PREFIX}${issueIdOrKey}`;
+}
+
+export async function getCachedIssue(issueIdOrKey: string): Promise<Issue | null> {
+  try {
+    const redis = await getRedisClient();
+    const data = await redis.get(getIssueKey(issueIdOrKey));
+    return data ? (JSON.parse(data) as Issue) : null;
+  } catch (err) {
+    console.error('Redis getCachedIssue error:', err);
+    return null;
+  }
+}
+
+export async function setCachedIssue(
+  issueIdOrKey: string,
+  issue: Issue,
+  ttl = JIRA_ISSUE_CACHE_TTL_SECONDS,
+): Promise<void> {
+  try {
+    const redis = await getRedisClient();
+    await redis.set(getIssueKey(issueIdOrKey), JSON.stringify(issue), { EX: ttl });
+  } catch (err) {
+    console.error('Redis setCachedIssue error:', err);
   }
 }

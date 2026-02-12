@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { startTimer, stopTimer } from '../lib/api-client';
+import { useRef } from 'react';
+import { startTimer, stopTimer, todayDate } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
 import { useSettings } from '../lib/settings-context';
 import type { ActiveTimersResponse } from '../lib/types';
 import { ACTIVE_TIMERS_KEY } from './useActiveTimers';
+import { WORKLOGS_KEY } from './useWorklogs';
 
 export function useStartTimer() {
   const queryClient = useQueryClient();
@@ -26,6 +28,7 @@ export function useStopTimer() {
   const queryClient = useQueryClient();
   const { settings } = useSettings();
   const accountId = settings.jiraToken;
+  const delayedWorklogsRefreshRef = useRef<number | null>(null);
 
   return useMutation({
     mutationFn: ({ issueKey }: { issueKey: string }) =>
@@ -58,6 +61,16 @@ export function useStopTimer() {
 
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: [ACTIVE_TIMERS_KEY] });
+
+      if (delayedWorklogsRefreshRef.current !== null) {
+        window.clearTimeout(delayedWorklogsRefreshRef.current);
+      }
+
+      delayedWorklogsRefreshRef.current = window.setTimeout(() => {
+        void queryClient.invalidateQueries({
+          queryKey: [WORKLOGS_KEY, accountId, todayDate()],
+        });
+      }, 10_000);
     },
   });
 }

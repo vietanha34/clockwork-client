@@ -75,6 +75,7 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             {
                 let _ = app.handle().set_dock_visibility(false);
+                let _ = window.set_shadow(false);
             }
 
             // Tray icon left-click → toggle window visibility + position near cursor
@@ -93,8 +94,8 @@ pub fn run() {
                             let _ = win.hide();
                         } else {
                             // Center window horizontally on tray icon, just below menu bar
-                            let x = (position.x as i32) - 190;
-                            let y = (position.y as i32) + 5;
+                            let x = (position.x as i32) - (274 / 2);
+                            let y = (position.y as i32) + 1;
                             let _ = win.set_position(tauri::Position::Physical(
                                 PhysicalPosition { x, y },
                             ));
@@ -111,17 +112,11 @@ pub fn run() {
                     api.prevent_close();
                     let _ = win.hide();
                 }
-                #[cfg(not(debug_assertions))]
                 tauri::WindowEvent::Focused(false) => {
                     let _ = win.hide();
                 }
                 _ => {}
             });
-
-            #[cfg(debug_assertions)]
-            {
-                window.open_devtools();
-            }
 
             Ok(())
         })

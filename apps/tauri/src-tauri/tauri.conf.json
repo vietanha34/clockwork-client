@@ -10,17 +10,19 @@
     "beforeBuildCommand": "pnpm build"
   },
   "app": {
-    "macOSPrivateApi": true,
     "withGlobalTauri": true,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
         "title": "Clockwork Menubar",
-        "width": 380,
-        "height": 560,
+        "width": 274,
+        "height": 403,
         "resizable": false,
         "decorations": false,
         "transparent": true,
+        "shadow": false,
+        "backgroundColor": "#00000000",
         "alwaysOnTop": true,
         "visible": true
       }

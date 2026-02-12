@@ -1,22 +1,27 @@
 import { ActiveTimer } from '../components/ActiveTimer';
 import { StartTimerForm } from '../components/StartTimerForm';
 import { WorklogList } from '../components/WorklogList';
+import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useWorklogs } from '../hooks/useWorklogs';
 
 export function MainView() {
   const { isFetching, refetch } = useWorklogs();
+  const { data: timerData } = useActiveTimers();
+  const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
 
   return (
     <div className="divide-y divide-gray-100">
       {/* Active timer section */}
-      <section>
-        <div className="px-4 pt-3 pb-0">
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-            Active Timer
-          </h3>
-        </div>
-        <ActiveTimer />
-      </section>
+      {hasActiveTimer && (
+        <section>
+          <div className="px-4 pt-3 pb-0">
+            <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+              Active Timer
+            </h3>
+          </div>
+          <ActiveTimer />
+        </section>
+      )}
 
       {/* Start new timer */}
       <section>

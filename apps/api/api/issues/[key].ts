@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getIssue } from '../../src/lib/atlassian-client';
+import { getCachedIssue, setCachedIssue } from '../../src/lib/redis';
 import { sendBadRequest, sendInternalError, sendSuccess } from '../../src/lib/response';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -17,7 +18,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   try {
-    const issue = await getIssue(key);
+    const cachedIssue = await getCachedIssue(key);
+    const issue = cachedIssue ?? await getIssue(key);
+    if (!cachedIssue) {
+      await Promise.all([
+        setCachedIssue(key, issue),
+        setCachedIssue(issue.id, issue),
+      ]);
+    }
     sendSuccess(res, { issue });
   } catch (err) {
     // eslint-disable-next-line no-console

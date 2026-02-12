@@ -44,49 +44,43 @@ export function ActiveTimer() {
     );
 
   if (!activeTimer) {
-    return (
-      <div className="px-4 py-4 text-center">
-        <p className="text-sm text-gray-500">No active timer</p>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="px-4 py-3">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-block w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
-            <span className="font-mono text-sm font-semibold text-gray-900 truncate">
-              {activeTimer.issue.key}
-            </span>
-          </div>
-          {issue && <p className="text-xs text-gray-500 truncate mb-1">{issue.summary}</p>}
-          {issue?.project && <p className="text-xs text-gray-400">{issue.project.name}</p>}
-          <p className="text-xs text-gray-400 mt-1">
-            Started at {formatStartTime(activeTimer.startedAt)}
-          </p>
+    <div className="px-4 py-3 flex items-center justify-between gap-3">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="inline-block w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
+          <span className="font-mono text-sm font-semibold text-gray-900 truncate">
+            {activeTimer.issue.key}
+          </span>
         </div>
-        <div className="text-right shrink-0">
-          <ElapsedTime
-            tillNow={activeTimer.tillNow}
-            cachedAt={data.cachedAt ?? new Date().toISOString()}
-            className="font-mono text-sm font-semibold text-gray-900 tabular-nums"
-          />
-        </div>
+        {issue && <p className="text-xs text-gray-500 truncate mb-1">{issue.summary}</p>}
+        {issue?.project && <p className="text-xs text-gray-400">{issue.project.name}</p>}
+        <p className="text-xs text-gray-400 mt-1">
+          Started at {formatStartTime(activeTimer.startedAt)}
+        </p>
       </div>
-
-      <button
-        type="button"
-        onClick={() => stopTimer.mutate({ issueKey: activeTimer.issue.key })}
-        disabled={stopTimer.isPending}
-        className="mt-3 w-full py-1.5 px-3 text-xs font-medium text-red-700 border border-red-300 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {stopTimer.isPending ? 'Stopping…' : 'Stop Timer'}
-      </button>
-      {stopTimer.isError && (
-        <p className="mt-1 text-xs text-red-600">Failed to stop timer. Try again.</p>
-      )}
+      
+      <div className="flex flex-col items-end gap-2 shrink-0">
+        <ElapsedTime
+          tillNow={activeTimer.tillNow}
+          cachedAt={data.cachedAt ?? new Date().toISOString()}
+          className="font-mono text-sm font-semibold text-gray-900 tabular-nums"
+        />
+        <button
+          type="button"
+          onClick={() => stopTimer.mutate({ issueKey: activeTimer.issue.key })}
+          disabled={stopTimer.isPending}
+          className="py-1 px-2 text-xs font-medium text-red-700 border border-red-300 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          {stopTimer.isPending ? 'Stopping…' : 'Stop'}
+        </button>
+        {stopTimer.isError && (
+          <p className="text-[10px] text-red-600">Failed</p>
+        )}
+      </div>
     </div>
   );
 }

@@ -26,6 +26,8 @@ export interface Timer {
 export interface Worklog {
   id: number;
   issueKey?: string;
+  issueName?: string;
+  projectName?: string;
   issueId: number;
   timeSpentSeconds: number;
   started: string;

@@ -39,7 +39,11 @@ export const syncActiveTimers = inngest.createFunction(
     name: 'Sync Active Clockwork Timers',
     retries: 2,
   },
-  [{ event: 'clockwork/timers.sync.requested' }, { cron: '*/2 * * * *' }],
+  [
+    { event: 'clockwork/timers.sync.requested' },
+    // Every minute from 7:00 to 19:59 Mon-Sat (VN time)
+    { cron: '* 7-19 * * 1-6' },
+  ],
   async ({ event, step }) => {
     const eventData = (event as SyncTimersEvent).data;
     const eventDomain = eventData?.jiraDomain;

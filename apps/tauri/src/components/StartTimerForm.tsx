@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useStartTimer } from '../hooks/useTimerActions';
 
 export function StartTimerForm() {
@@ -6,6 +7,8 @@ export function StartTimerForm() {
   const [comment, setComment] = useState('');
   const [expanded, setExpanded] = useState(false);
   const startTimer = useStartTimer();
+  const { data: timerData } = useActiveTimers();
+  const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,13 +28,27 @@ export function StartTimerForm() {
   return (
     <div className="px-4 py-3">
       {!expanded ? (
-        <button
-          type="button"
-          onClick={() => setExpanded(true)}
-          className="w-full py-2 px-3 text-xs font-medium text-blue-700 border border-blue-300 rounded hover:bg-blue-50"
-        >
-          + Start New Timer
-        </button>
+        !hasActiveTimer ? (
+          <div className="flex justify-center py-12">
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              className="py-2 px-6 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 shadow-sm transition-colors"
+            >
+              + Start New Timer
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              className="py-1 px-3 text-xs font-medium text-blue-700 border border-blue-300 rounded hover:bg-blue-50 w-auto"
+            >
+              + Start New Timer
+            </button>
+          </div>
+        )
       ) : (
         <form onSubmit={handleSubmit} className="space-y-2">
           <input
@@ -41,6 +58,7 @@ export function StartTimerForm() {
             placeholder="Issue key (e.g. KAN-42)"
             className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             required
+            autoFocus
           />
           <input
             type="text"

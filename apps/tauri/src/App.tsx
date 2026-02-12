@@ -3,6 +3,7 @@ import { AppShell } from './components/AppShell';
 import { useActiveTimers } from './hooks/useActiveTimers';
 import { useTrayTimer } from './hooks/useTrayTimer';
 import { useWorklogs } from './hooks/useWorklogs';
+import { totalWorklogSeconds } from './lib/api-client';
 import { SettingsProvider, useSettings } from './lib/settings-context';
 import { MainView } from './views/MainView';
 import { SettingsView } from './views/SettingsView';
@@ -16,17 +17,31 @@ function AppContent() {
   const { data: worklogs } = useWorklogs();
   const activeTimer = data?.timers[0];
 
-  // Calculate current elapsed time in seconds to add to daily total
-  const currentSessionDuration = activeTimer ? activeTimer.tillNow + Math.floor((Date.now() - new Date(data?.cachedAt ?? new Date().toISOString()).getTime()) / 1000) : 0;
+  // Count only today's running overlap from 08:00 local time.
+  const currentSessionDuration = (() => {
+    if (!activeTimer?.startedAt) return 0;
 
+    const startedMs = new Date(activeTimer.startedAt).getTime();
+    if (Number.isNaN(startedMs)) return 0;
+
+    const nowMs = Date.now();
+    const dayStart = new Date();
+    dayStart.setHours(8, 0, 0, 0);
+
+    const effectiveStartMs = Math.max(startedMs, dayStart.getTime());
+    if (effectiveStartMs >= nowMs) return 0;
+
+    return Math.floor((nowMs - effectiveStartMs) / 1000);
+  })();
   const effectiveStartedAt = activeTimer
     ? new Date(
-        new Date(data?.cachedAt ?? new Date().toISOString()).getTime() - activeTimer.tillNow * 1000,
+        (new Date()).getTime() - activeTimer.tillNow * 1000,
       ).toISOString()
     : undefined;
 
-  // Add current active timer duration to total worklogs
-  const totalSeconds = (worklogs?.total ?? 0) + currentSessionDuration;
+  // Always compute from worklog items so progress still works even when API `total` is stale/missing.
+  const loggedSeconds = totalWorklogSeconds(worklogs?.worklogs ?? []);
+  const totalSeconds = loggedSeconds + currentSessionDuration;
   const dailyProgress = totalSeconds / (8 * 3600);
 
   useTrayTimer(effectiveStartedAt, activeTimer?.issue.key, dailyProgress);
