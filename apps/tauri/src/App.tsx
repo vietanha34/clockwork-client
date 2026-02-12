@@ -14,7 +14,13 @@ function AppContent() {
   const { data } = useActiveTimers();
   const activeTimer = data?.timers[0];
 
-  useTrayTimer(activeTimer?.startedAt, activeTimer?.issue.key);
+  const effectiveStartedAt = activeTimer
+    ? new Date(
+        new Date(data?.cachedAt ?? new Date().toISOString()).getTime() - activeTimer.tillNow * 1000,
+      ).toISOString()
+    : undefined;
+
+  useTrayTimer(effectiveStartedAt, activeTimer?.issue.key);
 
   // On first load, if no email is configured, redirect to settings
   useEffect(() => {

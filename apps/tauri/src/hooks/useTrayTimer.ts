@@ -17,7 +17,7 @@ function formatDuration(startedAt: string): string {
 export function useTrayTimer(startedAt?: string, issueKey?: string) {
   useEffect(() => {
     if (!startedAt) {
-      invoke('update_tray_title', { title: '' }).catch(console.error);
+      invoke('update_tray_title', { title: 'No timer' }).catch(console.error);
       return;
     }
 

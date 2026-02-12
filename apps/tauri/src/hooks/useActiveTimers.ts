@@ -16,7 +16,7 @@ export function useActiveTimers() {
     queryKey: [ACTIVE_TIMERS_KEY, jiraToken],
     queryFn: () => fetchActiveTimers(API_BASE_URL, jiraToken),
     enabled,
-    refetchInterval: 5_000,
+    refetchInterval: 10_000,
     refetchIntervalInBackground: false,
   });
 
