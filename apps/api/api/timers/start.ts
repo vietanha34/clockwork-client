@@ -20,8 +20,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   try {
-    const timer = await startTimer(issueKey, comment);
-    sendSuccess(res, { timer }, 201);
+    await startTimer(issueKey, comment);
+    sendSuccess(res, {}, 201);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('[POST /api/timers/start] Error:', err);

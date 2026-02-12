@@ -27,7 +27,8 @@
       "Bash(RUSTUP_HOME=/Users/vietanha34/.rustup CARGO=/Users/vietanha34/.rustup/toolchains/stable-x86_64-apple-darwin/bin/cargo RUSTC=/Users/vietanha34/.rustup/toolchains/stable-x86_64-apple-darwin/bin/rustc PATH=\"/Users/vietanha34/.rustup/toolchains/stable-x86_64-apple-darwin/bin:$PATH\")",
       "Bash(arch -x86_64 env PATH=\"/Users/vietanha34/.rustup/toolchains/stable-x86_64-apple-darwin/bin:$PATH\" /Users/vietanha34/.rustup/toolchains/stable-x86_64-apple-darwin/bin/cargo check:*)",
       "Bash(node:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch(domain:docs.herocoders.com)"
     ]
   }
 }

@@ -32,7 +32,7 @@ export function WorklogList() {
         {worklogs.map((w) => (
           <li key={w.id} className="flex items-start gap-2">
             <span className="font-mono text-xs text-blue-600 shrink-0 mt-0.5 w-14">
-              {w.issueKey}
+              {w.issueKey ?? `#${w.issueId}`}
             </span>
             <div className="flex-1 min-w-0">
               {w.comment && <p className="text-xs text-gray-700 truncate">{w.comment}</p>}

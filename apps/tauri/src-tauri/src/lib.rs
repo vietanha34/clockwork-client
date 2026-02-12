@@ -51,6 +51,11 @@ fn update_tray_title(app: AppHandle, title: String) {
     }
 }
 
+#[tauri::command]
+fn exit_app(app: AppHandle) {
+    app.exit(0);
+}
+
 // ─── App Entry Point ──────────────────────────────────────────────────────────
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -115,7 +120,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_title])
+        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_title, exit_app])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

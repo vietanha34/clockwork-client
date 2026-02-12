@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-function secondsSince(startedAt: string): number {
-  return Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
+function secondsSince(isoTimestamp: string): number {
+  return Math.max(0, Math.floor((Date.now() - new Date(isoTimestamp).getTime()) / 1000));
 }
 
 function formatHMS(totalSeconds: number): string {
@@ -15,20 +15,23 @@ function formatHMS(totalSeconds: number): string {
 }
 
 interface ElapsedTimeProps {
-  startedAt: string;
+  /** Seconds already elapsed at the time the cache was captured (accounts for breaks). */
+  tillNow: number;
+  /** ISO timestamp when the cache snapshot was taken. */
+  cachedAt: string;
   className?: string;
 }
 
-export function ElapsedTime({ startedAt, className }: ElapsedTimeProps) {
-  const [seconds, setSeconds] = useState(() => secondsSince(startedAt));
+export function ElapsedTime({ tillNow, cachedAt, className }: ElapsedTimeProps) {
+  const [seconds, setSeconds] = useState(() => tillNow + secondsSince(cachedAt));
 
   useEffect(() => {
-    setSeconds(secondsSince(startedAt));
+    setSeconds(tillNow + secondsSince(cachedAt));
     const id = setInterval(() => {
-      setSeconds(secondsSince(startedAt));
+      setSeconds(tillNow + secondsSince(cachedAt));
     }, 1000);
     return () => clearInterval(id);
-  }, [startedAt]);
+  }, [tillNow, cachedAt]);
 
   return <span className={className}>{formatHMS(seconds)}</span>;
 }

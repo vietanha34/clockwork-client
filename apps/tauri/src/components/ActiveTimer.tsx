@@ -10,7 +10,10 @@ import { TimerSkeleton } from './Skeleton';
 function formatStartTime(startedAt: string): string {
   const date = new Date(startedAt);
   if (Number.isNaN(date.getTime())) return 'Unknown';
-  return date.toLocaleTimeString([], {
+  return date.toLocaleString([], {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -66,7 +69,8 @@ export function ActiveTimer() {
         </div>
         <div className="text-right shrink-0">
           <ElapsedTime
-            startedAt={activeTimer.startedAt}
+            tillNow={activeTimer.tillNow}
+            cachedAt={data.cachedAt ?? new Date().toISOString()}
             className="font-mono text-sm font-semibold text-gray-900 tabular-nums"
           />
         </div>
@@ -74,7 +78,7 @@ export function ActiveTimer() {
 
       <button
         type="button"
-        onClick={() => stopTimer.mutate({ timerId: activeTimer.id })}
+        onClick={() => stopTimer.mutate({ issueKey: activeTimer.issue.key })}
         disabled={stopTimer.isPending}
         className="mt-3 w-full py-1.5 px-3 text-xs font-medium text-red-700 border border-red-300 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >

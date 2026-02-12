@@ -2,8 +2,8 @@
 
 export interface ClockworkUser {
   accountId: string;
-  emailAddress: string;
-  displayName: string;
+  emailAddress?: string;
+  displayName?: string;
   avatarUrl?: string;
 }
 
@@ -26,7 +26,7 @@ export interface TimerIssueRef {
 
 export interface Worklog {
   id: number;
-  issueKey: string;
+  issueKey?: string;
   issueId: number;
   timeSpentSeconds: number;
   started: string;

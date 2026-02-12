@@ -1,5 +1,5 @@
 import { fetch } from '@tauri-apps/plugin-http';
-import type { ActiveTimersResponse, Issue, Timer, Worklog, WorklogsResponse } from './types';
+import type { ActiveTimersResponse, Issue, Worklog, WorklogsResponse } from './types';
 
 // ─── Base Fetch ───────────────────────────────────────────────────────────────
 
@@ -51,22 +51,24 @@ export async function startTimer(
   apiBaseUrl: string,
   issueKey: string,
   comment?: string,
-): Promise<Timer> {
+): Promise<void> {
   const body: { issueKey: string; comment?: string } = { issueKey };
   if (comment) body.comment = comment;
-  const res = await apiFetch<{ timer: Timer }>(apiBaseUrl, '/api/timers/start', {
+  await apiFetch<unknown>(apiBaseUrl, '/api/timers/start', {
     method: 'POST',
     body: JSON.stringify(body),
   });
-  return res.timer;
 }
 
-export async function stopTimer(apiBaseUrl: string, timerId: number): Promise<Timer> {
-  const res = await apiFetch<{ timer: Timer }>(apiBaseUrl, '/api/timers/stop', {
+export async function stopTimer(
+  apiBaseUrl: string,
+  issueKey: string,
+  accountId: string,
+): Promise<void> {
+  await apiFetch<unknown>(apiBaseUrl, '/api/timers/stop', {
     method: 'POST',
-    body: JSON.stringify({ timerId }),
+    body: JSON.stringify({ issueKey, accountId }),
   });
-  return res.timer;
 }
 
 // ─── Worklog Endpoints ────────────────────────────────────────────────────────
