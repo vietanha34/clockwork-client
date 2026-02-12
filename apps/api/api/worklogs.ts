@@ -10,10 +10,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const { userEmail, date } = req.query;
+  const { accountId, date } = req.query;
 
-  if (!userEmail || typeof userEmail !== 'string') {
-    sendBadRequest(res, 'Missing required query parameter: userEmail');
+  if (!accountId || typeof accountId !== 'string') {
+    sendBadRequest(res, 'Missing required query parameter: accountId');
     return;
   }
 
@@ -21,13 +21,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     typeof date === 'string' ? date : (new Date().toISOString().split('T')[0] ?? '');
 
   try {
-    const worklogs = await getWorklogs(userEmail, targetDate);
+    const worklogs = await getWorklogs(accountId, targetDate);
 
     const response: WorklogsResponse = {
       worklogs,
       total: worklogs.length,
       date: targetDate,
-      userEmail,
+      accountId,
     };
 
     sendSuccess(res, response);

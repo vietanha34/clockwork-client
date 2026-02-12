@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useStopTimer } from '../hooks/useTimerActions';
 import { fetchIssue } from '../lib/api-client';
-import { useSettings } from '../lib/settings-context';
+import { API_BASE_URL } from '../lib/constants';
 import { ElapsedTime } from './ElapsedTime';
 import { ErrorCard } from './ErrorCard';
 import { TimerSkeleton } from './Skeleton';
@@ -19,7 +19,6 @@ function formatStartTime(startedAt: string): string {
 export function ActiveTimer() {
   const { data, isLoading, error, needsAccountId } = useActiveTimers();
   const stopTimer = useStopTimer();
-  const { settings } = useSettings();
 
   const activeTimer = data?.timers[0];
 
@@ -27,8 +26,8 @@ export function ActiveTimer() {
   const { data: issue } = useQuery({
     queryKey: ['issue', activeTimer?.issue.key],
     // biome-ignore lint/style/noNonNullAssertion: guaranteed by enabled
-    queryFn: () => fetchIssue(settings.apiBaseUrl, activeTimer!.issue.key),
-    enabled: Boolean(activeTimer?.issue.key && settings.apiBaseUrl),
+    queryFn: () => fetchIssue(API_BASE_URL, activeTimer!.issue.key),
+    enabled: Boolean(activeTimer?.issue.key),
     staleTime: 60_000,
   });
 

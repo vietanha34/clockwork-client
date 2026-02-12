@@ -14,9 +14,9 @@ export function AppShell({
   onBackClick,
 }: AppShellProps) {
   return (
-    <div className="flex flex-col h-screen w-full bg-white text-gray-900 overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-gray-50/95 backdrop-blur-xl text-gray-900 overflow-hidden rounded-2xl border border-gray-200/50 shadow-sm">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200/50 shrink-0 bg-white/50">
         <div className="flex items-center gap-2">
           {showBackButton && (
             <button

@@ -10,6 +10,8 @@
     "beforeBuildCommand": "pnpm build"
   },
   "app": {
+    "macOSPrivateApi": true,
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
@@ -18,8 +20,9 @@
         "height": 560,
         "resizable": false,
         "decorations": false,
+        "transparent": true,
         "alwaysOnTop": true,
-        "visible": false
+        "visible": true
       }
     ],
     "security": {

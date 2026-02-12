@@ -1,20 +1,31 @@
+import { fetch } from '@tauri-apps/plugin-http';
 import type { ActiveTimersResponse, Issue, Timer, Worklog, WorklogsResponse } from './types';
 
 // ─── Base Fetch ───────────────────────────────────────────────────────────────
 
 async function apiFetch<T>(apiBaseUrl: string, path: string, options?: RequestInit): Promise<T> {
   const url = `${apiBaseUrl.replace(/\/$/, '')}${path}`;
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(
-      (body as { message?: string }).message ?? `Request failed: ${res.status} ${res.statusText}`,
-    );
+  console.log(`[API] Fetching: ${url}`, options);
+  try {
+    const res = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    console.log(`[API] Response status: ${res.status}`);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      console.error(`[API] Error body:`, body);
+      throw new Error(
+        (body as { message?: string }).message ?? `Request failed: ${res.status} ${res.statusText}`,
+      );
+    }
+    const data = await res.json();
+    console.log(`[API] Success data:`, data);
+    return data as T;
+  } catch (error) {
+    console.error(`[API] Fetch error:`, error);
+    throw error;
   }
-  return res.json() as Promise<T>;
 }
 
 // ─── Timer Endpoints ──────────────────────────────────────────────────────────
@@ -62,10 +73,10 @@ export async function stopTimer(apiBaseUrl: string, timerId: number): Promise<Ti
 
 export async function fetchWorklogs(
   apiBaseUrl: string,
-  userEmail: string,
+  accountId: string,
   date?: string,
 ): Promise<WorklogsResponse> {
-  const params = new URLSearchParams({ userEmail });
+  const params = new URLSearchParams({ accountId });
   if (date) params.set('date', date);
   return apiFetch<WorklogsResponse>(apiBaseUrl, `/api/worklogs?${params.toString()}`);
 }

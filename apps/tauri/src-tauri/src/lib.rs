@@ -9,12 +9,8 @@ use tauri::{AppHandle, Manager, PhysicalPosition};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppSettings {
-    #[serde(rename = "userEmail", default)]
-    pub user_email: String,
-    #[serde(rename = "apiBaseUrl", default)]
-    pub api_base_url: String,
-    #[serde(rename = "userAccountId", default)]
-    pub user_account_id: String,
+    #[serde(rename = "jiraToken", default)]
+    pub jira_token: String,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {
@@ -35,12 +31,24 @@ fn get_settings(app: AppHandle) -> AppSettings {
 
 #[tauri::command]
 fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
+    println!("Saving settings: {:?}", settings);
     let path = settings_path(&app);
+    println!("Settings path: {:?}", path);
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
     let json = serde_json::to_string_pretty(&settings).map_err(|e| e.to_string())?;
-    fs::write(path, json).map_err(|e| e.to_string())
+    fs::write(path, json).map_err(|e| {
+        println!("Error writing settings: {}", e);
+        e.to_string()
+    })
+}
+
+#[tauri::command]
+fn update_tray_title(app: AppHandle, title: String) {
+    if let Some(tray) = app.tray_by_id("main") {
+        let _ = tray.set_title(Some(title));
+    }
 }
 
 // ─── App Entry Point ──────────────────────────────────────────────────────────
@@ -49,6 +57,7 @@ fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_http::init())
         .setup(|app| {
             let window = app
                 .get_webview_window("main")
@@ -106,7 +115,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_settings, save_settings])
+        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_title])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

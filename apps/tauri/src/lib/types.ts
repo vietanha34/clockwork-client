@@ -63,7 +63,7 @@ export interface WorklogsResponse {
   worklogs: Worklog[];
   total: number;
   date: string;
-  userEmail: string;
+  accountId: string;
 }
 
 export interface ApiError {
@@ -75,7 +75,5 @@ export interface ApiError {
 // ─── App Settings ─────────────────────────────────────────────────────────────
 
 export interface AppSettings {
-  userEmail: string;
-  apiBaseUrl: string;
-  userAccountId: string;
+  jiraToken: string;
 }

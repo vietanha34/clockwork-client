@@ -86,14 +86,14 @@ function transformWorklog(raw: RawWorklog): Worklog {
 
 /**
  * Fetch today's worklogs for a user.
- * @param userEmail - The user's email address (used to filter by author)
+ * @param accountId - The user's accountId (used to filter by author)
  * @param date - ISO date string (YYYY-MM-DD), defaults to today
  */
-export async function getWorklogs(userEmail: string, date?: string): Promise<Worklog[]> {
+export async function getWorklogs(accountId: string, date?: string): Promise<Worklog[]> {
   const targetDate =
     date ?? new Date().toISOString().split('T')[0] ?? new Date().toISOString().substring(0, 10);
   const params = new URLSearchParams([
-    ['userEmail', userEmail],
+    ['accountId', accountId],
     ['from', targetDate],
     ['to', targetDate],
   ]);

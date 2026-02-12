@@ -66,7 +66,7 @@ export interface WorklogsResponse {
   worklogs: Worklog[];
   total: number;
   date: string;
-  userEmail: string;
+  accountId: string;
 }
 
 export interface ApiError {

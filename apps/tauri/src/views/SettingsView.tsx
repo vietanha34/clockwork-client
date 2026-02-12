@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { resolveUserAccountId } from '../lib/api-client';
 import { useSettings } from '../lib/settings-context';
 
 interface SettingsViewProps {
@@ -8,38 +7,31 @@ interface SettingsViewProps {
 
 export function SettingsView({ onClose }: SettingsViewProps) {
   const { settings, updateSettings } = useSettings();
-  const [userEmail, setUserEmail] = useState(settings.userEmail);
-  const [apiBaseUrl, setApiBaseUrl] = useState(settings.apiBaseUrl);
+  // @ts-ignore
+  const isTauri = typeof window !== 'undefined' && (!!window.__TAURI_INTERNALS__ || !!window.__TAURI__);
+  const [jiraToken, setJiraToken] = useState(settings.jiraToken);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [accountIdWarning, setAccountIdWarning] = useState<string | null>(null);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
-    setAccountIdWarning(null);
     try {
-      let userAccountId = settings.userAccountId;
-      if (userEmail && apiBaseUrl) {
-        try {
-          const resolved = await resolveUserAccountId(apiBaseUrl, userEmail);
-          userAccountId = resolved.accountId;
-        } catch {
-          setAccountIdWarning(
-            'Could not resolve Jira accountId. Timers may not load until resolved.',
-          );
-        }
-      }
-      await updateSettings({ userEmail, apiBaseUrl, userAccountId });
+      await updateSettings({ jiraToken });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      if (userEmail && apiBaseUrl) {
+      if (jiraToken) {
         setTimeout(onClose, 500);
       }
-    } catch {
-      setError('Failed to save settings.');
+    } catch (error) {
+      console.error('Save Settings Error:', error);
+      if (error instanceof Error) {
+        setError(`${error.message} (${JSON.stringify(error)})`);
+      } else {
+        setError(`Failed to save settings: ${JSON.stringify(error)}`);
+      }
     } finally {
       setSaving(false);
     }
@@ -48,40 +40,36 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   return (
     <div className="p-4">
       <h2 className="text-base font-semibold text-gray-900 mb-4">Settings</h2>
+      {!isTauri && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                Bạn đang chạy trên trình duyệt. Tính năng lưu settings chỉ hoạt động trên App Desktop.
+                <br />
+                Vui lòng mở ứng dụng Clockwork Menubar để sử dụng.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <div>
-          <label htmlFor="jira-email" className="block text-xs font-medium text-gray-700 mb-1">
-            Jira Email
+          <label htmlFor="jira-token" className="block text-xs font-medium text-gray-700 mb-1">
+            Jira Account ID
           </label>
           <input
-            id="jira-email"
-            type="email"
-            value={userEmail}
-            onChange={(e) => setUserEmail(e.target.value)}
-            placeholder="you@yourorg.atlassian.net"
+            id="jira-token"
+            type="text"
+            value={jiraToken}
+            onChange={(e) => setJiraToken(e.target.value)}
+            placeholder="Enter your Jira Account ID"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
-        </div>
-
-        <div>
-          <label htmlFor="api-base-url" className="block text-xs font-medium text-gray-700 mb-1">
-            API Base URL
-          </label>
-          <input
-            id="api-base-url"
-            type="url"
-            value={apiBaseUrl}
-            onChange={(e) => setApiBaseUrl(e.target.value)}
-            placeholder="https://your-api.vercel.app"
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <p className="mt-1 text-xs text-gray-500">URL of your deployed Clockwork Menubar API</p>
         </div>
 
         {error && <p className="text-xs text-red-600">{error}</p>}
-        {accountIdWarning && <p className="text-xs text-yellow-600">{accountIdWarning}</p>}
 
         <button
           type="submit"

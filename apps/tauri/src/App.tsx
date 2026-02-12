@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
+import { useActiveTimers } from './hooks/useActiveTimers';
+import { useTrayTimer } from './hooks/useTrayTimer';
 import { SettingsProvider, useSettings } from './lib/settings-context';
 import { MainView } from './views/MainView';
 import { SettingsView } from './views/SettingsView';
@@ -9,13 +11,17 @@ type View = 'main' | 'settings';
 function AppContent() {
   const [view, setView] = useState<View>('main');
   const { settings, isLoaded } = useSettings();
+  const { data } = useActiveTimers();
+  const activeTimer = data?.timers[0];
+
+  useTrayTimer(activeTimer?.startedAt, activeTimer?.issue.key);
 
   // On first load, if no email is configured, redirect to settings
   useEffect(() => {
-    if (isLoaded && !settings.userEmail) {
+    if (isLoaded && !settings.jiraToken) {
       setView('settings');
     }
-  }, [isLoaded, settings.userEmail]);
+  }, [isLoaded, settings.jiraToken]);
 
   return (
     <AppShell
