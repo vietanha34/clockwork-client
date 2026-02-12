@@ -21,11 +21,11 @@ async function apiFetch<T>(apiBaseUrl: string, path: string, options?: RequestIn
 
 export async function fetchActiveTimers(
   apiBaseUrl: string,
-  displayName: string,
+  accountId: string,
 ): Promise<ActiveTimersResponse> {
   return apiFetch<ActiveTimersResponse>(
     apiBaseUrl,
-    `/api/timers/active?displayName=${encodeURIComponent(displayName)}`,
+    `/api/timers/active?accountId=${encodeURIComponent(accountId)}`,
   );
 }
 

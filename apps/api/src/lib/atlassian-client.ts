@@ -108,6 +108,7 @@ export async function searchJiraUser(query: string): Promise<ClockworkUser | nul
     `/user/search?query=${encodeURIComponent(query)}&maxResults=1`,
   );
   // If query is email, try to find exact match first
+  console.log('searchJiraUser: ', JSON.stringify(query), JSON.stringify(data));
   const exactMatch = data.find((u) => u.emailAddress === query);
   const user = exactMatch ?? data[0] ?? null;
   

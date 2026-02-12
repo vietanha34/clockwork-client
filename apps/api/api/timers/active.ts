@@ -10,8 +10,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const accountId = typeof req.query.accountId === 'string' ? req.query.accountId : 
-                    typeof req.query.displayName === 'string' ? req.query.displayName : 'all';
+  const accountId = typeof req.query.accountId === 'string' ? req.query.accountId : 'all';
 
   try {
     const cached = await getActiveTimers(accountId);
