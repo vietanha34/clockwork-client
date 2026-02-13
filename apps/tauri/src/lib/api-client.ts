@@ -51,11 +51,19 @@ export async function startTimer(
   apiBaseUrl: string,
   issueKey: string,
   comment?: string,
+  clockworkApiToken?: string,
 ): Promise<void> {
   const body: { issueKey: string; comment?: string } = { issueKey };
   if (comment) body.comment = comment;
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (clockworkApiToken) {
+    headers['X-Clockwork-Token'] = clockworkApiToken;
+  }
+
   await apiFetch<unknown>(apiBaseUrl, '/api/timers/start', {
     method: 'POST',
+    headers,
     body: JSON.stringify(body),
   });
 }
