@@ -1,0 +1,21 @@
+{
+  "id": "client-token_20260213",
+  "title": "Client-Side Clockwork API Token",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-02-13T00:00:00.000Z",
+  "updated": "2026-02-13T04:59:50Z",
+  "current_phase": 1,
+  "current_task": "1.2",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 8,
+    "completed": 1
+  },
+  "commits": [
+    "405d94d: feat(tauri): add clockwork api token settings model (client-token_20260213)"
+  ]
+}

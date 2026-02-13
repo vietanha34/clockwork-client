@@ -10,4 +10,6 @@
 | [x] | jira-user-enrichment_20260211 | Jira User Enrichment for Active Timers | 2026-02-11 | 2026-02-11 |
 | [x] | accountid-primary-key_20260211 | Switch Primary Key from Email to accountId | 2026-02-11 | 2026-02-11 |
 
+| [~] | client-token_20260213 | Client-Side Clockwork API Token | 2026-02-13 | 2026-02-13 |
+
 <!-- Tracks registered by /conductor:new-track -->
