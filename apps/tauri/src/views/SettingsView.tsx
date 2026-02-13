@@ -10,6 +10,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   // @ts-ignore
   const isTauri = typeof window !== 'undefined' && (!!window.__TAURI_INTERNALS__ || !!window.__TAURI__);
   const [jiraToken, setJiraToken] = useState(settings.jiraToken);
+  const [clockworkApiToken, setClockworkApiToken] = useState(settings.clockworkApiToken);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
     setSaving(true);
     setError(null);
     try {
-      await updateSettings({ jiraToken });
+      await updateSettings({ jiraToken, clockworkApiToken });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       if (jiraToken) {
@@ -66,6 +67,20 @@ export function SettingsView({ onClose }: SettingsViewProps) {
             placeholder="Enter your Jira Account ID"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="clockwork-api-token" className="block text-xs font-medium text-gray-700 mb-1">
+            Clockwork API Token
+          </label>
+          <input
+            id="clockwork-api-token"
+            type="password"
+            value={clockworkApiToken}
+            onChange={(e) => setClockworkApiToken(e.target.value)}
+            placeholder="Enter your Clockwork API token"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
