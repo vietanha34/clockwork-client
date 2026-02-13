@@ -4,20 +4,22 @@
   "type": "feature",
   "status": "in_progress",
   "created": "2026-02-13T00:00:00.000Z",
-  "updated": "2026-02-13T05:01:35Z",
-  "current_phase": 1,
-  "current_task": "phase_1_verification",
+  "updated": "2026-02-13T05:30:42Z",
+  "current_phase": 2,
+  "current_task": "phase_2_verification",
   "phases": {
     "total": 3,
-    "completed": 0
+    "completed": 1
   },
   "tasks": {
     "total": 8,
-    "completed": 3
+    "completed": 5
   },
   "commits": [
     "405d94d: feat(tauri): add clockwork api token settings model (client-token_20260213)",
     "2d33353: feat(tauri): add rust clockwork token setting field (client-token_20260213)",
-    "176dc75: feat(tauri): add clockwork api token field in settings view (client-token_20260213)"
+    "176dc75: feat(tauri): add clockwork api token field in settings view (client-token_20260213)",
+    "edbf878: feat(tauri): send optional clockwork token header on start timer (client-token_20260213)",
+    "fb01f16: feat(tauri): pass settings token to start timer call (client-token_20260213)"
   ]
 }

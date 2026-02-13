@@ -29,8 +29,8 @@ Update the Tauri HTTP client to include the token on outbound requests.
 
 ### Tasks
 
-- [ ] Task 2.1: Update `apiFetch` or `startTimer` in `apps/tauri/src/lib/api-client.ts` to accept and send `X-Clockwork-Token` header
-- [ ] Task 2.2: Update the call site (e.g., `useTimerActions.ts` or wherever `startTimer` is invoked) to pass the token from settings context
+- [x] Task 2.1: Update `apiFetch` or `startTimer` in `apps/tauri/src/lib/api-client.ts` to accept and send `X-Clockwork-Token` header
+- [x] Task 2.2: Update the call site (e.g., `useTimerActions.ts` or wherever `startTimer` is invoked) to pass the token from settings context
 
 ### Verification
 
