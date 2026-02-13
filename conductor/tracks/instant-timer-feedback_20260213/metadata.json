@@ -1,0 +1,19 @@
+{
+  "id": "instant-timer-feedback_20260213",
+  "title": "Instant Timer Feedback After Start",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-02-13T00:00:00.000Z",
+  "updated": "2026-02-13T07:15:49.000Z",
+  "current_phase": 1,
+  "current_task": "1.2",
+  "phases": {
+    "total": 2,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 5,
+    "completed": 2
+  },
+  "commits": []
+}

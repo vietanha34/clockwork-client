@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { startTimer } from '../../src/lib/clockwork-client';
+import { inngest } from '../../src/inngest/client';
 import { sendBadRequest, sendInternalError, sendSuccess } from '../../src/lib/response';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -25,6 +26,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   try {
     await startTimer(issueKey, comment, normalizedToken || undefined);
+
+    try {
+      await inngest.send({
+        name: 'clockwork/timers.sync.requested',
+        data: {
+          issueKey,
+          jiraDomain: process.env.JIRA_DOMAIN,
+        },
+      });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[POST /api/timers/start] Failed to dispatch sync event:', err);
+    }
+
     sendSuccess(res, {}, 201);
   } catch (err) {
     // eslint-disable-next-line no-console

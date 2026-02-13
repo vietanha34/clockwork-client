@@ -12,4 +12,6 @@
 
 | [x] | client-token_20260213 | Client-Side Clockwork API Token | 2026-02-13 | 2026-02-13 |
 
+| [~] | instant-timer-feedback_20260213 | Instant Timer Feedback After Start | 2026-02-13 | 2026-02-13 |
+
 <!-- Tracks registered by /conductor:new-track -->
