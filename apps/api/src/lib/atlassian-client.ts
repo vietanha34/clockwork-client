@@ -32,6 +32,10 @@ interface RawJiraIssue {
   };
 }
 
+interface RawSearchIssuesResponse {
+  issues: RawJiraIssue[];
+}
+
 // ─── Base HTTP helper ─────────────────────────────────────────────────────────
 
 function getBasicAuthHeader(): string {
@@ -96,6 +100,18 @@ export async function getIssue(issueKey: string): Promise<Issue> {
   const fields = 'summary,status,priority,assignee,project';
   const data = await atlassianFetch<RawJiraIssue>(`/issue/${issueKey}?fields=${fields}`);
   return transformIssue(data);
+}
+
+export async function searchIssues(jql: string, maxResults = 10): Promise<Issue[]> {
+  const fields = 'summary,status,priority,assignee,project';
+  const params = new URLSearchParams({
+    jql,
+    maxResults: String(maxResults),
+    fields,
+  });
+
+  const data = await atlassianFetch<RawSearchIssuesResponse>(`/search?${params.toString()}`);
+  return data.issues.map(transformIssue);
 }
 
 /**

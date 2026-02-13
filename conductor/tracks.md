@@ -14,4 +14,6 @@
 
 | [x] | instant-timer-feedback_20260213 | Instant Timer Feedback After Start | 2026-02-13 | 2026-02-13 |
 
+| [~] | issue-search_20260213 | Jira Issue Search for Start Timer | 2026-02-13 | 2026-02-13 |
+
 <!-- Tracks registered by /conductor:new-track -->
