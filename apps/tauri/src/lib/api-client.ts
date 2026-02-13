@@ -64,10 +64,11 @@ export async function stopTimer(
   apiBaseUrl: string,
   issueKey: string,
   accountId: string,
+  timerId?: number,
 ): Promise<void> {
   await apiFetch<unknown>(apiBaseUrl, '/api/timers/stop', {
     method: 'POST',
-    body: JSON.stringify({ issueKey, accountId }),
+    body: JSON.stringify({ issueKey, accountId, timerId }),
   });
 }
 

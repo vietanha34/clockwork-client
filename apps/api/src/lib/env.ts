@@ -51,4 +51,7 @@ export const env = {
   get JIRA_DOMAIN(): string {
     return required('JIRA_DOMAIN');
   },
+  get JIRA_FULL_COOKIE(): string {
+    return required('JIRA_FULL_COOKIE');
+  },
 } as const;

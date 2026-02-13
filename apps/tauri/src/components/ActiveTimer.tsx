@@ -56,10 +56,28 @@ export function ActiveTimer() {
             {activeTimer.issue.key}
           </span>
         </div>
-        {issue && <p className="text-xs text-gray-500 truncate mb-1">{issue.summary}</p>}
-        {issue?.project && <p className="text-xs text-gray-400">{issue.project.name}</p>}
-        <p className="text-xs text-gray-400 mt-1">
-          Started at {formatStartTime(activeTimer.startedAt)}
+        
+        {issue?.project && (
+          <div className="flex items-baseline gap-1 mb-0.5 max-w-full">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 select-none">PRJ:</span>
+            <p className="text-xs text-gray-600 truncate font-medium" title={issue.project.name}>
+              {issue.project.name}
+            </p>
+          </div>
+        )}
+
+        {issue && (
+          <div className="flex items-baseline gap-1 mb-1 max-w-full">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 select-none">ISS:</span>
+            <p className="text-xs text-gray-500 truncate" title={issue.summary}>
+              {issue.summary}
+            </p>
+          </div>
+        )}
+
+        <p className="text-[10px] text-gray-400 mt-1.5 flex items-center gap-1">
+          <span className="w-1 h-1 rounded-full bg-gray-300 inline-block" />
+          Started: {formatStartTime(activeTimer.startedAt)}
         </p>
       </div>
       
@@ -71,14 +89,16 @@ export function ActiveTimer() {
         />
         <button
           type="button"
-          onClick={() => stopTimer.mutate({ issueKey: activeTimer.issue.key })}
+          onClick={() => stopTimer.mutate({ issueKey: activeTimer.issue.key, timerId: activeTimer.id })}
           disabled={stopTimer.isPending}
           className="py-1 px-2 text-xs font-medium text-red-700 border border-red-300 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
         >
           {stopTimer.isPending ? 'Stopping…' : 'Stop'}
         </button>
         {stopTimer.isError && (
-          <p className="text-[10px] text-red-600">Failed</p>
+          <p className="text-[10px] text-red-600 max-w-[180px] text-right" title={stopTimer.error.message}>
+            {stopTimer.error.message}
+          </p>
         )}
       </div>
     </div>

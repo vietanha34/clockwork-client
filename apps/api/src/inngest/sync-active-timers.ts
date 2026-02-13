@@ -42,7 +42,7 @@ export const syncActiveTimers = inngest.createFunction(
   [
     { event: 'clockwork/timers.sync.requested' },
     // Every minute from 7:00 to 19:59 Mon-Sat (VN time)
-    { cron: '* 7-19 * * 1-6' },
+    { cron: 'TZ=Asia/Ho_Chi_Minh * 7-19 * * 1-6' },
   ],
   async ({ event, step }) => {
     const eventData = (event as SyncTimersEvent).data;

@@ -31,8 +31,8 @@ export function useStopTimer() {
   const delayedWorklogsRefreshRef = useRef<number | null>(null);
 
   return useMutation({
-    mutationFn: ({ issueKey }: { issueKey: string }) =>
-      stopTimer(API_BASE_URL, issueKey, accountId),
+    mutationFn: ({ issueKey, timerId }: { issueKey: string; timerId?: number }) =>
+      stopTimer(API_BASE_URL, issueKey, accountId, timerId),
 
     onMutate: async () => {
       // Cancel any in-flight refetches so they don't overwrite the optimistic update
