@@ -3,6 +3,7 @@ import type { AppSettings } from './types';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   jiraToken: '',
+  clockworkApiToken: '',
 };
 
 export async function loadSettings(): Promise<AppSettings> {

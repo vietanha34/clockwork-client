@@ -78,4 +78,5 @@ export interface ApiError {
 
 export interface AppSettings {
   jiraToken: string;
+  clockworkApiToken: string;
 }
