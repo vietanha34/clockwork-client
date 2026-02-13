@@ -62,7 +62,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   }
 
   return (
-    <div className="p-4">
+    <div className="h-full overflow-y-auto p-4">
       <h2 className="text-base font-semibold text-gray-900 mb-4">Settings</h2>
       {!isTauri && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">

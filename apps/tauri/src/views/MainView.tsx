@@ -10,7 +10,7 @@ export function MainView() {
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
 
   return (
-    <div className="divide-y divide-gray-100">
+    <div className="h-full min-h-0 flex flex-col divide-y divide-gray-100">
       {/* Active timer section */}
       {hasActiveTimer && (
         <section>
@@ -29,7 +29,7 @@ export function MainView() {
       </section>
 
       {/* Today's worklogs */}
-      <section>
+      <section className="flex min-h-0 flex-1 flex-col">
         <div className="px-4 pt-3 pb-0 flex items-center gap-1.5">
           <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide">Worklogs</h3>
           <button
@@ -53,7 +53,9 @@ export function MainView() {
             </svg>
           </button>
         </div>
-        <WorklogList />
+        <div className="worklogs-scroll min-h-0 flex-1 overflow-y-auto">
+          <WorklogList />
+        </div>
       </section>
     </div>
   );

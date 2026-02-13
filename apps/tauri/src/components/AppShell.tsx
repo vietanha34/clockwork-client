@@ -78,7 +78,7 @@ export function AppShell({
           </header>
 
           {/* Scrollable content */}
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
         </div>
       </div>
     </div>

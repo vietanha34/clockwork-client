@@ -16,8 +16,8 @@
       {
         "label": "main",
         "title": "Clockwork Menubar",
-        "width": 274,
-        "height": 403,
+        "width": 302,
+        "height": 443,
         "resizable": false,
         "decorations": false,
         "transparent": true,

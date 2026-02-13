@@ -1,0 +1,4 @@
+interface:
+  display_name: "Conductor Implement"
+  short_description: "Run Conductor track tasks with TDD checkpoints"
+  default_prompt: "Use $conductor-implement to execute the next incomplete task in my Conductor track and keep plan/metadata in sync."

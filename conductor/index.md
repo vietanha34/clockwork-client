@@ -21,6 +21,8 @@ Navigation hub for project context.
 
 - [x] [Client-Side Clockwork API Token](./tracks/client-token_20260213/index.md) - `client-token_20260213`
 
+- [x] [Instant Timer Feedback After Start](./tracks/instant-timer-feedback_20260213/index.md) - `instant-timer-feedback_20260213`
+
 <!-- Auto-populated by /conductor:new-track -->
 
 ## Getting Started

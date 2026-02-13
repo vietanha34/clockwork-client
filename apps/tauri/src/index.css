@@ -67,3 +67,20 @@ html, body {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
+
+.worklogs-scroll {
+  scrollbar-gutter: stable;
+}
+
+.worklogs-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.worklogs-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.worklogs-scroll::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.45);
+  border-radius: 999px;
+}

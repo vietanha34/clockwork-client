@@ -110,7 +110,7 @@ pub fn run() {
                             let _ = win.hide();
                         } else {
                             // Center window horizontally on tray icon, just below menu bar
-                            let x = (position.x as i32) - (274 / 2);
+                            let x = (position.x as i32) - (302 / 2);
                             let y = (position.y as i32) + 1;
                             let _ = win.set_position(tauri::Position::Physical(
                                 PhysicalPosition { x, y },
