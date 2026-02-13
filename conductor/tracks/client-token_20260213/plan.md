@@ -42,9 +42,9 @@ Update the API route and clockwork-client to accept token from the request heade
 
 ### Tasks
 
-- [ ] Task 3.1: Update `clockworkFetch` in `apps/api/src/lib/clockwork-client.ts` to accept an optional `token` parameter, falling back to `env.CLOCKWORK_API_TOKEN`
-- [ ] Task 3.2: Update `startTimer` in `clockwork-client.ts` to pass through the optional token
-- [ ] Task 3.3: Update `/api/timers/start` route to extract `X-Clockwork-Token` header and pass it to `startTimer`
+- [x] Task 3.1: Update `clockworkFetch` in `apps/api/src/lib/clockwork-client.ts` to accept an optional `token` parameter, falling back to `env.CLOCKWORK_API_TOKEN`
+- [x] Task 3.2: Update `startTimer` in `clockwork-client.ts` to pass through the optional token
+- [x] Task 3.3: Update `/api/timers/start` route to extract `X-Clockwork-Token` header and pass it to `startTimer`
 
 ### Verification
 
