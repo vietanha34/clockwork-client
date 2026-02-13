@@ -2,6 +2,7 @@ import { fetch } from '@tauri-apps/plugin-http';
 import type {
   ActiveTimersResponse,
   Issue,
+  SearchIssuesResponse,
   SettingsValidationError,
   SettingsValidationField,
   Worklog,
@@ -155,6 +156,28 @@ export async function fetchIssue(apiBaseUrl: string, issueKey: string): Promise<
     `/api/issues/${encodeURIComponent(issueKey)}`,
   );
   return res.issue;
+}
+
+export async function searchIssues(
+  apiBaseUrl: string,
+  query: string,
+  accountId: string,
+): Promise<Issue[]> {
+  const params = new URLSearchParams({
+    accountId,
+    maxResults: '10',
+  });
+
+  const trimmedQuery = query.trim();
+  if (trimmedQuery) {
+    params.set('q', trimmedQuery);
+  }
+
+  const res = await apiFetch<SearchIssuesResponse>(
+    apiBaseUrl,
+    `/api/issues/search?${params.toString()}`,
+  );
+  return res.issues;
 }
 
 // ─── Worklog helpers ──────────────────────────────────────────────────────────

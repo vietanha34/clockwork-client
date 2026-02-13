@@ -68,6 +68,10 @@ export interface WorklogsResponse {
   accountId: string;
 }
 
+export interface SearchIssuesResponse {
+  issues: Issue[];
+}
+
 export interface ApiError {
   error: string;
   message: string;

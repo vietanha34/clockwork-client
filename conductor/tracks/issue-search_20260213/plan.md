@@ -30,9 +30,9 @@ Wire up the Tauri client to call the search endpoint with debouncing.
 
 ### Tasks
 
-- [~] Task 2.1: Add `searchIssues(apiBaseUrl, query, accountId)` function to `apps/tauri/src/lib/api-client.ts`
-- [ ] Task 2.2: Add `Issue` type (if not already present) and `SearchIssuesResponse` to `apps/tauri/src/lib/types.ts`
-- [ ] Task 2.3: Create `useIssueSearch(query, accountId)` hook in `apps/tauri/src/hooks/useIssueSearch.ts` — React Query with 300ms debounce, 30s stale time, max 10 results
+- [x] Task 2.1: Add `searchIssues(apiBaseUrl, query, accountId)` function to `apps/tauri/src/lib/api-client.ts`
+- [x] Task 2.2: Add `Issue` type (if not already present) and `SearchIssuesResponse` to `apps/tauri/src/lib/types.ts`
+- [x] Task 2.3: Create `useIssueSearch(query, accountId)` hook in `apps/tauri/src/hooks/useIssueSearch.ts` — React Query with 300ms debounce, 30s stale time, max 10 results
 
 ### Verification
 
@@ -44,9 +44,9 @@ Replace the plain text input with a searchable combobox dropdown.
 
 ### Tasks
 
-- [ ] Task 3.1: Create `IssueCombobox` component in `apps/tauri/src/components/IssueCombobox.tsx` — input field with absolute-positioned dropdown, shows `[KEY] Summary (Status)` per item, loading/empty states
-- [ ] Task 3.2: Integrate `IssueCombobox` into `StartTimerForm.tsx` — replace plain issue key input, wire selected issue to form state
-- [ ] Task 3.3: Handle edge cases — allow manual key entry without dropdown selection, close dropdown on blur/escape, keyboard up/down navigation for item selection
+- [x] Task 3.1: Create `IssueCombobox` component in `apps/tauri/src/components/IssueCombobox.tsx` — input field with absolute-positioned dropdown, shows `[KEY] Summary (Status)` per item, loading/empty states
+- [x] Task 3.2: Integrate `IssueCombobox` into `StartTimerForm.tsx` — replace plain issue key input, wire selected issue to form state
+- [x] Task 3.3: Handle edge cases — allow manual key entry without dropdown selection, close dropdown on blur/escape, keyboard up/down navigation for item selection
 
 ### Verification
 

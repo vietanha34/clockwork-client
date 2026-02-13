@@ -1,12 +1,16 @@
 import { useState } from 'react';
+import { useSettings } from '../lib/settings-context';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useStartTimer } from '../hooks/useTimerActions';
+import { IssueCombobox } from './IssueCombobox';
 
 export function StartTimerForm() {
   const [issueKey, setIssueKey] = useState('');
   const [comment, setComment] = useState('');
   const [expanded, setExpanded] = useState(false);
   const startTimer = useStartTimer();
+  const { settings } = useSettings();
+  const accountId = settings.jiraToken;
   const { data: timerData } = useActiveTimers();
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
 
@@ -51,13 +55,12 @@ export function StartTimerForm() {
         )
       ) : (
         <form onSubmit={handleSubmit} className="space-y-2">
-          <input
-            type="text"
+          <IssueCombobox
             value={issueKey}
-            onChange={(e) => setIssueKey(e.target.value)}
+            accountId={accountId}
+            onChange={setIssueKey}
+            onSelect={setIssueKey}
             placeholder="Issue key (e.g. KAN-42)"
-            className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-            required
             autoFocus
           />
           <input
