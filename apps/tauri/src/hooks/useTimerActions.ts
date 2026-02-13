@@ -4,7 +4,7 @@ import { startTimer, stopTimer, todayDate } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
 import { useSettings } from '../lib/settings-context';
 import type { ActiveTimersResponse } from '../lib/types';
-import { ACTIVE_TIMERS_KEY } from './useActiveTimers';
+import { activateFastPolling, ACTIVE_TIMERS_KEY } from './useActiveTimers';
 import { WORKLOGS_KEY } from './useWorklogs';
 
 export function useStartTimer() {
@@ -21,6 +21,7 @@ export function useStartTimer() {
       comment?: string;
     }) => startTimer(API_BASE_URL, issueKey, comment, clockworkApiToken),
     onSuccess: () => {
+      activateFastPolling();
       void queryClient.invalidateQueries({ queryKey: [ACTIVE_TIMERS_KEY] });
     },
   });

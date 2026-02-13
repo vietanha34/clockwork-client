@@ -28,9 +28,9 @@ Temporarily increase React Query polling frequency after a successful start muta
 
 ### Tasks
 
-- [ ] Task 2.1: Add a `fastPolling` state (or ref) to `useActiveTimers` that can be toggled externally (e.g., via a callback or shared state)
-- [ ] Task 2.2: When `fastPolling` is active, set `refetchInterval` to 2000ms instead of 10000ms, with auto-reset after 30s
-- [ ] Task 2.3: In `useStartTimer` `onSuccess`, activate fast polling mode
+- [x] Task 2.1: Add a `fastPolling` state (or ref) to `useActiveTimers` that can be toggled externally (e.g., via a callback or shared state)
+- [x] Task 2.2: When `fastPolling` is active, set `refetchInterval` to 2000ms instead of 10000ms, with auto-reset after 30s
+- [x] Task 2.3: In `useStartTimer` `onSuccess`, activate fast polling mode
 
 ### Verification
 
