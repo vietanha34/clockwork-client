@@ -3,7 +3,7 @@
 **Track ID:** client-token_20260213
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-13
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -21,7 +21,7 @@ Extend the settings model and UI to support the new token field.
 
 ### Verification
 
-- [ ] Settings UI shows the new token field, value persists after save and reload
+- [x] Settings UI shows the new token field, value persists after save and reload
 
 ## Phase 2: Tauri API Client — Send Token Header
 
@@ -34,7 +34,7 @@ Update the Tauri HTTP client to include the token on outbound requests.
 
 ### Verification
 
-- [ ] Start timer request includes `X-Clockwork-Token` header (verify via network log or curl debug)
+- [x] Start timer request includes `X-Clockwork-Token` header (verify via network log or curl debug)
 
 ## Phase 3: Server-Side Token Extraction
 
@@ -48,14 +48,14 @@ Update the API route and clockwork-client to accept token from the request heade
 
 ### Verification
 
-- [ ] Start timer works end-to-end with client-provided token
-- [ ] Start timer still works with env var fallback when no header is sent
+- [x] Start timer works end-to-end with client-provided token
+- [x] Start timer still works with env var fallback when no header is sent
 
 ## Final Verification
 
-- [ ] All acceptance criteria met
-- [ ] No regressions in existing timer functionality (stop timer, active timers)
-- [ ] Settings persist across app restart
+- [x] All acceptance criteria met
+- [x] No regressions in existing timer functionality (stop timer, active timers)
+- [x] Settings persist across app restart
 
 ---
 
