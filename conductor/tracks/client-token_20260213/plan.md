@@ -16,7 +16,7 @@ Extend the settings model and UI to support the new token field.
 ### Tasks
 
 - [x] Task 1.1: Add `clockworkApiToken` field to TypeScript `AppSettings` interface and `DEFAULT_SETTINGS` in `apps/tauri/src/lib/types.ts`
-- [ ] Task 1.2: Add `clockwork_api_token` field to Rust `AppSettings` struct in `apps/tauri/src-tauri/src/lib.rs`
+- [x] Task 1.2: Add `clockwork_api_token` field to Rust `AppSettings` struct in `apps/tauri/src-tauri/src/lib.rs`
 - [ ] Task 1.3: Add "Clockwork API Token" input field to `SettingsView.tsx` (password-masked input)
 
 ### Verification
