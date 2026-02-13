@@ -16,13 +16,36 @@ interface RawWorklog {
 
 // ─── Base HTTP helper ─────────────────────────────────────────────────────────
 
+export class ClockworkApiError extends Error {
+  public readonly status: number;
+  public readonly path: string;
+  public readonly responseText: string;
+
+  constructor(status: number, path: string, responseText: string) {
+    super(`Clockwork API error ${status} on ${path}: ${responseText}`);
+    this.name = 'ClockworkApiError';
+    this.status = status;
+    this.path = path;
+    this.responseText = responseText;
+  }
+}
+
+interface ClockworkFetchOptions {
+  token?: string;
+  allowEnvFallback?: boolean;
+}
+
 async function clockworkFetch<T>(
   path: string,
   options: RequestInit = {},
-  token?: string,
+  fetchOptions: ClockworkFetchOptions = {},
 ): Promise<T> {
   const url = `${env.CLOCKWORK_API_BASE_URL}${path}`;
-  const resolvedToken = token || env.CLOCKWORK_API_TOKEN;
+  const { token, allowEnvFallback = true } = fetchOptions;
+  const resolvedToken = token || (allowEnvFallback ? env.CLOCKWORK_API_TOKEN : '');
+  if (!resolvedToken) {
+    throw new Error('Clockwork token is required');
+  }
   const res = await fetch(url, {
     ...options,
     headers: {
@@ -46,7 +69,7 @@ async function clockworkFetch<T>(
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Clockwork API error ${res.status} on ${path}: ${text}`);
+    throw new ClockworkApiError(res.status, path, text);
   }
 
   return res.json() as Promise<T>;
@@ -86,6 +109,26 @@ export async function getWorklogs(accountId: string, date?: string): Promise<Wor
   return data.map(transformWorklog);
 }
 
+export async function validateClockworkToken(
+  accountId: string,
+  token: string,
+  date?: string,
+): Promise<void> {
+  const targetDate =
+    date ?? new Date().toISOString().split('T')[0] ?? new Date().toISOString().substring(0, 10);
+  const params = new URLSearchParams([
+    ['account_id', accountId],
+    ['starting_at', targetDate],
+    ['ending_at', targetDate],
+  ]);
+
+  await clockworkFetch<RawWorklog[]>(
+    `/worklogs?${params.toString()}`,
+    undefined,
+    { token, allowEnvFallback: false },
+  );
+}
+
 /**
  * Start a new timer for the given issue.
  */
@@ -95,7 +138,7 @@ export async function startTimer(issueKey: string, comment?: string, token?: str
   await clockworkFetch<unknown>('/start_timer', {
     method: 'POST',
     body: JSON.stringify(payload),
-  }, token);
+  }, { token });
 }
 
 /**

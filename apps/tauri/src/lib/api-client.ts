@@ -1,5 +1,22 @@
 import { fetch } from '@tauri-apps/plugin-http';
-import type { ActiveTimersResponse, Issue, Worklog, WorklogsResponse } from './types';
+import type {
+  ActiveTimersResponse,
+  Issue,
+  SettingsValidationError,
+  SettingsValidationField,
+  Worklog,
+  WorklogsResponse,
+} from './types';
+
+export class ApiValidationError extends Error {
+  public readonly field: SettingsValidationField;
+
+  constructor(message: string, field: SettingsValidationField) {
+    super(message);
+    this.name = 'ApiValidationError';
+    this.field = field;
+  }
+}
 
 // ─── Base Fetch ───────────────────────────────────────────────────────────────
 
@@ -78,6 +95,44 @@ export async function stopTimer(
     method: 'POST',
     body: JSON.stringify({ issueKey, accountId, timerId }),
   });
+}
+
+export async function validateSettings(
+  apiBaseUrl: string,
+  payload: { accountId: string; clockworkApiToken: string },
+): Promise<{
+  valid: true;
+  user: {
+    accountId: string;
+    displayName?: string;
+    emailAddress?: string;
+    avatarUrl?: string;
+  };
+}> {
+  const url = `${apiBaseUrl.replace(/\/$/, '')}/api/settings/validate`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const errorBody = body as Partial<SettingsValidationError>;
+    const field = errorBody.field ?? 'general';
+    const message = errorBody.message ?? 'Settings validation failed';
+    throw new ApiValidationError(message, field);
+  }
+
+  return (await res.json()) as {
+    valid: true;
+    user: {
+      accountId: string;
+      displayName?: string;
+      emailAddress?: string;
+      avatarUrl?: string;
+    };
+  };
 }
 
 // ─── Worklog Endpoints ────────────────────────────────────────────────────────

@@ -4,11 +4,13 @@ import type { AppSettings } from './types';
 export const DEFAULT_SETTINGS: AppSettings = {
   jiraToken: '',
   clockworkApiToken: '',
+  jiraUser: null,
 };
 
 export async function loadSettings(): Promise<AppSettings> {
   try {
-    return await invoke<AppSettings>('get_settings');
+    const loaded = await invoke<Partial<AppSettings>>('get_settings');
+    return { ...DEFAULT_SETTINGS, ...loaded };
   } catch {
     return DEFAULT_SETTINGS;
   }

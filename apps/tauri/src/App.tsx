@@ -48,16 +48,17 @@ function AppContent() {
 
   // On first load, if no email is configured, redirect to settings
   useEffect(() => {
-    if (isLoaded && !settings.jiraToken) {
+    if (isLoaded && (!settings.jiraToken || !settings.clockworkApiToken)) {
       setView('settings');
     }
-  }, [isLoaded, settings.jiraToken]);
+  }, [isLoaded, settings.jiraToken, settings.clockworkApiToken]);
 
   return (
     <AppShell
       onSettingsClick={() => setView('settings')}
       showBackButton={view === 'settings'}
       onBackClick={() => setView('main')}
+      userDisplayName={view === 'main' ? settings.jiraUser?.displayName : undefined}
     >
       {view === 'main' && <MainView />}
       {view === 'settings' && <SettingsView onClose={() => setView('main')} />}

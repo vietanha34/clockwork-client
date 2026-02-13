@@ -8,11 +8,25 @@ use tauri::{AppHandle, Manager, PhysicalPosition};
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct JiraUserSettings {
+    #[serde(rename = "accountId", default)]
+    pub account_id: String,
+    #[serde(rename = "emailAddress", default)]
+    pub email_address: String,
+    #[serde(rename = "displayName", default)]
+    pub display_name: String,
+    #[serde(rename = "avatarUrl", default)]
+    pub avatar_url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppSettings {
     #[serde(rename = "jiraToken", default)]
     pub jira_token: String,
     #[serde(rename = "clockworkApiToken", default)]
     pub clockwork_api_token: String,
+    #[serde(rename = "jiraUser", default)]
+    pub jira_user: Option<JiraUserSettings>,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {

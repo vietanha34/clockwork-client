@@ -17,7 +17,9 @@ Navigation hub for project context.
 - [x] [Tauri Client UI](./tracks/tauri-client-ui_20260210/index.md) - `tauri-client-ui_20260210`
 - [x] [Vercel Deployment](./tracks/vercel-deployment_20260210/index.md) - `vercel-deployment_20260210`
 - [x] [Jira User Enrichment for Active Timers](./tracks/jira-user-enrichment_20260211/index.md) - `jira-user-enrichment_20260211`
-- [ ] [Switch Primary Key from Email to accountId](./tracks/accountid-primary-key_20260211/index.md) - `accountid-primary-key_20260211`
+- [x] [Switch Primary Key from Email to accountId](./tracks/accountid-primary-key_20260211/index.md) - `accountid-primary-key_20260211`
+
+- [x] [Client-Side Clockwork API Token](./tracks/client-token_20260213/index.md) - `client-token_20260213`
 
 <!-- Auto-populated by /conductor:new-track -->
 

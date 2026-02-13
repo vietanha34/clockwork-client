@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { API_BASE_URL } from '../lib/constants';
+import { ApiValidationError, validateSettings } from '../lib/api-client';
 import { useSettings } from '../lib/settings-context';
 
 interface SettingsViewProps {
@@ -11,6 +13,8 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const isTauri = typeof window !== 'undefined' && (!!window.__TAURI_INTERNALS__ || !!window.__TAURI__);
   const [jiraToken, setJiraToken] = useState(settings.jiraToken);
   const [clockworkApiToken, setClockworkApiToken] = useState(settings.clockworkApiToken);
+  const [accountIdError, setAccountIdError] = useState<string | null>(null);
+  const [clockworkTokenError, setClockworkTokenError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,20 +22,39 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setAccountIdError(null);
+    setClockworkTokenError(null);
     setError(null);
     try {
-      await updateSettings({ jiraToken, clockworkApiToken });
+      const accountId = jiraToken.trim();
+      const token = clockworkApiToken.trim();
+      const validation = await validateSettings(API_BASE_URL, {
+        accountId,
+        clockworkApiToken: token,
+      });
+
+      await updateSettings({
+        jiraToken: accountId,
+        clockworkApiToken: token,
+        jiraUser: validation.user,
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      if (jiraToken) {
-        setTimeout(onClose, 500);
-      }
+      setTimeout(onClose, 300);
     } catch (error) {
       console.error('Save Settings Error:', error);
-      if (error instanceof Error) {
-        setError(`${error.message} (${JSON.stringify(error)})`);
+      if (error instanceof ApiValidationError) {
+        if (error.field === 'accountId') {
+          setAccountIdError(error.message);
+        } else if (error.field === 'clockworkApiToken') {
+          setClockworkTokenError(error.message);
+        } else {
+          setError(error.message);
+        }
+      } else if (error instanceof Error) {
+        setError(error.message);
       } else {
-        setError(`Failed to save settings: ${JSON.stringify(error)}`);
+        setError('Failed to save settings');
       }
     } finally {
       setSaving(false);
@@ -68,6 +91,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+          {accountIdError && <p className="mt-1 text-xs text-red-600">{accountIdError}</p>}
         </div>
 
         <div>
@@ -81,7 +105,9 @@ export function SettingsView({ onClose }: SettingsViewProps) {
             onChange={(e) => setClockworkApiToken(e.target.value)}
             placeholder="Enter your Clockwork API token"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
+          {clockworkTokenError && <p className="mt-1 text-xs text-red-600">{clockworkTokenError}</p>}
         </div>
 
         {error && <p className="text-xs text-red-600">{error}</p>}

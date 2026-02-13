@@ -74,9 +74,16 @@ export interface ApiError {
   statusCode: number;
 }
 
+export type SettingsValidationField = 'accountId' | 'clockworkApiToken' | 'general';
+
+export interface SettingsValidationError extends ApiError {
+  field?: SettingsValidationField;
+}
+
 // ─── App Settings ─────────────────────────────────────────────────────────────
 
 export interface AppSettings {
   jiraToken: string;
   clockworkApiToken: string;
+  jiraUser: ClockworkUser | null;
 }

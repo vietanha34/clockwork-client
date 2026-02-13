@@ -8,6 +8,7 @@ interface AppShellProps {
   onSettingsClick: () => void;
   showBackButton?: boolean;
   onBackClick?: () => void;
+  userDisplayName?: string;
 }
 
 export function AppShell({
@@ -15,6 +16,7 @@ export function AppShell({
   onSettingsClick,
   showBackButton,
   onBackClick,
+  userDisplayName,
 }: AppShellProps) {
   return (
     <div className="menubar-popover-frame h-full w-full p-2 pt-2">
@@ -48,7 +50,12 @@ export function AppShell({
                   </svg>
                 </button>
               )}
-              <span className="font-semibold text-sm text-gray-900">Clockwork</span>
+              <span className="font-semibold text-sm text-gray-900">
+                Clockwork
+                {userDisplayName ? (
+                  <span className="ml-1 font-medium text-teal-700">({userDisplayName})</span>
+                ) : null}
+              </span>
             </div>
             <div className="flex items-center gap-0.5">
               <button
