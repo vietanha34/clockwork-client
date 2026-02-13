@@ -31,11 +31,12 @@ export function useStopTimer() {
   const queryClient = useQueryClient();
   const { settings } = useSettings();
   const accountId = settings.jiraToken;
+  const clockworkApiToken = settings.clockworkApiToken;
   const delayedWorklogsRefreshRef = useRef<number | null>(null);
 
   return useMutation({
     mutationFn: ({ issueKey, timerId }: { issueKey: string; timerId?: number }) =>
-      stopTimer(API_BASE_URL, issueKey, accountId, timerId),
+      stopTimer(API_BASE_URL, issueKey, accountId, timerId, clockworkApiToken),
 
     onMutate: async () => {
       // Cancel any in-flight refetches so they don't overwrite the optimistic update

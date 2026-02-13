@@ -110,7 +110,7 @@ export async function searchIssues(jql: string, maxResults = 10): Promise<Issue[
     fields,
   });
 
-  const data = await atlassianFetch<RawSearchIssuesResponse>(`/search?${params.toString()}`);
+  const data = await atlassianFetch<RawSearchIssuesResponse>(`/search/jql?${params.toString()}`);
   return data.issues.map(transformIssue);
 }
 

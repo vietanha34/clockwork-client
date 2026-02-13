@@ -23,6 +23,8 @@ Navigation hub for project context.
 
 - [x] [Instant Timer Feedback After Start](./tracks/instant-timer-feedback_20260213/index.md) - `instant-timer-feedback_20260213`
 
+- [x] [Jira Issue Search for Start Timer](./tracks/issue-search_20260213/index.md) - `issue-search_20260213`
+
 <!-- Auto-populated by /conductor:new-track -->
 
 ## Getting Started

@@ -144,9 +144,9 @@ export async function startTimer(issueKey: string, comment?: string, token?: str
 /**
  * Stop a running timer by issue key.
  */
-export async function stopTimer(issueKey: string): Promise<void> {
+export async function stopTimer(issueKey: string, token?: string): Promise<void> {
   await clockworkFetch<unknown>('/stop_timer', {
     method: 'POST',
     body: JSON.stringify({ issue_key: issueKey }),
-  });
+  }, { token });
 }

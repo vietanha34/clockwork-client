@@ -91,9 +91,16 @@ export async function stopTimer(
   issueKey: string,
   accountId: string,
   timerId?: number,
+  clockworkApiToken?: string,
 ): Promise<void> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (clockworkApiToken) {
+    headers['X-Clockwork-Token'] = clockworkApiToken;
+  }
+
   await apiFetch<unknown>(apiBaseUrl, '/api/timers/stop', {
     method: 'POST',
+    headers,
     body: JSON.stringify({ issueKey, accountId, timerId }),
   });
 }
