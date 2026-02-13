@@ -11,6 +11,8 @@ use tauri::{AppHandle, Manager, PhysicalPosition};
 pub struct AppSettings {
     #[serde(rename = "jiraToken", default)]
     pub jira_token: String,
+    #[serde(rename = "clockworkApiToken", default)]
+    pub clockwork_api_token: String,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {
