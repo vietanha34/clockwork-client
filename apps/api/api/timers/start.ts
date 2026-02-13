@@ -19,8 +19,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
+  const tokenHeader = req.headers['x-clockwork-token'];
+  const clockworkToken = Array.isArray(tokenHeader) ? tokenHeader[0] : tokenHeader;
+  const normalizedToken = typeof clockworkToken === 'string' ? clockworkToken.trim() : '';
+
   try {
-    await startTimer(issueKey, comment);
+    await startTimer(issueKey, comment, normalizedToken || undefined);
     sendSuccess(res, {}, 201);
   } catch (err) {
     // eslint-disable-next-line no-console
