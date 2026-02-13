@@ -16,13 +16,18 @@ interface RawWorklog {
 
 // ─── Base HTTP helper ─────────────────────────────────────────────────────────
 
-async function clockworkFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function clockworkFetch<T>(
+  path: string,
+  options: RequestInit = {},
+  token?: string,
+): Promise<T> {
   const url = `${env.CLOCKWORK_API_BASE_URL}${path}`;
+  const resolvedToken = token || env.CLOCKWORK_API_TOKEN;
   const res = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Token ${env.CLOCKWORK_API_TOKEN}`,
+      'Authorization': `Token ${resolvedToken}`,
       ...options.headers,
     },
   });
@@ -32,7 +37,7 @@ async function clockworkFetch<T>(path: string, options: RequestInit = {}): Promi
     'curl',
     '-X', options.method || 'GET',
     '-H', 'Content-Type: application/json',
-    '-H', `Authorization: Token ${env.CLOCKWORK_API_TOKEN}`,
+    '-H', `Authorization: Token ${resolvedToken}`,
     ...(options.body ? ['-d', options.body as string] : []),
     `"${url}"`,
   ].join(' ');
