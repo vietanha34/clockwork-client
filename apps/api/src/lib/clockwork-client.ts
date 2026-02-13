@@ -89,13 +89,13 @@ export async function getWorklogs(accountId: string, date?: string): Promise<Wor
 /**
  * Start a new timer for the given issue.
  */
-export async function startTimer(issueKey: string, comment?: string): Promise<void> {
+export async function startTimer(issueKey: string, comment?: string, token?: string): Promise<void> {
   const payload = { issue_key: issueKey, ...(comment ? { comment } : {}) };
 
   await clockworkFetch<unknown>('/start_timer', {
     method: 'POST',
     body: JSON.stringify(payload),
-  });
+  }, token);
 }
 
 /**
