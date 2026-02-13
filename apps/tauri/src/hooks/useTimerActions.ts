@@ -9,6 +9,8 @@ import { WORKLOGS_KEY } from './useWorklogs';
 
 export function useStartTimer() {
   const queryClient = useQueryClient();
+  const { settings } = useSettings();
+  const clockworkApiToken = settings.clockworkApiToken;
 
   return useMutation({
     mutationFn: ({
@@ -17,7 +19,7 @@ export function useStartTimer() {
     }: {
       issueKey: string;
       comment?: string;
-    }) => startTimer(API_BASE_URL, issueKey, comment),
+    }) => startTimer(API_BASE_URL, issueKey, comment, clockworkApiToken),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [ACTIVE_TIMERS_KEY] });
     },
