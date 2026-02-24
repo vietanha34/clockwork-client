@@ -3,7 +3,7 @@
 **Track ID:** unlogged-days-warning_20260224
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-24
-**Status:** [~] In Progress
+**Status:** [x] Complete
 
 ## Overview
 
@@ -32,9 +32,9 @@ Build the banner component and guide modal, integrate into MainView.
 
 ### Tasks
 
-- [ ] Task 2.1: Create `UnloggedDaysWarning` component in `apps/tauri/src/components/UnloggedDaysWarning.tsx` — amber banner listing unlogged days, collapsible, with "Huong dan log bu" button
-- [ ] Task 2.2: Create `LogGuideModal` component in `apps/tauri/src/components/LogGuideModal.tsx` — overlay modal with markdown-style instructions for logging time via CLI tools and Clockwork web
-- [ ] Task 2.3: Integrate `UnloggedDaysWarning` into `MainView.tsx` — render at top of view, pass `unloggedDays` data from hook
+- [x] Task 2.1: Create `UnloggedDaysWarning` component in `apps/tauri/src/components/UnloggedDaysWarning.tsx` — amber banner listing unlogged days, collapsible, with "Huong dan log bu" button
+- [x] Task 2.2: Create `LogGuideModal` component in `apps/tauri/src/components/LogGuideModal.tsx` — overlay modal with markdown-style instructions for logging time via CLI tools and Clockwork web
+- [x] Task 2.3: Integrate `UnloggedDaysWarning` into `MainView.tsx` — render at top of view, pass `unloggedDays` data from hook
 
 ### Verification
 
@@ -50,8 +50,8 @@ Add red dot to tray icon when unlogged days exist.
 
 ### Tasks
 
-- [ ] Task 3.1: Modify `App.tsx` to pass `hasUnloggedDays` boolean to `useTrayTimer` hook
-- [ ] Task 3.2: Modify `useTrayTimer.ts` to draw a red dot at the top-right corner of the tray icon bitmap when `hasUnloggedDays === true`
+- [x] Task 3.1: Modify `App.tsx` to pass `hasUnloggedDays` boolean to `useTrayTimer` hook
+- [x] Task 3.2: Modify `useTrayTimer.ts` to draw a red dot at the top-right corner of the tray icon bitmap when `hasUnloggedDays === true`
 
 ### Verification
 
@@ -65,7 +65,7 @@ Wire up re-checking after stop timer actions.
 
 ### Tasks
 
-- [ ] Task 4.1: Modify `useTimerActions.ts` — after successful `stopTimer`, invalidate worklog queries for previous days to trigger re-check of unlogged days
+- [x] Task 4.1: Modify `useTimerActions.ts` — after successful `stopTimer`, invalidate worklog queries for previous days to trigger re-check of unlogged days
 
 ### Verification
 
