@@ -4,7 +4,8 @@ import { startTimer, stopTimer, todayDate } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
 import { useSettings } from '../lib/settings-context';
 import type { ActiveTimersResponse } from '../lib/types';
-import { activateFastPolling, ACTIVE_TIMERS_KEY } from './useActiveTimers';
+import { ACTIVE_TIMERS_KEY, activateFastPolling } from './useActiveTimers';
+import { getWeekdaysUntilYesterday } from './useUnloggedDays';
 import { WORKLOGS_KEY } from './useWorklogs';
 
 export function useStartTimer() {
@@ -61,6 +62,15 @@ export function useStopTimer() {
     onError: (_err, _vars, context) => {
       // Rollback to snapshot on failure
       queryClient.setQueryData([ACTIVE_TIMERS_KEY, accountId], context?.previous);
+    },
+
+    onSuccess: () => {
+      const weekdays = getWeekdaysUntilYesterday();
+      for (const day of weekdays) {
+        void queryClient.invalidateQueries({
+          queryKey: [WORKLOGS_KEY, accountId, day.date],
+        });
+      }
     },
 
     onSettled: () => {
