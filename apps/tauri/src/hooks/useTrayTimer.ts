@@ -14,7 +14,12 @@ function formatDuration(startedAt: string): string {
   return `${mm}:${ss}`;
 }
 
-export function useTrayTimer(startedAt?: string, issueKey?: string, progress?: number) {
+export function useTrayTimer(
+  startedAt?: string,
+  issueKey?: string,
+  progress?: number,
+  hasUnloggedDays?: boolean,
+) {
   useEffect(() => {
     // 1. Create Canvas
     const canvas = document.createElement('canvas');
@@ -82,11 +87,29 @@ export function useTrayTimer(startedAt?: string, issueKey?: string, progress?: n
         // Đẩy text xuống sát đáy hơn (totalHeight)
         ctx.fillText(displayText, totalWidth / 2, totalHeight + 2);
 
-        // 7. Get Bytes
+        // 7. Draw red warning dot
+        if (hasUnloggedDays) {
+            const radius = 3;
+            const dotX = totalWidth - radius - 1;
+            const dotY = radius + 1;
+
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // 8. Get Bytes
         const imageData = ctx.getImageData(0, 0, totalWidth, totalHeight);
         const buffer = Array.from(imageData.data);
 
-        // 8. Send to Rust
+        // 9. Send to Rust
         invoke('update_tray_bitmap', { 
             buffer, 
             width: totalWidth, 
@@ -98,5 +121,5 @@ export function useTrayTimer(startedAt?: string, issueKey?: string, progress?: n
     const interval = setInterval(render, 1000);
 
     return () => clearInterval(interval);
-  }, [startedAt, issueKey, progress]);
+  }, [startedAt, issueKey, progress, hasUnloggedDays]);
 }
