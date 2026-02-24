@@ -68,6 +68,13 @@ export interface WorklogsResponse {
   accountId: string;
 }
 
+export interface UnloggedDay {
+  date: string;
+  dayOfWeek: string;
+  loggedSeconds: number;
+  requiredSeconds: number;
+}
+
 export interface SearchIssuesResponse {
   issues: Issue[];
 }
