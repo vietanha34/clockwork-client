@@ -16,4 +16,6 @@
 
 | [x] | issue-search_20260213 | Jira Issue Search for Start Timer | 2026-02-13 | 2026-02-13 |
 
+| [~] | unlogged-days-warning_20260224 | Unlogged Days Warning | 2026-02-24 | 2026-02-24 |
+
 <!-- Tracks registered by /conductor:new-track -->
