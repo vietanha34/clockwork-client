@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { useActiveTimers } from './hooks/useActiveTimers';
 import { useTrayTimer } from './hooks/useTrayTimer';
+import { useUnloggedDays } from './hooks/useUnloggedDays';
 import { useWorklogs } from './hooks/useWorklogs';
 import { totalWorklogSeconds } from './lib/api-client';
 import { SettingsProvider, useSettings } from './lib/settings-context';
@@ -15,6 +16,7 @@ function AppContent() {
   const { settings, isLoaded } = useSettings();
   const { data } = useActiveTimers();
   const { data: worklogs } = useWorklogs();
+  const { unloggedDays } = useUnloggedDays();
   const activeTimer = data?.timers[0];
 
   // Count only today's running overlap from 08:00 local time.
@@ -43,8 +45,9 @@ function AppContent() {
   const loggedSeconds = totalWorklogSeconds(worklogs?.worklogs ?? []);
   const totalSeconds = loggedSeconds + currentSessionDuration;
   const dailyProgress = totalSeconds / (8 * 3600);
+  const hasUnloggedDays = unloggedDays.length > 0;
 
-  useTrayTimer(effectiveStartedAt, activeTimer?.issue.key, dailyProgress);
+  useTrayTimer(effectiveStartedAt, activeTimer?.issue.key, dailyProgress, hasUnloggedDays);
 
   // On first load, if no email is configured, redirect to settings
   useEffect(() => {
