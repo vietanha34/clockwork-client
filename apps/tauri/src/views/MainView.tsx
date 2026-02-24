@@ -1,16 +1,21 @@
 import { ActiveTimer } from '../components/ActiveTimer';
 import { StartTimerForm } from '../components/StartTimerForm';
+import { UnloggedDaysWarning } from '../components/UnloggedDaysWarning';
 import { WorklogList } from '../components/WorklogList';
 import { useActiveTimers } from '../hooks/useActiveTimers';
+import { useUnloggedDays } from '../hooks/useUnloggedDays';
 import { useWorklogs } from '../hooks/useWorklogs';
 
 export function MainView() {
   const { isFetching, refetch } = useWorklogs();
   const { data: timerData } = useActiveTimers();
+  const { unloggedDays } = useUnloggedDays();
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
 
   return (
-    <div className="h-full min-h-0 flex flex-col divide-y divide-gray-100">
+    <div className="relative h-full min-h-0 flex flex-col divide-y divide-gray-100">
+      <UnloggedDaysWarning unloggedDays={unloggedDays} />
+
       {/* Active timer section */}
       {hasActiveTimer && (
         <section>
