@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { LogGuideModal } from './LogGuideModal';
 import type { UnloggedDay } from '../lib/types';
+import { LogGuideModal } from './LogGuideModal';
 
 interface UnloggedDaysWarningProps {
   unloggedDays: UnloggedDay[];

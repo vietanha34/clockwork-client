@@ -25,7 +25,8 @@ export function LogGuideModal({ isOpen, onClose }: LogGuideModalProps) {
           <section>
             <p className="font-semibold">1. Log qua CLI</p>
             <p className="mt-1">
-              Dung cong cu CLI de them worklog cho ngay bi thieu thoi gian, sau do sync lai trong app.
+              Dung cong cu CLI de them worklog cho ngay bi thieu thoi gian, sau do sync lai trong
+              app.
             </p>
           </section>
 

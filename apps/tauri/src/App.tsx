@@ -36,9 +36,7 @@ function AppContent() {
     return Math.floor((nowMs - effectiveStartMs) / 1000);
   })();
   const effectiveStartedAt = activeTimer
-    ? new Date(
-        (new Date()).getTime() - activeTimer.tillNow * 1000,
-      ).toISOString()
+    ? new Date(new Date().getTime() - activeTimer.tillNow * 1000).toISOString()
     : undefined;
 
   // Always compute from worklog items so progress still works even when API `total` is stale/missing.
