@@ -26,6 +26,9 @@ apps/tauri/src-tauri/WixTools/
 .env.production.local
 .env*.local
 
+# Claude Code (MCP config contains API tokens)
+.claude/mcp.json
+
 # Editor / OS
 .DS_Store
 .DS_Store?

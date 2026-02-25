@@ -45,9 +45,11 @@ export function useTrayTimer(
       const paddingX = 0; // minimal padding
       const barHeight = 11; // Tăng độ cao bar
       const barY = 0; // Đẩy bar lên sát hơn
+      const warningLaneWidth = hasUnloggedDays ? 16 : 0;
 
       const totalHeight = 23; // Standard Menu Bar Height
-      const totalWidth = Math.max(textWidth, 40) + paddingX * 2; // Minimum width 40px
+      const contentWidth = Math.max(textWidth, 40) + paddingX * 2; // Minimum width 40px
+      const totalWidth = contentWidth + warningLaneWidth;
 
       // 3. Resize Canvas
       if (canvas.width !== totalWidth || canvas.height !== totalHeight) {
@@ -62,7 +64,7 @@ export function useTrayTimer(
 
       // 5. Draw Progress Bar (Top)
       if (typeof progress === 'number') {
-        const barTotalWidth = totalWidth;
+        const barTotalWidth = contentWidth;
         const barFillWidth = Math.floor(barTotalWidth * Math.min(Math.max(progress, 0), 1));
 
         // Draw Track (Background) - Semi-transparent White
@@ -85,12 +87,12 @@ export function useTrayTimer(
       ctx.textBaseline = 'bottom';
       ctx.textAlign = 'center';
       // Đẩy text xuống sát đáy hơn (totalHeight)
-      ctx.fillText(displayText, totalWidth / 2, totalHeight + 2);
+      ctx.fillText(displayText, contentWidth / 2, totalHeight + 2);
 
       // 7. Draw red warning dot
       if (hasUnloggedDays) {
-        const radius = 3;
-        const dotX = totalWidth - radius - 1;
+        const radius = 4.5;
+        const dotX = contentWidth + Math.floor(warningLaneWidth / 2);
         const dotY = radius + 1;
 
         ctx.fillStyle = '#ef4444';

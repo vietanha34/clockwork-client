@@ -25,6 +25,10 @@ Navigation hub for project context.
 
 - [x] [Jira Issue Search for Start Timer](./tracks/issue-search_20260213/index.md) - `issue-search_20260213`
 
+- [ ] [Unlogged Days Warning](./tracks/unlogged-days-warning_20260224/index.md) - `unlogged-days-warning_20260224`
+
+- [ ] [Worklog History & Weekly Summary](./tracks/worklog-history-weekly_20260225/index.md) - `worklog-history-weekly_20260225`
+
 <!-- Auto-populated by /conductor:new-track -->
 
 ## Getting Started

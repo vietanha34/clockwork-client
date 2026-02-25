@@ -29,7 +29,30 @@
       "Bash(node:*)",
       "Bash(python3:*)",
       "WebFetch(domain:docs.herocoders.com)",
-      "Bash(npx skills:*)"
+      "Bash(npx skills:*)",
+      "Bash(ln:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker kill:*)",
+      "Bash(head:*)",
+      "Bash(docker run:*)",
+      "Bash(docker info:*)",
+      "Bash(which claude && claude --version 2>&1)",
+      "Bash(claude mcp:*)",
+      "Bash(ls:*)",
+      "mcp__atlassian__jira_search",
+      "mcp__atlassian__jira_search_fields",
+      "mcp__atlassian__jira_get_field_options",
+      "mcp__atlassian__jira_create_issue",
+      "mcp__atlassian__jira_add_worklog",
+      "WebSearch",
+      "Bash(claude:*)",
+      "Bash(echo TERM=$TERM:*)",
+      "Bash(npx:*)",
+      "mcp__atlassian__jira_get_user_profile",
+      "mcp__atlassian__jira_get_worklog"
+    ],
+    "additionalDirectories": [
+      "/Users/vietanha34/Documents/workspace/personal-projects/clockwork-client/docs/plans"
     ]
   }
 }
