@@ -39,10 +39,12 @@ export function MainView() {
         </section>
       )}
 
-      {/* Start new timer */}
-      <section>
-        <StartTimerForm />
-      </section>
+      {/* Start new timer — hidden while a timer is running */}
+      {!hasActiveTimer && (
+        <section>
+          <StartTimerForm />
+        </section>
+      )}
 
       {/* Worklogs section with tabs + date strip */}
       <section className="flex min-h-0 flex-1 flex-col">
