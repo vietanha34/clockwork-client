@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActiveTimer } from '../components/ActiveTimer';
 import { DateStrip } from '../components/DateStrip';
 import { StartTimerForm } from '../components/StartTimerForm';
@@ -12,6 +12,17 @@ import { useWeeklyWorklogs } from '../hooks/useWeeklyWorklogs';
 import { useWorklogs } from '../hooks/useWorklogs';
 import { todayDate } from '../lib/api-client';
 
+const rangeFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+
+function weekRangeLabel(weekData: { date: string }[]): string {
+  const first = weekData[0]?.date;
+  const last = weekData[weekData.length - 1]?.date;
+  if (!first || !last) return '';
+  const [fy = 0, fm = 1, fd = 1] = first.split('-').map(Number);
+  const [ly = 0, lm = 1, ld = 1] = last.split('-').map(Number);
+  return `${rangeFmt.format(new Date(fy, fm - 1, fd))} – ${rangeFmt.format(new Date(ly, lm - 1, ld))}`;
+}
+
 export function MainView() {
   const [selectedDate, setSelectedDate] = useState<string>(() => todayDate());
   const [activeTab, setActiveTab] = useState<WorklogTab>('list');
@@ -22,6 +33,7 @@ export function MainView() {
   const { weekData } = useWeeklyWorklogs();
 
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
+  const weekRange = useMemo(() => weekRangeLabel(weekData), [weekData]);
 
   return (
     <div className="relative h-full min-h-0 flex flex-col divide-y divide-gray-100">
@@ -76,14 +88,18 @@ export function MainView() {
           )}
         </div>
 
-        {/* Tab switcher + date strip */}
+        {/* Tab switcher + date strip / week range */}
         <div className="px-4 pt-2 pb-1 flex flex-col gap-1.5">
           <WorklogTabs activeTab={activeTab} onTabChange={setActiveTab} />
-          <DateStrip
-            weekData={weekData}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-          />
+          {activeTab === 'list' ? (
+            <DateStrip
+              weekData={weekData}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+          ) : (
+            <p className="text-xs text-center text-gray-400">{weekRange}</p>
+          )}
         </div>
 
         {/* Tab content */}
