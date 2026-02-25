@@ -22,4 +22,8 @@
 
 | [x] | windows-platform-support_20260225 | Windows Platform Support | 2026-02-25 | 2026-02-25 |
 
+| [x] | clickable-issue-keys_20260225 | Clickable Issue Keys | 2026-02-25 | 2026-02-25 |
+
+| [x] | windows-tray-enhancement_20260225 | Windows Tray Icon Enhancement | 2026-02-25 | 2026-02-25 |
+
 <!-- Tracks registered by /conductor:new-track -->

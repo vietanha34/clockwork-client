@@ -21,6 +21,14 @@ export function useTrayTimer(
   progress?: number,
   hasUnloggedDays?: boolean,
 ) {
+  // Update Windows tray icon state (active/idle) when timer starts/stops
+  useEffect(() => {
+    const os = platform();
+    if (os === 'windows') {
+      invoke('update_tray_icon_state', { active: Boolean(startedAt) }).catch(console.error);
+    }
+  }, [startedAt]);
+
   useEffect(() => {
     const os = platform();
 

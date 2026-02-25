@@ -1,5 +1,7 @@
+import { platform } from '@tauri-apps/plugin-os';
 import { useMemo, useState } from 'react';
 import { ActiveTimer } from '../components/ActiveTimer';
+import { DailyProgressBar } from '../components/DailyProgressBar';
 import { DateStrip } from '../components/DateStrip';
 import { StartTimerForm } from '../components/StartTimerForm';
 import { UnloggedDaysWarning } from '../components/UnloggedDaysWarning';
@@ -23,7 +25,11 @@ function weekRangeLabel(weekData: { date: string }[]): string {
   return `${rangeFmt.format(new Date(fy, fm - 1, fd))} – ${rangeFmt.format(new Date(ly, lm - 1, ld))}`;
 }
 
-export function MainView() {
+export interface MainViewProps {
+  todayProgressSeconds?: number;
+}
+
+export function MainView({ todayProgressSeconds }: MainViewProps) {
   const [selectedDate, setSelectedDate] = useState<string>(() => todayDate());
   const [activeTab, setActiveTab] = useState<WorklogTab>('list');
 
@@ -34,9 +40,14 @@ export function MainView() {
 
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
   const weekRange = useMemo(() => weekRangeLabel(weekData), [weekData]);
+  const os = platform();
 
   return (
     <div className="relative h-full min-h-0 flex flex-col divide-y divide-gray-100">
+      {os === 'windows' && typeof todayProgressSeconds === 'number' && (
+        <DailyProgressBar loggedSeconds={todayProgressSeconds} />
+      )}
+
       <UnloggedDaysWarning unloggedDays={unloggedDays} />
 
       {/* Active timer section */}

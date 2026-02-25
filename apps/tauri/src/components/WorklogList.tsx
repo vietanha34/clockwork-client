@@ -1,6 +1,7 @@
 import { useWorklogs } from '../hooks/useWorklogs';
 import { formatSeconds, todayDate, totalWorklogSeconds } from '../lib/api-client';
 import { ErrorCard } from './ErrorCard';
+import { openIssueInBrowser } from '../lib/utils';
 import { WorklogSkeleton } from './Skeleton';
 
 interface WorklogListProps {
@@ -47,9 +48,14 @@ export function WorklogList({ date }: WorklogListProps) {
       <ul className="space-y-2">
         {worklogs.map((w) => (
           <li key={w.id} className="flex items-start gap-2">
-            <span className="font-mono text-xs text-blue-600 shrink-0 mt-0.5 w-14" title={w.issueKey ?? `#${w.issueId}`}>
+            <button
+              type="button"
+              className="font-mono text-xs text-blue-600 shrink-0 mt-0.5 w-14 text-left hover:underline cursor-pointer truncate"
+              title={w.issueKey ?? `#${w.issueId}`}
+              onClick={() => w.issueKey && openIssueInBrowser(w.issueKey)}
+            >
               {w.issueKey ?? `#${w.issueId}`}
-            </span>
+            </button>
             <div className="flex-1 min-w-0">
               {w.issueName && (
                 <p className="text-xs text-gray-800 truncate" title={w.issueName}>

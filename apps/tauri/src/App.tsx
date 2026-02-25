@@ -69,7 +69,7 @@ function AppContent() {
       onBackClick={() => setView('main')}
       userDisplayName={view === 'main' ? settings.jiraUser?.displayName : undefined}
     >
-      {view === 'main' && <MainView />}
+      {view === 'main' && <MainView todayProgressSeconds={totalSeconds} />}
       {view === 'settings' && <SettingsView onClose={() => setView('main')} />}
     </AppShell>
   );

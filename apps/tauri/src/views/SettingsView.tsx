@@ -1,3 +1,4 @@
+import { platform } from '@tauri-apps/plugin-os';
 import { useState } from 'react';
 import { API_BASE_URL } from '../lib/constants';
 import { ApiValidationError, validateSettings } from '../lib/api-client';
@@ -9,6 +10,7 @@ interface SettingsViewProps {
 
 export function SettingsView({ onClose }: SettingsViewProps) {
   const { settings, updateSettings } = useSettings();
+  const os = platform();
   // @ts-ignore
   const isTauri = typeof window !== 'undefined' && (!!window.__TAURI_INTERNALS__ || !!window.__TAURI__);
   const [jiraToken, setJiraToken] = useState(settings.jiraToken);
@@ -18,6 +20,8 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const showPinGuide = os === 'windows' && !settings.pinIconDismissed;
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -37,6 +41,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
         jiraToken: accountId,
         clockworkApiToken: token,
         jiraUser: validation.user,
+        pinIconDismissed: settings.pinIconDismissed,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -64,6 +69,37 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   return (
     <div className="h-full overflow-y-auto p-4">
       <h2 className="text-base font-semibold text-gray-900 mb-4">Settings</h2>
+      
+      {showPinGuide && (
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 relative">
+          <button
+            type="button"
+            onClick={() => updateSettings({ ...settings, pinIconDismissed: true })}
+            className="absolute top-2 right-2 text-blue-400 hover:text-blue-600 p-1 cursor-pointer"
+            aria-label="Dismiss tip"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4 h-4"
+            >
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
+          <h4 className="text-xs font-semibold text-blue-800 mb-1">Tip: Keep Icon Visible</h4>
+          <p className="text-xs text-blue-700 leading-relaxed">
+            Windows hides tray icons by default. To keep Clockwork visible:
+            <br />
+            1. Right-click Taskbar → <strong>Taskbar settings</strong>
+            <br />
+            2. Expand <strong>Other system tray icons</strong>
+            <br />
+            3. Toggle <strong>On</strong> for Clockwork Menubar
+          </p>
+        </div>
+      )}
+
       {!isTauri && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
           <div className="flex">

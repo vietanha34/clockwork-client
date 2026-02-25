@@ -31,6 +31,8 @@ pub struct AppSettings {
     pub clockwork_api_token: String,
     #[serde(rename = "jiraUser", default)]
     pub jira_user: Option<JiraUserSettings>,
+    #[serde(rename = "pinIconDismissed", default)]
+    pub pin_icon_dismissed: bool,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {
@@ -79,6 +81,18 @@ fn update_tray_bitmap(app: AppHandle, buffer: Vec<u8>, width: u32, height: u32) 
 fn update_tray_tooltip(app: AppHandle, tooltip: String) {
     if let Some(tray) = app.tray_by_id("main") {
         let _ = tray.set_tooltip(Some(tooltip));
+    }
+}
+
+#[tauri::command]
+fn update_tray_icon_state(app: AppHandle, active: bool) {
+    if let Some(tray) = app.tray_by_id("main") {
+        let icon = if active {
+            tauri::image::Image::from_bytes(include_bytes!("../icons/tray-active.png")).unwrap()
+        } else {
+            tauri::image::Image::from_bytes(include_bytes!("../icons/tray-idle.png")).unwrap()
+        };
+        let _ = tray.set_icon(Some(icon));
     }
 }
 
@@ -154,7 +168,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_bitmap, update_tray_tooltip, exit_app])
+        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_bitmap, update_tray_tooltip, update_tray_icon_state, exit_app])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

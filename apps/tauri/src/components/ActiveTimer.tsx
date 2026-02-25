@@ -3,6 +3,7 @@ import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useStopTimer } from '../hooks/useTimerActions';
 import { fetchIssue } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
+import { openIssueInBrowser } from '../lib/utils';
 import { ElapsedTime } from './ElapsedTime';
 import { ErrorCard } from './ErrorCard';
 import { TimerSkeleton } from './Skeleton';
@@ -52,9 +53,14 @@ export function ActiveTimer() {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-1">
           <span className="inline-block w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
-          <span className="font-mono text-sm font-semibold text-gray-900 truncate">
+          <button
+            type="button"
+            className="font-mono text-sm font-semibold text-gray-900 truncate hover:underline hover:text-blue-600 cursor-pointer"
+            onClick={() => openIssueInBrowser(activeTimer.issue.key)}
+            title="Open in Jira"
+          >
             {activeTimer.issue.key}
-          </span>
+          </button>
         </div>
         
         {issue?.project && (
