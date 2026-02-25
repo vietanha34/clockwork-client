@@ -18,4 +18,6 @@
 
 | [x] | unlogged-days-warning_20260224 | Unlogged Days Warning | 2026-02-24 | 2026-02-24 |
 
+| [~] | worklog-history-weekly_20260225 | Worklog History & Weekly Summary | 2026-02-25 | 2026-02-25 |
+
 <!-- Tracks registered by /conductor:new-track -->
