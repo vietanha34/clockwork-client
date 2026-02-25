@@ -84,3 +84,19 @@ html, body {
   background: rgba(107, 114, 128, 0.45);
   border-radius: 999px;
 }
+
+/* Windows Platform Overrides */
+.platform-windows .menubar-popover {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.platform-windows .menubar-popover::before,
+.platform-windows .menubar-popover::after {
+  display: none;
+}
+
+.platform-windows .menubar-popover-content {
+  border-radius: 8px;
+}

@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{AppHandle, Manager, PhysicalPosition};
 
+const WINDOW_WIDTH: i32 = 302;
+#[allow(dead_code)]
+const WINDOW_HEIGHT: i32 = 540;
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -72,6 +76,13 @@ fn update_tray_bitmap(app: AppHandle, buffer: Vec<u8>, width: u32, height: u32) 
 }
 
 #[tauri::command]
+fn update_tray_tooltip(app: AppHandle, tooltip: String) {
+    if let Some(tray) = app.tray_by_id("main") {
+        let _ = tray.set_tooltip(Some(tooltip));
+    }
+}
+
+#[tauri::command]
 fn exit_app(app: AppHandle) {
     app.exit(0);
 }
@@ -83,6 +94,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_os::init())
         .setup(|app| {
             let window = app
                 .get_webview_window("main")
@@ -110,8 +122,14 @@ pub fn run() {
                             let _ = win.hide();
                         } else {
                             // Center window horizontally on tray icon, just below menu bar
-                            let x = (position.x as i32) - (302 / 2);
+                            let x = (position.x as i32) - (WINDOW_WIDTH / 2);
+                            
+                            #[cfg(target_os = "windows")]
+                            let y = (position.y as i32) - WINDOW_HEIGHT;
+                            
+                            #[cfg(not(target_os = "windows"))]
                             let y = (position.y as i32) + 1;
+
                             let _ = win.set_position(tauri::Position::Physical(
                                 PhysicalPosition { x, y },
                             ));
@@ -136,7 +154,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_bitmap, exit_app])
+        .invoke_handler(tauri::generate_handler![get_settings, save_settings, update_tray_bitmap, update_tray_tooltip, exit_app])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

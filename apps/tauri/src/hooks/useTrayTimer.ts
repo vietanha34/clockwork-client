@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+import { platform } from '@tauri-apps/plugin-os';
 import { useEffect } from 'react';
 
 function formatDuration(startedAt: string): string {
@@ -21,14 +22,26 @@ export function useTrayTimer(
   hasUnloggedDays?: boolean,
 ) {
   useEffect(() => {
-    // 1. Create Canvas
+    const os = platform();
+
+    // 1. Create Canvas (only needed for macOS/Linux)
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-    if (!ctx) return;
-
     const render = () => {
       const timeStr = startedAt ? formatDuration(startedAt) : 'No timer';
+
+      if (os === 'windows') {
+        const tooltip = issueKey && startedAt
+          ? `${issueKey}: ${timeStr}`
+          : timeStr;
+          
+        invoke('update_tray_tooltip', { tooltip }).catch(console.error);
+        return;
+      }
+
+      if (!ctx) return;
+
       const displayKey = issueKey || '';
       const displayText = startedAt && displayKey ? `${timeStr} - ${displayKey}` : timeStr;
 

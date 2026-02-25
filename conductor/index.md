@@ -29,6 +29,8 @@ Navigation hub for project context.
 
 - [ ] [Worklog History & Weekly Summary](./tracks/worklog-history-weekly_20260225/index.md) - `worklog-history-weekly_20260225`
 
+- [ ] [Windows Platform Support](./tracks/windows-platform-support_20260225/index.md) - `windows-platform-support_20260225`
+
 <!-- Auto-populated by /conductor:new-track -->
 
 ## Getting Started

@@ -20,4 +20,6 @@
 
 | [~] | worklog-history-weekly_20260225 | Worklog History & Weekly Summary | 2026-02-25 | 2026-02-25 |
 
+| [x] | windows-platform-support_20260225 | Windows Platform Support | 2026-02-25 | 2026-02-25 |
+
 <!-- Tracks registered by /conductor:new-track -->

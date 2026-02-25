@@ -1,3 +1,4 @@
+import { platform } from '@tauri-apps/plugin-os';
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { useActiveTimers } from './hooks/useActiveTimers';
@@ -18,6 +19,13 @@ function AppContent() {
   const { data: worklogs } = useWorklogs();
   const { unloggedDays } = useUnloggedDays();
   const activeTimer = data?.timers[0];
+
+  useEffect(() => {
+    const os = platform();
+    if (os === 'windows') {
+      document.documentElement.classList.add('platform-windows');
+    }
+  }, []);
 
   // Count only today's running overlap from 08:00 local time.
   const currentSessionDuration = (() => {
