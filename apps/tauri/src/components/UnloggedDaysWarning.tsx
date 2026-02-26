@@ -59,7 +59,7 @@ export function UnloggedDaysWarning({ unloggedDays }: UnloggedDaysWarningProps) 
               onClick={() => setIsGuideOpen(true)}
               className="mt-1 rounded border border-amber-300 bg-amber-200/80 px-2 py-1 text-xs font-semibold text-amber-900 hover:bg-amber-200"
             >
-              Huong dan log bu
+              Hướng dẫn log bù
             </button>
           </div>
         ) : null}
