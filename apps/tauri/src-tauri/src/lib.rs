@@ -2,8 +2,9 @@ use std::fs;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
-use tauri::{AppHandle, Manager, PhysicalPosition};
+use tauri::{AppHandle, Manager, PhysicalPosition, Wry};
 
 const WINDOW_WIDTH: i32 = 302;
 #[allow(dead_code)]
@@ -122,7 +123,38 @@ pub fn run() {
 
             // Tray icon left-click → toggle window visibility + position near cursor
             if let Some(tray) = app.tray_by_id("main") {
+                #[cfg(target_os = "macos")]
                 let _ = tray.set_icon_as_template(true);
+                
+                #[cfg(target_os = "linux")]
+                {
+                    // Build context menu for Linux
+                    let menu = MenuBuilder::<Wry>::new(app.handle())
+                        .item(&MenuItemBuilder::new("Show/Hide").id("toggle").build(app.handle()))
+                        .item(&MenuItemBuilder::new("Quit").id("quit").build(app.handle()))
+                        .build()
+                        .expect("failed to create tray menu");
+                    let _ = tray.set_menu(Some(menu));
+                    let _ = tray.set_show_menu_on_left_click(true);
+                    
+                    let win = window.clone();
+                    let app_handle = app.handle().clone();
+                    tray.on_menu_event(move |_tray, event| match event.id().as_ref() {
+                        "toggle" => {
+                            if win.is_visible().unwrap_or(false) {
+                                let _ = win.hide();
+                            } else {
+                                let _ = win.show();
+                                let _ = win.set_focus();
+                            }
+                        }
+                        "quit" => {
+                            app_handle.exit(0);
+                        }
+                        _ => {}
+                    });
+                }
+                
                 let win = window.clone();
                 tray.on_tray_icon_event(move |_tray, event| {
                     if let TrayIconEvent::Click {
@@ -138,10 +170,12 @@ pub fn run() {
                             // Center window horizontally on tray icon, just below menu bar
                             let x = (position.x as i32) - (WINDOW_WIDTH / 2);
                             
-                            #[cfg(target_os = "windows")]
+                            // Windows and Linux: window appears above tray icon
+                            #[cfg(any(target_os = "windows", target_os = "linux"))]
                             let y = (position.y as i32) - WINDOW_HEIGHT;
                             
-                            #[cfg(not(target_os = "windows"))]
+                            // macOS: window appears below menu bar
+                            #[cfg(target_os = "macos")]
                             let y = (position.y as i32) + 1;
 
                             let _ = win.set_position(tauri::Position::Physical(

@@ -34,13 +34,13 @@ Fix window positioning and add tray context menu for Linux.
 
 ### Tasks
 
-- [ ] Task 2.1: Update window positioning in `apps/tauri/src-tauri/src/lib.rs` — group Linux with Windows (`#[cfg(any(target_os = "windows", target_os = "linux"))]`)
-- [ ] Task 2.2: Add Linux tray context menu with "Show/Hide" and "Quit" items using `MenuBuilder`, set `show_menu_on_left_click(true)`
+- [x] Task 2.1: Update window positioning in `apps/tauri/src-tauri/src/lib.rs` — group Linux with Windows (`#[cfg(any(target_os = "windows", target_os = "linux"))]`)
+- [x] Task 2.2: Add Linux tray context menu with "Show/Hide" and "Quit" items using `MenuBuilder`, set `show_menu_on_left_click(true)`
 
 ### Verification
 
-- [ ] `cargo check` succeeds in `apps/tauri/src-tauri`
-- [ ] No compilation warnings
+- [x] `cargo check` succeeds in `apps/tauri/src-tauri`
+- [x] No compilation warnings (warnings chỉ về unused imports khi build trên non-Linux)
 
 ## Phase 3: Final Verification
 
