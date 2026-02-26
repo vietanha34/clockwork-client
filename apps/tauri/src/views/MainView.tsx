@@ -1,4 +1,3 @@
-import { platform } from '@tauri-apps/plugin-os';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActiveTimer } from '../components/ActiveTimer';
 import { DailyProgressBar } from '../components/DailyProgressBar';
@@ -7,13 +6,14 @@ import { StartTimerForm } from '../components/StartTimerForm';
 import { UnloggedDaysWarning } from '../components/UnloggedDaysWarning';
 import { WeeklyChart } from '../components/WeeklyChart';
 import { WorklogList } from '../components/WorklogList';
-import { WorklogTabs, type WorklogTab } from '../components/WorklogTabs';
+import { type WorklogTab, WorklogTabs } from '../components/WorklogTabs';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useToday } from '../hooks/useToday';
 import { useUnloggedDays } from '../hooks/useUnloggedDays';
 import { useWeeklyWorklogs } from '../hooks/useWeeklyWorklogs';
 import { useWorklogs } from '../hooks/useWorklogs';
 import { todayDate } from '../lib/api-client';
+import { isSquareTrayPlatform } from '../lib/platform';
 
 const rangeFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
@@ -53,11 +53,11 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
 
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
   const weekRange = useMemo(() => weekRangeLabel(weekData), [weekData]);
-  const os = platform();
+  const showProgressBar = isSquareTrayPlatform();
 
   return (
     <div className="relative h-full min-h-0 flex flex-col divide-y divide-gray-100">
-      {os === 'windows' && typeof todayProgressSeconds === 'number' && (
+      {showProgressBar && typeof todayProgressSeconds === 'number' && (
         <DailyProgressBar loggedSeconds={todayProgressSeconds} />
       )}
 

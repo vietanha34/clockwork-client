@@ -3,7 +3,7 @@
 **Track ID:** ubuntu-platform-support_20260226
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-26
-**Status:** [ ] Not Started
+**Status:** [~] In Progress
 
 ## Overview
 
@@ -15,18 +15,18 @@ Create the platform abstraction and migrate all frontend files.
 
 ### Tasks
 
-- [ ] Task 1.1: Create `apps/tauri/src/lib/platform.ts` with `getPlatformGroup()` and `isSquareTrayPlatform()` helpers
-- [ ] Task 1.2: Refactor `apps/tauri/src/App.tsx` — replace `platform()` import with `isSquareTrayPlatform()`, change CSS class to `platform-desktop`
-- [ ] Task 1.3: Refactor `apps/tauri/src/hooks/useTrayTimer.ts` — replace all `os === 'windows'` checks with `isSquareTrayPlatform()`
-- [ ] Task 1.4: Refactor `apps/tauri/src/views/MainView.tsx` — replace `platform()` with `isSquareTrayPlatform()` for daily progress bar
-- [ ] Task 1.5: Refactor `apps/tauri/src/views/SettingsView.tsx` — use `isSquareTrayPlatform()` for pin guide visibility, add Linux-specific guide text
-- [ ] Task 1.6: Rename `.platform-windows` to `.platform-desktop` in `apps/tauri/src/index.css`
+- [x] Task 1.1: Create `apps/tauri/src/lib/platform.ts` with `getPlatformGroup()` and `isSquareTrayPlatform()` helpers
+- [x] Task 1.2: Refactor `apps/tauri/src/App.tsx` — replace `platform()` import with `isSquareTrayPlatform()`, change CSS class to `platform-desktop`
+- [x] Task 1.3: Refactor `apps/tauri/src/hooks/useTrayTimer.ts` — replace all `os === 'windows'` checks with `isSquareTrayPlatform()`
+- [x] Task 1.4: Refactor `apps/tauri/src/views/MainView.tsx` — replace `platform()` with `isSquareTrayPlatform()` for daily progress bar
+- [x] Task 1.5: Refactor `apps/tauri/src/views/SettingsView.tsx` — use `isSquareTrayPlatform()` for pin guide visibility, add Linux-specific guide text
+- [x] Task 1.6: Rename `.platform-windows` to `.platform-desktop` in `apps/tauri/src/index.css`
 
 ### Verification
 
-- [ ] `npx tsc --noEmit` passes in `apps/tauri`
-- [ ] `npx biome check src/` passes in `apps/tauri`
-- [ ] No remaining `os === 'windows'` in frontend code (except SettingsView OS-specific text)
+- [x] `npx tsc --noEmit` passes in `apps/tauri`
+- [x] `npx biome check src/` passes in `apps/tauri`
+- [x] No remaining `os === 'windows'` in frontend code (except SettingsView OS-specific text)
 
 ## Phase 2: Rust Backend Changes
 

@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
-import { platform } from '@tauri-apps/plugin-os';
 import { useEffect } from 'react';
+import { isSquareTrayPlatform } from '../lib/platform';
 
 function formatDuration(startedAt: string): string {
   const diff = Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
@@ -21,16 +21,15 @@ export function useTrayTimer(
   progress?: number,
   hasUnloggedDays?: boolean,
 ) {
-  // Update Windows tray icon state (active/idle) when timer starts/stops
+  // Update desktop tray icon state (active/idle) when timer starts/stops
   useEffect(() => {
-    const os = platform();
-    if (os === 'windows') {
+    if (isSquareTrayPlatform()) {
       invoke('update_tray_icon_state', { active: Boolean(startedAt) }).catch(console.error);
     }
   }, [startedAt]);
 
   useEffect(() => {
-    const os = platform();
+    const isDesktop = isSquareTrayPlatform();
 
     // 1. Create Canvas (only needed for macOS/Linux)
     const canvas = document.createElement('canvas');
@@ -39,11 +38,9 @@ export function useTrayTimer(
     const render = () => {
       const timeStr = startedAt ? formatDuration(startedAt) : 'No timer';
 
-      if (os === 'windows') {
-        const tooltip = issueKey && startedAt
-          ? `${issueKey}: ${timeStr}`
-          : timeStr;
-          
+      if (isDesktop) {
+        const tooltip = issueKey && startedAt ? `${issueKey}: ${timeStr}` : timeStr;
+
         invoke('update_tray_tooltip', { tooltip }).catch(console.error);
         return;
       }

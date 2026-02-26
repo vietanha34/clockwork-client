@@ -1,4 +1,3 @@
-import { platform } from '@tauri-apps/plugin-os';
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { useActiveTimers } from './hooks/useActiveTimers';
@@ -7,6 +6,7 @@ import { useTrayTimer } from './hooks/useTrayTimer';
 import { useUnloggedDays } from './hooks/useUnloggedDays';
 import { useWorklogs } from './hooks/useWorklogs';
 import { totalWorklogSeconds } from './lib/api-client';
+import { isSquareTrayPlatform } from './lib/platform';
 import { SettingsProvider, useSettings } from './lib/settings-context';
 import { MainView } from './views/MainView';
 import { SettingsView } from './views/SettingsView';
@@ -23,9 +23,8 @@ function AppContent() {
   const activeTimer = data?.timers[0];
 
   useEffect(() => {
-    const os = platform();
-    if (os === 'windows') {
-      document.documentElement.classList.add('platform-windows');
+    if (isSquareTrayPlatform()) {
+      document.documentElement.classList.add('platform-desktop');
     }
   }, []);
 
