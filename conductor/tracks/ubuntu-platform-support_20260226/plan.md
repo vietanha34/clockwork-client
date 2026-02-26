@@ -3,7 +3,7 @@
 **Track ID:** ubuntu-platform-support_20260226
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-26
-**Status:** [~] In Progress
+**Status:** [x] Complete
 
 ## Overview
 
@@ -46,21 +46,21 @@ Fix window positioning and add tray context menu for Linux.
 
 ### Tasks
 
-- [ ] Task 3.1: Run full TypeScript type check and lint
-- [ ] Task 3.2: Manual verification on macOS (no regressions)
+- [x] Task 3.1: Run full TypeScript type check and lint
+- [x] Task 3.2: Manual verification on macOS (no regressions)
 
 ### Verification
 
-- [ ] All acceptance criteria from spec.md met
-- [ ] macOS behavior unchanged
-- [ ] Ready for review
+- [x] All acceptance criteria from spec.md met
+- [x] macOS behavior unchanged
+- [x] Ready for review
 
 ## Final Verification
 
-- [ ] All acceptance criteria met
-- [ ] Tests passing
-- [ ] Documentation updated (if applicable)
-- [ ] Ready for review
+- [x] All acceptance criteria met
+- [x] Tests passing
+- [x] Documentation updated (if applicable)
+- [x] Ready for review
 
 ---
 

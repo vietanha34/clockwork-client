@@ -12,9 +12,10 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const { settings, updateSettings } = useSettings();
   const os = getPlatform();
   const isDesktop = isSquareTrayPlatform();
-  // @ts-ignore
   const isTauri =
-    typeof window !== 'undefined' && (!!window.__TAURI_INTERNALS__ || !!window.__TAURI__);
+    typeof window !== 'undefined' &&
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (!!(window as any).__TAURI_INTERNALS__ || !!(window as any).__TAURI__);
   const [jiraToken, setJiraToken] = useState(settings.jiraToken);
   const [clockworkApiToken, setClockworkApiToken] = useState(settings.clockworkApiToken);
   const [accountIdError, setAccountIdError] = useState<string | null>(null);
