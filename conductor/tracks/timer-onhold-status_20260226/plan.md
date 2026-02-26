@@ -31,13 +31,13 @@ Create the status derivation logic and update ActiveTimer component.
 
 ### Tasks
 
-- [ ] Task 2.1: Create `apps/tauri/src/lib/timer-utils.ts` with `getTimerStatus()` returning `'running' | 'on_hold' | 'stopped'`
-- [ ] Task 2.2: Update `apps/tauri/src/components/ActiveTimer.tsx` — derive status, add amber card styling, pause icon, and "On Hold" badge
+- [x] Task 2.1: Create `apps/tauri/src/lib/timer-utils.ts` with `getTimerStatus()` returning `'running' | 'on_hold' | 'stopped'`
+- [x] Task 2.2: Update `apps/tauri/src/components/ActiveTimer.tsx` — derive status, add amber card styling, pause icon, and "On Hold" badge
 
 ### Verification
 
-- [ ] TypeScript compiles without errors
-- [ ] ActiveTimer renders correctly for both running and on-hold states
+- [x] TypeScript compiles without errors
+- [x] ActiveTimer renders correctly for both running and on-hold states
 
 ## Phase 3: Tray Icon — 3 States
 
