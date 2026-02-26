@@ -20,13 +20,23 @@ export function useTrayTimer(
   issueKey?: string,
   progress?: number,
   hasUnloggedDays?: boolean,
+  withinWorkingHours?: boolean,
 ) {
-  // Update desktop tray icon state (active/idle) when timer starts/stops
+  // Determine tray icon state
+  const getTrayState = (): string => {
+    if (!startedAt) return 'idle';
+    if (withinWorkingHours === false) return 'onhold';
+    return 'active';
+  };
+
+  // Update desktop tray icon state (active/onhold/idle) when timer state changes
   useEffect(() => {
     if (isSquareTrayPlatform()) {
-      invoke('update_tray_icon_state', { active: Boolean(startedAt) }).catch(console.error);
+      const state = getTrayState();
+      invoke('update_tray_icon_state', { state }).catch(console.error);
     }
-  }, [startedAt]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startedAt, withinWorkingHours]);
 
   useEffect(() => {
     const isDesktop = isSquareTrayPlatform();
@@ -80,20 +90,26 @@ export function useTrayTimer(
       // 4. Clear
       ctx.clearRect(0, 0, totalWidth, totalHeight);
 
+      // Determine if timer is on hold (for macOS canvas colors)
+      const isOnHold = withinWorkingHours === false;
+      const textColor = isOnHold ? 'rgba(245, 158, 11, 1)' : 'rgba(255, 255, 255, 1)'; // amber-500 or white
+      const barTrackColor = isOnHold ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+      const barFillColor = isOnHold ? 'rgba(245, 158, 11, 1)' : 'rgba(255, 255, 255, 1)';
+
       // 5. Draw Progress Bar (Top)
       if (typeof progress === 'number') {
         const barTotalWidth = contentWidth;
         const barFillWidth = Math.floor(barTotalWidth * Math.min(Math.max(progress, 0), 1));
 
-        // Draw Track (Background) - Semi-transparent White
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        // Draw Track (Background)
+        ctx.fillStyle = barTrackColor;
         ctx.beginPath();
         ctx.roundRect(0, barY, barTotalWidth, barHeight, 3);
         ctx.fill();
 
-        // Draw Fill (Progress) - Solid White
+        // Draw Fill (Progress)
         if (barFillWidth > 0) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+          ctx.fillStyle = barFillColor;
           ctx.beginPath();
           ctx.roundRect(0, barY, barFillWidth, barHeight, 3);
           ctx.fill();
@@ -101,7 +117,7 @@ export function useTrayTimer(
       }
 
       // 6. Draw Text (Bottom)
-      ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Chuyển màu chữ sang trắng
+      ctx.fillStyle = textColor;
       ctx.textBaseline = 'bottom';
       ctx.textAlign = 'center';
       // Đẩy text xuống sát đáy hơn (totalHeight)
@@ -141,5 +157,5 @@ export function useTrayTimer(
     const interval = setInterval(render, 1000);
 
     return () => clearInterval(interval);
-  }, [startedAt, issueKey, progress, hasUnloggedDays]);
+  }, [startedAt, issueKey, progress, hasUnloggedDays, withinWorkingHours]);
 }

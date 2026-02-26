@@ -45,16 +45,16 @@ Add amber tray icon, update Rust command, and update frontend tray hook.
 
 ### Tasks
 
-- [ ] Task 3.1: Create `apps/tauri/src-tauri/icons/tray-onhold.png` (amber 32x32)
-- [ ] Task 3.2: Update `update_tray_icon_state` in `apps/tauri/src-tauri/src/lib.rs` to accept `state: String` with 3 values
-- [ ] Task 3.3: Update `apps/tauri/src/hooks/useTrayTimer.ts` — add `withinWorkingHours` param, update square tray state logic, update macOS canvas colors to amber when on hold
-- [ ] Task 3.4: Pass `withinWorkingHours` from `apps/tauri/src/App.tsx` to `useTrayTimer` hook
+- [x] Task 3.1: Create `apps/tauri/src-tauri/icons/tray-onhold.png` (amber 32x32)
+- [x] Task 3.2: Update `update_tray_icon_state` in `apps/tauri/src-tauri/src/lib.rs` to accept `state: String` with 3 values
+- [x] Task 3.3: Update `apps/tauri/src/hooks/useTrayTimer.ts` — add `withinWorkingHours` param, update square tray state logic, update macOS canvas colors to amber when on hold
+- [x] Task 3.4: Pass `withinWorkingHours` from `apps/tauri/src/App.tsx` to `useTrayTimer` hook
 
 ### Verification
 
-- [ ] `cargo check` succeeds
-- [ ] TypeScript compiles without errors
-- [ ] Tray icon changes state correctly for idle/active/onhold
+- [x] `cargo check` succeeds
+- [x] TypeScript compiles without errors
+- [x] Tray icon changes state correctly for idle/active/onhold
 
 ## Phase 4: Final Verification
 

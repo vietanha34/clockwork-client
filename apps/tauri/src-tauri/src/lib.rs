@@ -86,12 +86,12 @@ fn update_tray_tooltip(app: AppHandle, tooltip: String) {
 }
 
 #[tauri::command]
-fn update_tray_icon_state(app: AppHandle, active: bool) {
+fn update_tray_icon_state(app: AppHandle, state: String) {
     if let Some(tray) = app.tray_by_id("main") {
-        let icon = if active {
-            tauri::image::Image::from_bytes(include_bytes!("../icons/tray-active.png")).unwrap()
-        } else {
-            tauri::image::Image::from_bytes(include_bytes!("../icons/tray-idle.png")).unwrap()
+        let icon = match state.as_str() {
+            "active" => tauri::image::Image::from_bytes(include_bytes!("../icons/tray-active.png")).unwrap(),
+            "onhold" => tauri::image::Image::from_bytes(include_bytes!("../icons/tray-onhold.png")).unwrap(),
+            _ => tauri::image::Image::from_bytes(include_bytes!("../icons/tray-idle.png")).unwrap(),
         };
         let _ = tray.set_icon(Some(icon));
     }

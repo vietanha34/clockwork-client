@@ -54,7 +54,13 @@ function AppContent() {
   const dailyProgress = totalSeconds / (8 * 3600);
   const hasUnloggedDays = unloggedDays.length > 0;
 
-  useTrayTimer(effectiveStartedAt, activeTimer?.issue.key, dailyProgress, hasUnloggedDays);
+  useTrayTimer(
+    effectiveStartedAt,
+    activeTimer?.issue.key,
+    dailyProgress,
+    hasUnloggedDays,
+    activeTimer?.withinWorkingHours,
+  );
 
   // On first load, if no email is configured, redirect to settings
   useEffect(() => {
