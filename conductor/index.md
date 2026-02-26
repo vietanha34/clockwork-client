@@ -35,6 +35,10 @@ Navigation hub for project context.
 
 - [ ] [Windows Tray Icon Enhancement](./tracks/windows-tray-enhancement_20260225/index.md) - `windows-tray-enhancement_20260225`
 
+- [ ] [Ubuntu Platform Support](./tracks/ubuntu-platform-support_20260226/index.md) - `ubuntu-platform-support_20260226`
+
+- [ ] [Timer On Hold Status](./tracks/timer-onhold-status_20260226/index.md) - `timer-onhold-status_20260226`
+
 <!-- Auto-populated by /conductor:new-track -->
 
 ## Getting Started

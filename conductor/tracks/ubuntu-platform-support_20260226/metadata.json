@@ -1,0 +1,16 @@
+{
+  "id": "ubuntu-platform-support_20260226",
+  "title": "Ubuntu Platform Support",
+  "type": "feature",
+  "status": "pending",
+  "created": "2026-02-26T13:30:00.000Z",
+  "updated": "2026-02-26T13:30:00.000Z",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 10,
+    "completed": 0
+  }
+}
