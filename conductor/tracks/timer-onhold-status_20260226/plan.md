@@ -3,7 +3,7 @@
 **Track ID:** timer-onhold-status_20260226
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-26
-**Status:** [ ] Not Started
+**Status:** [~] In Progress
 
 ## Overview
 
@@ -17,13 +17,13 @@ Add the missing fields to the Timer interface and map them from the raw API resp
 
 ### Tasks
 
-- [ ] Task 1.1: Add `withinWorkingHours` and `startedWithinWorkingHours` to `Timer` interface in `apps/api/src/lib/types.ts`
-- [ ] Task 1.2: Map fields in `apps/api/src/lib/jira-user-resolver.ts` (default `null` to `true`)
-- [ ] Task 1.3: Add same fields to Tauri `Timer` interface in `apps/tauri/src/lib/types.ts`
+- [x] Task 1.1: Add `withinWorkingHours` and `startedWithinWorkingHours` to `Timer` interface in `apps/api/src/lib/types.ts`
+- [x] Task 1.2: Map fields in `apps/api/src/lib/jira-user-resolver.ts` (default `null` to `true`)
+- [x] Task 1.3: Add same fields to Tauri `Timer` interface in `apps/tauri/src/lib/types.ts`
 
 ### Verification
 
-- [ ] `npx tsc --noEmit` passes in both `apps/api` and `apps/tauri`
+- [x] `npx tsc --noEmit` passes in both `apps/api` and `apps/tauri`
 
 ## Phase 2: Timer Status Utility & UI
 

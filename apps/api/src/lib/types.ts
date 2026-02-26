@@ -17,6 +17,8 @@ export interface Timer {
   worklogCount: number;
   issue: TimerIssueRef;
   author?: ClockworkUser;
+  withinWorkingHours: boolean;
+  startedWithinWorkingHours: boolean;
 }
 
 export interface TimerIssueRef {

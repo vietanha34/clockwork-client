@@ -21,6 +21,8 @@ export interface Timer {
   tillNow: number; // seconds elapsed
   worklogCount: number;
   issue: TimerIssueRef;
+  withinWorkingHours: boolean;
+  startedWithinWorkingHours: boolean;
 }
 
 export interface Worklog {

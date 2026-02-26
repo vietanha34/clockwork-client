@@ -112,6 +112,8 @@ export async function resolveTimerAuthors(
       worklogCount: t.worklog_count,
       issue: { key: t.issue.key, id: t.issue.id },
       author,
+      withinWorkingHours: t.within_working_hours ?? true,
+      startedWithinWorkingHours: t.started_within_working_hours ?? true,
     };
   });
 }

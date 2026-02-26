@@ -28,6 +28,6 @@
 
 | [x] | ubuntu-platform-support_20260226 | Ubuntu Platform Support | 2026-02-26 | 2026-02-26 |
 
-| [ ] | timer-onhold-status_20260226 | Timer On Hold Status | 2026-02-26 | 2026-02-26 |
+| [~] | timer-onhold-status_20260226 | Timer On Hold Status | 2026-02-26 | 2026-02-26 |
 
 <!-- Tracks registered by /conductor:new-track -->
