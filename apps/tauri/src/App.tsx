@@ -2,6 +2,7 @@ import { platform } from '@tauri-apps/plugin-os';
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { useActiveTimers } from './hooks/useActiveTimers';
+import { useToday } from './hooks/useToday';
 import { useTrayTimer } from './hooks/useTrayTimer';
 import { useUnloggedDays } from './hooks/useUnloggedDays';
 import { useWorklogs } from './hooks/useWorklogs';
@@ -16,7 +17,8 @@ function AppContent() {
   const [view, setView] = useState<View>('main');
   const { settings, isLoaded } = useSettings();
   const { data } = useActiveTimers();
-  const { data: worklogs } = useWorklogs();
+  const today = useToday();
+  const { data: worklogs } = useWorklogs(today);
   const { unloggedDays } = useUnloggedDays();
   const activeTimer = data?.timers[0];
 

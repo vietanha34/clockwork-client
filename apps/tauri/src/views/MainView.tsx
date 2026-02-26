@@ -1,5 +1,5 @@
 import { platform } from '@tauri-apps/plugin-os';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActiveTimer } from '../components/ActiveTimer';
 import { DailyProgressBar } from '../components/DailyProgressBar';
 import { DateStrip } from '../components/DateStrip';
@@ -9,6 +9,7 @@ import { WeeklyChart } from '../components/WeeklyChart';
 import { WorklogList } from '../components/WorklogList';
 import { WorklogTabs, type WorklogTab } from '../components/WorklogTabs';
 import { useActiveTimers } from '../hooks/useActiveTimers';
+import { useToday } from '../hooks/useToday';
 import { useUnloggedDays } from '../hooks/useUnloggedDays';
 import { useWeeklyWorklogs } from '../hooks/useWeeklyWorklogs';
 import { useWorklogs } from '../hooks/useWorklogs';
@@ -30,8 +31,20 @@ export interface MainViewProps {
 }
 
 export function MainView({ todayProgressSeconds }: MainViewProps) {
-  const [selectedDate, setSelectedDate] = useState<string>(() => todayDate());
+  const today = useToday();
+  const [selectedDate, setSelectedDate] = useState<string>(today);
   const [activeTab, setActiveTab] = useState<WorklogTab>('list');
+
+  // Auto-switch date if needed when day changes
+  const prevTodayRef = useRef(today);
+  useEffect(() => {
+    if (prevTodayRef.current !== today) {
+      if (selectedDate === prevTodayRef.current) {
+        setSelectedDate(today);
+      }
+      prevTodayRef.current = today;
+    }
+  }, [today, selectedDate]);
 
   const { isFetching, refetch } = useWorklogs(selectedDate);
   const { data: timerData } = useActiveTimers();

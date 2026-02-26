@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { fetchWorklogs, todayDate } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
 import { useSettings } from '../lib/settings-context';
+import { useToday } from './useToday';
 import { WORKLOGS_KEY } from './useWorklogs';
 
 const weekdayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
@@ -60,7 +61,8 @@ export function useWeeklyWorklogs(): {
 } {
   const { settings } = useSettings();
   const { jiraToken: accountId } = settings;
-  const weekDates = useMemo(() => getWeekDates(), []);
+  const today = useToday();
+  const weekDates = useMemo(() => getWeekDates(), [today]);
 
   const worklogQueries = useQueries({
     queries: weekDates.map((day) => ({
