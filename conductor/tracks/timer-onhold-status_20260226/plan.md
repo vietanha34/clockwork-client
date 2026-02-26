@@ -3,7 +3,7 @@
 **Track ID:** timer-onhold-status_20260226
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-02-26
-**Status:** [~] In Progress
+**Status:** [x] Complete
 
 ## Overview
 
@@ -60,21 +60,21 @@ Add amber tray icon, update Rust command, and update frontend tray hook.
 
 ### Tasks
 
-- [ ] Task 4.1: Run full TypeScript type check and lint across both apps
-- [ ] Task 4.2: Manual verification of all 3 timer states
+- [x] Task 4.1: Run full TypeScript type check and lint across both apps
+- [x] Task 4.2: Manual verification of all 3 timer states
 
 ### Verification
 
-- [ ] All acceptance criteria from spec.md met
-- [ ] Tests passing
-- [ ] Ready for review
+- [x] All acceptance criteria from spec.md met
+- [x] Tests passing
+- [x] Ready for review
 
 ## Final Verification
 
-- [ ] All acceptance criteria met
-- [ ] Tests passing
-- [ ] Documentation updated (if applicable)
-- [ ] Ready for review
+- [x] All acceptance criteria met
+- [x] Tests passing
+- [x] Documentation updated (if applicable)
+- [x] Ready for review
 
 ---
 
