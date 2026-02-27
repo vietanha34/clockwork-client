@@ -7,6 +7,7 @@
     "core:default",
     "shell:allow-open",
     "os:default",
+    "autostart:default",
     {
       "identifier": "http:default",
       "allow": [{ "url": "https://clockwork-client.vercel.app/*" }],
