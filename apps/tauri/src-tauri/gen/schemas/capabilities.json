@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"Capability for the main window","local":true,"windows":["main"],"permissions":["core:default","shell:allow-open","os:default",{"identifier":"http:default","allow":[{"url":"https://clockwork-client.vercel.app/*"}],"deny":[]}]}}
+{"default":{"identifier":"default","description":"Capability for the main window","local":true,"windows":["main"],"permissions":["core:default","shell:allow-open","os:default","autostart:default",{"identifier":"http:default","allow":[{"url":"https://clockwork-client.vercel.app/*"}],"deny":[]}]}}

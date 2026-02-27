@@ -49,7 +49,12 @@
       "Bash(echo TERM=$TERM:*)",
       "Bash(npx:*)",
       "mcp__atlassian__jira_get_user_profile",
-      "mcp__atlassian__jira_get_worklog"
+      "mcp__atlassian__jira_get_worklog",
+      "Bash(git remote:*)",
+      "Bash(chmod +x:*)",
+      "Bash(git:*)",
+      "Bash(test:*)",
+      "Bash(gh auth:*)"
     ],
     "additionalDirectories": [
       "/Users/vietanha34/Documents/workspace/personal-projects/clockwork-client/docs/plans"
