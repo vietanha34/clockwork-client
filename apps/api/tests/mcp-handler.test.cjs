@@ -44,7 +44,43 @@ test('tools/list returns all expected tools', async () => {
   const response = await handler(makeRequest('tools/list'));
   const names = response.result.tools.map((tool) => tool.name).sort();
 
-  assert.deepEqual(names, ['get_active_timers', 'get_worklogs', 'search_issues']);
+  assert.deepEqual(names, ['get_active_timers', 'get_all_active_timers', 'get_worklogs', 'search_issues']);
+});
+
+test('get_all_active_timers groups timers by account id', async () => {
+  const handler = createMcpMethodHandler({
+    getActiveTimers: async (userKey) => {
+      assert.equal(userKey, 'all');
+      return {
+        timers: [
+          { id: 1, runningFor: 'u1', author: { accountId: 'u1' } },
+          { id: 2, runningFor: 'u1', author: { accountId: 'u1' } },
+          { id: 3, runningFor: 'u2', author: { accountId: 'u2' } },
+        ],
+        cachedAt: '2026-02-27T00:00:00.000Z',
+      };
+    },
+    getWorklogs: async () => [],
+    searchIssues: async () => [],
+  });
+
+  const response = await handler(
+    makeRequest('tools/call', {
+      name: 'get_all_active_timers',
+      arguments: {},
+    }),
+  );
+
+  assert.equal(response.error, undefined);
+  assert.equal(response.result.isError, undefined);
+  assert.equal(response.result.structuredContent.total_accounts, 2);
+  assert.equal(response.result.structuredContent.total_timers, 3);
+  assert.deepEqual(
+    response.result.structuredContent.timers_by_account_id.map((item) => item.account_id),
+    ['u1', 'u2'],
+  );
+  assert.equal(response.result.structuredContent.timers_by_account_id[0].timers.length, 2);
+  assert.equal(response.result.structuredContent.timers_by_account_id[1].timers.length, 1);
 });
 
 test('tools/call returns method error for unknown tool', async () => {

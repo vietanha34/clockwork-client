@@ -82,6 +82,15 @@ const TOOLS: ToolDescriptor[] = [
     },
   },
   {
+    name: 'get_all_active_timers',
+    description: 'Get all active timers and group them by account id.',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'search_issues',
     description: 'Search Jira issues by key or text query.',
     inputSchema: {
@@ -239,6 +248,42 @@ async function callGetWorklogs(
   };
 }
 
+async function callGetAllActiveTimers(
+  deps: McpDependencies,
+): Promise<McpToolResult> {
+  const cached = await deps.getActiveTimers('all');
+  const timers = cached?.timers ?? [];
+
+  const grouped = new Map<string, unknown[]>();
+  for (const timer of timers) {
+    const accountId = timer.author?.accountId || timer.runningFor;
+    if (!accountId) continue;
+
+    const existing = grouped.get(accountId) ?? [];
+    existing.push(timer);
+    grouped.set(accountId, existing);
+  }
+
+  const timersByAccountId = Array.from(grouped.entries())
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([accountId, accountTimers]) => ({
+      account_id: accountId,
+      timers: accountTimers,
+    }));
+
+  const payload = {
+    total_accounts: timersByAccountId.length,
+    total_timers: timers.length,
+    cached_at: cached?.cachedAt ?? null,
+    timers_by_account_id: timersByAccountId,
+  };
+
+  return {
+    content: [{ type: 'text', text: safeStringify(payload) }],
+    structuredContent: payload,
+  };
+}
+
 async function callSearchIssues(
   deps: McpDependencies,
   args: Record<string, unknown>,
@@ -335,6 +380,8 @@ export function createMcpMethodHandler(deps: McpDependencies = DEFAULT_DEPENDENC
           let toolResult: McpToolResult;
           if (toolName === 'get_active_timers') {
             toolResult = await callGetActiveTimers(deps, args);
+          } else if (toolName === 'get_all_active_timers') {
+            toolResult = await callGetAllActiveTimers(deps);
           } else if (toolName === 'get_worklogs') {
             toolResult = await callGetWorklogs(deps, args);
           } else if (toolName === 'search_issues') {
