@@ -3,6 +3,7 @@ import type { CachedTimerData, ClockworkUser, Issue, Timer } from './types';
 
 const TIMER_CACHE_TTL_SECONDS = 600; // 1 minute
 const TIMER_KEY_PREFIX = 'clockwork:timers:';
+const ACTIVE_USERS_SET_KEY = 'clockwork:active_users';
 
 const JIRA_USER_CACHE_TTL_SECONDS = 172_800; // 2 days
 const JIRA_USER_KEY_PREFIX = 'jira:user:';
@@ -72,12 +73,35 @@ export async function setActiveTimers(
 }
 
 export async function deleteActiveTimers(userKey: string): Promise<void> {
+  console.log(`[deleteActiveTimers] Deleting cached timers for ${userKey}`);
   try {
     const redis = await getRedisClient();
     const key = getTimerKey(userKey);
     await redis.del(key);
   } catch (err) {
     console.error('Redis deleteActiveTimers error:', err);
+  }
+}
+
+export async function getActiveUserIds(): Promise<string[]> {
+  try {
+    const redis = await getRedisClient();
+    return await redis.sMembers(ACTIVE_USERS_SET_KEY);
+  } catch (err) {
+    console.error('Redis getActiveUserIds error:', err);
+    return [];
+  }
+}
+
+export async function setActiveUserIds(userIds: string[]): Promise<void> {
+  try {
+    const redis = await getRedisClient();
+    await redis.del(ACTIVE_USERS_SET_KEY);
+    if (userIds.length > 0) {
+      await redis.sAdd(ACTIVE_USERS_SET_KEY, userIds);
+    }
+  } catch (err) {
+    console.error('Redis setActiveUserIds error:', err);
   }
 }
 

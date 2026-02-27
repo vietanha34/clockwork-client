@@ -1,7 +1,12 @@
 import { fetchActiveTimers } from '../lib/clockwork-report';
 import { acquireClockworkJwt } from '../lib/jira-jwt';
 import { resolveTimerAuthors } from '../lib/jira-user-resolver';
-import { setActiveTimers } from '../lib/redis';
+import {
+  deleteActiveTimers,
+  getActiveUserIds,
+  setActiveTimers,
+  setActiveUserIds,
+} from '../lib/redis';
 import type { Timer } from '../lib/types';
 import { inngest } from './client';
 
@@ -87,6 +92,27 @@ export const syncActiveTimers = inngest.createFunction(
 
       // 4. Cache to Redis
       console.log('[sync-process] Caching to Redis...');
+
+      // Handle stopped timers: Check previously active users
+      const oldActiveUsers = await getActiveUserIds();
+      const currentActiveUsers = Object.keys(byUser);
+
+      const usersToClear = oldActiveUsers.filter(
+        (userId) => !currentActiveUsers.includes(userId),
+      );
+
+      if (usersToClear.length > 0) {
+        console.log(
+          `[sync-process] Clearing cache for ${usersToClear.length} users with stopped timers...`,
+        );
+        await Promise.all(
+          usersToClear.map((userId) => deleteActiveTimers(userId)),
+        );
+      }
+
+      // Update active users set
+      await setActiveUserIds(currentActiveUsers);
+
       // Cache for each user by accountId
       await Promise.all(
         Object.entries(byUser).map(([accountId, userTimers]) =>
