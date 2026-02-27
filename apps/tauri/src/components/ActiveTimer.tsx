@@ -125,7 +125,8 @@ export function ActiveTimer() {
         <ElapsedTime
           tillNow={activeTimer.tillNow}
           cachedAt={data.cachedAt ?? new Date().toISOString()}
-          className="font-mono text-sm font-semibold text-gray-900 tabular-nums"
+          isPaused={isOnHold}
+          className={`font-mono text-sm font-semibold tabular-nums ${isOnHold ? 'text-amber-700' : 'text-gray-900'}`}
         />
         <button
           type="button"

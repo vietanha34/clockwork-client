@@ -20,18 +20,26 @@ interface ElapsedTimeProps {
   /** ISO timestamp when the cache snapshot was taken. */
   cachedAt: string;
   className?: string;
+  /** Whether the timer is paused (e.g., on_hold status) - stops counting up */
+  isPaused?: boolean;
 }
 
-export function ElapsedTime({ tillNow, cachedAt, className }: ElapsedTimeProps) {
+export function ElapsedTime({ tillNow, cachedAt, className, isPaused }: ElapsedTimeProps) {
   const [seconds, setSeconds] = useState(() => tillNow + secondsSince(cachedAt));
 
   useEffect(() => {
+    // When paused, show the frozen time without adding elapsed time since cachedAt
+    if (isPaused) {
+      setSeconds(tillNow);
+      return;
+    }
+
     setSeconds(tillNow + secondsSince(cachedAt));
     const id = setInterval(() => {
       setSeconds(tillNow + secondsSince(cachedAt));
     }, 1000);
     return () => clearInterval(id);
-  }, [tillNow, cachedAt]);
+  }, [tillNow, cachedAt, isPaused]);
 
   return <span className={className}>{formatHMS(seconds)}</span>;
 }
