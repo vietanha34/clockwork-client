@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "clockwork-vercel": {
+      "url": "https://your-api-domain.vercel.app/api/mcp",
+      "headers": {
+        "x-api-key": "replace-with-your-mcp-api-key"
+      }
+    }
+  }
+}

@@ -240,6 +240,12 @@ Rust runtime hiện có:
 - `POST /api/timers/start`
 - `POST /api/timers/stop`
 - `GET /api/issues/:key`
+- `POST /api/mcp` (MCP Streamable HTTP JSON-RPC endpoint)
+
+MCP sample config files:
+
+- `apps/api/mcp.sample.json` (generic MCP client config)
+- `apps/api/mcp.inspector.sample.json` (MCP Inspector transport config)
 
 ## 12. Triển khai (Vercel + Inngest)
 
