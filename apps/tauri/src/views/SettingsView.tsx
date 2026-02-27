@@ -3,6 +3,7 @@ import { ApiValidationError, validateSettings } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
 import { getPlatform, isSquareTrayPlatform } from '../lib/platform';
 import { useSettings } from '../lib/settings-context';
+import { enable, disable } from '@tauri-apps/plugin-autostart';
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -23,8 +24,24 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [launchAtStartup, setLaunchAtStartup] = useState(settings.launchAtStartup);
 
   const showPinGuide = isDesktop && !settings.pinIconDismissed;
+
+  async function handleAutoStartToggle(checked: boolean) {
+    setLaunchAtStartup(checked);
+    try {
+      if (checked) {
+        await enable();
+      } else {
+        await disable();
+      }
+      await updateSettings({ ...settings, launchAtStartup: checked });
+    } catch (err) {
+      console.error('Failed to toggle autostart:', err);
+      setLaunchAtStartup(!checked);
+    }
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -45,6 +62,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
         clockworkApiToken: token,
         jiraUser: validation.user,
         pinIconDismissed: settings.pinIconDismissed,
+        launchAtStartup,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -131,6 +149,27 @@ export function SettingsView({ onClose }: SettingsViewProps) {
           </div>
         </div>
       )}
+      <div className="flex items-center justify-between py-2 mb-4">
+        <label htmlFor="launch-at-startup" className="text-xs font-medium text-gray-700">
+          Launch at startup
+        </label>
+        <button
+          id="launch-at-startup"
+          type="button"
+          role="switch"
+          aria-checked={launchAtStartup}
+          onClick={() => handleAutoStartToggle(!launchAtStartup)}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+            launchAtStartup ? 'bg-blue-600' : 'bg-gray-300'
+          }`}
+        >
+          <span
+            className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+              launchAtStartup ? 'translate-x-4.5' : 'translate-x-0.5'
+            }`}
+          />
+        </button>
+      </div>
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <div>
           <label htmlFor="jira-token" className="block text-xs font-medium text-gray-700 mb-1">
