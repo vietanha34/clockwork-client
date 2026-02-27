@@ -100,4 +100,5 @@ export interface AppSettings {
   clockworkApiToken: string;
   jiraUser: ClockworkUser | null;
   pinIconDismissed?: boolean;
+  launchAtStartup: boolean;
 }

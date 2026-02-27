@@ -6,6 +6,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   clockworkApiToken: '',
   jiraUser: null,
   pinIconDismissed: false,
+  launchAtStartup: true,
 };
 
 export async function loadSettings(): Promise<AppSettings> {
