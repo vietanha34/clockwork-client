@@ -1,0 +1,40 @@
+{
+  "npm": {
+    "publish": false
+  },
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "push": true,
+    "pushArgs": ["--follow-tags"]
+  },
+  "github": {
+    "release": true,
+    "releaseName": "v${version}"
+  },
+  "plugins": {
+    "@release-it/bumper": {
+      "out": [
+        {
+          "file": "apps/tauri/package.json",
+          "type": "application/json",
+          "path": "version"
+        },
+        {
+          "file": "apps/tauri/src-tauri/tauri.conf.json",
+          "type": "application/json",
+          "path": "version"
+        },
+        {
+          "file": "apps/tauri/src-tauri/Cargo.toml",
+          "type": "text/plain",
+          "search": "version = \"{{currentVersion}}\"",
+          "replace": "version = \"{{version}}\""
+        }
+      ]
+    }
+  },
+  "hooks": {
+    "after:release": "bash scripts/release-macos.sh v${version}"
+  }
+}
