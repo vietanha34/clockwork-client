@@ -5,12 +5,18 @@ use serde::{Deserialize, Serialize};
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{AppHandle, Manager, PhysicalPosition, Wry};
+use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_autostart::ManagerExt as AutostartManagerExt;
 
 const WINDOW_WIDTH: i32 = 302;
 #[allow(dead_code)]
 const WINDOW_HEIGHT: i32 = 540;
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
+
+fn default_true() -> bool {
+    true
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct JiraUserSettings {
@@ -34,6 +40,8 @@ pub struct AppSettings {
     pub jira_user: Option<JiraUserSettings>,
     #[serde(rename = "pinIconDismissed", default)]
     pub pin_icon_dismissed: bool,
+    #[serde(rename = "launchAtStartup", default = "default_true")]
+    pub launch_at_startup: bool,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {
@@ -107,6 +115,10 @@ fn exit_app(app: AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
@@ -114,6 +126,17 @@ pub fn run() {
             let window = app
                 .get_webview_window("main")
                 .expect("main window not found");
+
+            // Auto-start: enable/disable based on saved preference (defaults to true)
+            {
+                let settings = get_settings(app.handle().clone());
+                let manager = app.autolaunch();
+                if settings.launch_at_startup {
+                    let _ = manager.enable();
+                } else {
+                    let _ = manager.disable();
+                }
+            }
 
             #[cfg(target_os = "macos")]
             {
