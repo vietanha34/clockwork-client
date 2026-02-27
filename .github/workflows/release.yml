@@ -53,6 +53,20 @@ jobs:
         working-directory: apps/tauri
         run: pnpm tauri build --target ${{ matrix.target }}
 
+      - name: Wait for GitHub Release to exist
+        run: |
+          for i in $(seq 1 30); do
+            if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
+              echo "Release ${{ github.ref_name }} found"
+              exit 0
+            fi
+            echo "Waiting for release... attempt $i/30"
+            sleep 10
+          done
+          echo "Release not found after 5 minutes, uploading will create it"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload release assets (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
         uses: softprops/action-gh-release@v2
