@@ -44,10 +44,8 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
       // Only check at or after 17:00, and only once per day
       if (currentHour < NOTIFICATION_HOUR) {
         // Before 17:00 — hide any stale banner from yesterday
-        setShowBanner((prev) => {
-          if (prev) return false;
-          return prev;
-        });
+        if (showBanner) setShowBanner(false);
+        setDeficit(0);
         return;
       }
 
