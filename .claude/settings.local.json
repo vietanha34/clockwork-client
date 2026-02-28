@@ -54,7 +54,8 @@
       "Bash(chmod +x:*)",
       "Bash(git:*)",
       "Bash(test:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(xargs basename:*)"
     ],
     "additionalDirectories": [
       "/Users/vietanha34/Documents/workspace/personal-projects/clockwork-client/docs/plans"
