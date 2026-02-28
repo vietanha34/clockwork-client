@@ -8,6 +8,7 @@ import { formatSeconds } from '../lib/api-client';
 
 const NOTIFICATION_HOUR = 17;
 const WORKLOG_TARGET_SECONDS = 7.5 * 3600; // 27,000 seconds
+const LOCAL_STORAGE_KEY = 'worklog-notification-last-date';
 
 function todayDateKey(): string {
   const d = new Date();
@@ -25,7 +26,12 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
 
   // Restore last-notified date from localStorage on mount
   useEffect(() => {
-    hasNotifiedRef.current = localStorage.getItem('worklog-notification-last-date');
+    try {
+      hasNotifiedRef.current = localStorage.getItem(LOCAL_STORAGE_KEY);
+    } catch {
+      // localStorage not available (private browsing, quota exceeded)
+      hasNotifiedRef.current = null;
+    }
   }, []);
 
   // Check every 60 seconds
@@ -38,7 +44,10 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
       // Only check at or after 17:00, and only once per day
       if (currentHour < NOTIFICATION_HOUR) {
         // Before 17:00 — hide any stale banner from yesterday
-        if (showBanner) setShowBanner(false);
+        setShowBanner((prev) => {
+          if (prev) return false;
+          return prev;
+        });
         return;
       }
 
@@ -66,7 +75,11 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
 
       // Mark as notified
       hasNotifiedRef.current = todayKey;
-      localStorage.setItem('worklog-notification-last-date', todayKey);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, todayKey);
+      } catch {
+        // localStorage not available (private browsing, quota exceeded)
+      }
 
       // Send OS notification
       try {
@@ -81,8 +94,9 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
             body: `You've logged ${formatSeconds(totalLoggedSeconds)} / ${formatSeconds(WORKLOG_TARGET_SECONDS)} today. ${formatSeconds(remaining)} remaining.`,
           });
         }
-      } catch {
+      } catch (error) {
         // Notification send failed — banner still shows as fallback
+        console.error('Failed to send worklog notification:', error);
       }
     };
 
@@ -91,7 +105,7 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
 
     const interval = setInterval(check, 60_000);
     return () => clearInterval(interval);
-  }, [totalLoggedSeconds, showBanner]);
+  }, [totalLoggedSeconds]);
 
   return { showBanner, deficit, target: WORKLOG_TARGET_SECONDS, logged: totalLoggedSeconds };
 }
