@@ -10,6 +10,8 @@ import { isSquareTrayPlatform } from './lib/platform';
 import { SettingsProvider, useSettings } from './lib/settings-context';
 import { MainView } from './views/MainView';
 import { SettingsView } from './views/SettingsView';
+import { useWorklogNotification } from './hooks/useWorklogNotification';
+import { WorklogBanner } from './components/WorklogBanner';
 
 type View = 'main' | 'settings';
 
@@ -53,6 +55,9 @@ function AppContent() {
   const totalSeconds = loggedSeconds + currentSessionDuration;
   const dailyProgress = totalSeconds / (8 * 3600);
   const hasUnloggedDays = unloggedDays.length > 0;
+  const { showBanner, deficit, target, logged } = useWorklogNotification({
+    totalLoggedSeconds: totalSeconds,
+  });
 
   useTrayTimer(
     effectiveStartedAt,
@@ -76,6 +81,9 @@ function AppContent() {
       onBackClick={() => setView('main')}
       userDisplayName={view === 'main' ? settings.jiraUser?.displayName : undefined}
     >
+      {showBanner && (
+        <WorklogBanner logged={logged} target={target} deficit={deficit} />
+      )}
       {view === 'main' && <MainView todayProgressSeconds={totalSeconds} />}
       {view === 'settings' && <SettingsView onClose={() => setView('main')} />}
     </AppShell>
