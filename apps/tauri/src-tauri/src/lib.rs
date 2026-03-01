@@ -2,9 +2,10 @@ use std::fs;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+#[cfg(target_os = "linux")]
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
-use tauri::{AppHandle, Manager, PhysicalPosition, Wry};
+use tauri::{AppHandle, Manager, PhysicalPosition};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt as AutostartManagerExt;
 
@@ -153,7 +154,7 @@ pub fn run() {
                 #[cfg(target_os = "linux")]
                 {
                     // Build context menu for Linux
-                    let menu = MenuBuilder::<Wry>::new(app.handle())
+                    let menu = MenuBuilder::new(app.handle())
                         .item(&MenuItemBuilder::new("Show/Hide").id("toggle").build(app.handle()))
                         .item(&MenuItemBuilder::new("Quit").id("quit").build(app.handle()))
                         .build()
