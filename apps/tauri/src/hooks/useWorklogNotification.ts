@@ -17,9 +17,13 @@ function todayDateKey(): string {
 
 interface UseWorklogNotificationOptions {
   totalLoggedSeconds: number; // worklogs + running timer elapsed
+  isDataReady: boolean; // true only after first successful API response
 }
 
-export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotificationOptions) {
+export function useWorklogNotification({
+  totalLoggedSeconds,
+  isDataReady,
+}: UseWorklogNotificationOptions) {
   const [showBanner, setShowBanner] = useState(false);
   const [deficit, setDeficit] = useState(0);
   const hasNotifiedRef = useRef<string | null>(null);
@@ -37,14 +41,24 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
   // Check every 60 seconds
   useEffect(() => {
     const check = async () => {
+      // Wait until API data is available — avoids cold-start false positives
+      if (!isDataReady) return;
+
       const now = new Date();
+      const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
+      // Skip weekends — no worklog requirement on Sat/Sun
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        setShowBanner(false);
+        return;
+      }
+
       const currentHour = now.getHours();
       const todayKey = todayDateKey();
 
       // Only check at or after 17:00, and only once per day
       if (currentHour < NOTIFICATION_HOUR) {
         // Before 17:00 — hide any stale banner from yesterday
-        if (showBanner) setShowBanner(false);
+        setShowBanner(false);
         setDeficit(0);
         return;
       }
@@ -87,7 +101,7 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
           granted = permission === 'granted';
         }
         if (granted) {
-          sendNotification({
+          await sendNotification({
             title: 'Worklog Reminder',
             body: `You've logged ${formatSeconds(totalLoggedSeconds)} / ${formatSeconds(WORKLOG_TARGET_SECONDS)} today. ${formatSeconds(remaining)} remaining.`,
           });
@@ -103,7 +117,7 @@ export function useWorklogNotification({ totalLoggedSeconds }: UseWorklogNotific
 
     const interval = setInterval(check, 60_000);
     return () => clearInterval(interval);
-  }, [totalLoggedSeconds]);
+  }, [totalLoggedSeconds, isDataReady]);
 
   return { showBanner, deficit, target: WORKLOG_TARGET_SECONDS, logged: totalLoggedSeconds };
 }
