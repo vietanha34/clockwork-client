@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
+import { TimerSkeleton, WorklogSkeleton } from './components/Skeleton';
+import { UnifiedWarning } from './components/UnifiedWarning';
 import { useActiveTimers } from './hooks/useActiveTimers';
 import { useToday } from './hooks/useToday';
 import { useTrayTimer } from './hooks/useTrayTimer';
 import { useUnloggedDays } from './hooks/useUnloggedDays';
+import { useWorklogNotification } from './hooks/useWorklogNotification';
 import { useWorklogs } from './hooks/useWorklogs';
 import { totalWorklogSeconds } from './lib/api-client';
 import { isSquareTrayPlatform } from './lib/platform';
 import { SettingsProvider, useSettings } from './lib/settings-context';
 import { MainView } from './views/MainView';
 import { SettingsView } from './views/SettingsView';
-import { useWorklogNotification } from './hooks/useWorklogNotification';
-import { WorklogBanner } from './components/WorklogBanner';
 
 type View = 'main' | 'settings';
 
@@ -20,7 +21,7 @@ function AppContent() {
   const { settings, isLoaded } = useSettings();
   const { data } = useActiveTimers();
   const today = useToday();
-  const { data: worklogs } = useWorklogs(today);
+  const { data: worklogs, isSuccess: worklogsLoaded } = useWorklogs(today);
   const { unloggedDays } = useUnloggedDays();
   const activeTimer = data?.timers[0];
 
@@ -57,6 +58,7 @@ function AppContent() {
   const hasUnloggedDays = unloggedDays.length > 0;
   const { showBanner, deficit, target, logged } = useWorklogNotification({
     totalLoggedSeconds: totalSeconds,
+    isDataReady: worklogsLoaded,
   });
 
   useTrayTimer(
@@ -74,6 +76,18 @@ function AppContent() {
     }
   }, [isLoaded, settings.jiraToken, settings.clockworkApiToken]);
 
+  // Show skeleton while settings are loading to avoid flash of main view
+  if (!isLoaded) {
+    return (
+      <AppShell onSettingsClick={() => {}} showBackButton={false} onBackClick={() => {}}>
+        <div className="divide-y divide-gray-100">
+          <TimerSkeleton />
+          <WorklogSkeleton />
+        </div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell
       onSettingsClick={() => setView('settings')}
@@ -81,9 +95,13 @@ function AppContent() {
       onBackClick={() => setView('main')}
       userDisplayName={view === 'main' ? settings.jiraUser?.displayName : undefined}
     >
-      {showBanner && (
-        <WorklogBanner logged={logged} target={target} deficit={deficit} />
-      )}
+      <UnifiedWarning
+        unloggedDays={unloggedDays}
+        showToday={showBanner}
+        todayLogged={logged}
+        todayTarget={target}
+        todayDeficit={deficit}
+      />
       {view === 'main' && <MainView todayProgressSeconds={totalSeconds} />}
       {view === 'settings' && <SettingsView onClose={() => setView('main')} />}
     </AppShell>
