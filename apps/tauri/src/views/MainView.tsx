@@ -3,13 +3,11 @@ import { ActiveTimer } from '../components/ActiveTimer';
 import { DailyProgressBar } from '../components/DailyProgressBar';
 import { DateStrip } from '../components/DateStrip';
 import { StartTimerForm } from '../components/StartTimerForm';
-import { UnloggedDaysWarning } from '../components/UnloggedDaysWarning';
 import { WeeklyChart } from '../components/WeeklyChart';
 import { WorklogList } from '../components/WorklogList';
 import { type WorklogTab, WorklogTabs } from '../components/WorklogTabs';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useToday } from '../hooks/useToday';
-import { useUnloggedDays } from '../hooks/useUnloggedDays';
 import { useWeeklyWorklogs } from '../hooks/useWeeklyWorklogs';
 import { useWorklogs } from '../hooks/useWorklogs';
 import { todayDate } from '../lib/api-client';
@@ -48,7 +46,6 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
 
   const { isFetching, refetch } = useWorklogs(selectedDate);
   const { data: timerData } = useActiveTimers();
-  const { unloggedDays } = useUnloggedDays();
   const { weekData } = useWeeklyWorklogs();
 
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
@@ -60,8 +57,6 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
       {showProgressBar && typeof todayProgressSeconds === 'number' && (
         <DailyProgressBar loggedSeconds={todayProgressSeconds} />
       )}
-
-      <UnloggedDaysWarning unloggedDays={unloggedDays} />
 
       {/* Active timer section */}
       {hasActiveTimer && (
