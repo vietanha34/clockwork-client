@@ -54,6 +54,7 @@ jobs:
         run: pnpm tauri build --target ${{ matrix.target }}
 
       - name: Wait for GitHub Release to exist
+        shell: bash
         run: |
           for i in $(seq 1 30); do
             if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then

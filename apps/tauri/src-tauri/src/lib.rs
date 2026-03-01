@@ -154,11 +154,12 @@ pub fn run() {
                 #[cfg(target_os = "linux")]
                 {
                     // Build context menu for Linux
+                    let show_hide = MenuItemBuilder::new("Show/Hide").id("toggle").build(app.handle())?;
+                    let quit = MenuItemBuilder::new("Quit").id("quit").build(app.handle())?;
                     let menu = MenuBuilder::new(app.handle())
-                        .item(&MenuItemBuilder::new("Show/Hide").id("toggle").build(app.handle()))
-                        .item(&MenuItemBuilder::new("Quit").id("quit").build(app.handle()))
-                        .build()
-                        .expect("failed to create tray menu");
+                        .item(&show_hide)
+                        .item(&quit)
+                        .build()?;
                     let _ = tray.set_menu(Some(menu));
                     let _ = tray.set_show_menu_on_left_click(true);
                     

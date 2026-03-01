@@ -35,6 +35,7 @@
     }
   },
   "hooks": {
+    "after:bump": "cargo check && git add Cargo.lock",
     "after:release": "bash scripts/release-macos.sh v${version}"
   }
 }
