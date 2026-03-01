@@ -69,13 +69,6 @@ function AppContent() {
     activeTimer?.withinWorkingHours,
   );
 
-  // On first load, if no email is configured, redirect to settings
-  useEffect(() => {
-    if (isLoaded && (!settings.jiraToken || !settings.clockworkApiToken)) {
-      setView('settings');
-    }
-  }, [isLoaded, settings.jiraToken, settings.clockworkApiToken]);
-
   // Show skeleton while settings are loading to avoid flash of main view
   if (!isLoaded) {
     return (
@@ -88,22 +81,29 @@ function AppContent() {
     );
   }
 
+  // Derive effective view synchronously — if credentials are missing, always force settings.
+  // This prevents any flash of main view between renders.
+  const credsMissing = !settings.jiraToken || !settings.clockworkApiToken;
+  const effectiveView: View = credsMissing ? 'settings' : view;
+
   return (
     <AppShell
       onSettingsClick={() => setView('settings')}
-      showBackButton={view === 'settings'}
+      showBackButton={effectiveView === 'settings' && !credsMissing}
       onBackClick={() => setView('main')}
-      userDisplayName={view === 'main' ? settings.jiraUser?.displayName : undefined}
+      userDisplayName={effectiveView === 'main' ? settings.jiraUser?.displayName : undefined}
     >
-      <UnifiedWarning
-        unloggedDays={unloggedDays}
-        showToday={showBanner}
-        todayLogged={logged}
-        todayTarget={target}
-        todayDeficit={deficit}
-      />
-      {view === 'main' && <MainView todayProgressSeconds={totalSeconds} />}
-      {view === 'settings' && <SettingsView onClose={() => setView('main')} />}
+      {effectiveView === 'main' && (
+        <UnifiedWarning
+          unloggedDays={unloggedDays}
+          showToday={showBanner}
+          todayLogged={logged}
+          todayTarget={target}
+          todayDeficit={deficit}
+        />
+      )}
+      {effectiveView === 'main' && <MainView todayProgressSeconds={totalSeconds} />}
+      {effectiveView === 'settings' && <SettingsView onClose={() => setView('main')} />}
     </AppShell>
   );
 }
