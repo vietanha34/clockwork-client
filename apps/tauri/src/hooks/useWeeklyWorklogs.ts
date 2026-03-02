@@ -32,12 +32,17 @@ export interface WeekDay {
   isLoading: boolean;
 }
 
-export function getWeekDates(today = new Date()): Array<{
+export function getWeekDates(
+  today = new Date(),
+  weekOffset: 0 | -1 = 0,
+): Array<{
   date: string;
   dayOfWeek: string;
   isFuture: boolean;
 }> {
-  const monday = startOfCurrentWeekMonday(today);
+  const ref = new Date(today);
+  ref.setDate(ref.getDate() + weekOffset * 7);
+  const monday = startOfCurrentWeekMonday(ref);
   const todayStr = toLocalDateString(today);
   const result = [];
 
