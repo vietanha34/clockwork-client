@@ -189,3 +189,38 @@ export async function setCachedIssue(
     console.error('Redis setCachedIssue error:', err);
   }
 }
+
+// ─── Forge Context Token Cache ───────────────────────────────────────────────
+
+const FORGE_CONTEXT_TOKEN_KEY = 'clockwork:forge:context-token';
+const FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS = 840; // 14 minutes
+
+export async function getCachedForgeContextToken(): Promise<string | null> {
+  try {
+    const redis = await getRedisClient();
+    return await redis.get(FORGE_CONTEXT_TOKEN_KEY);
+  } catch (err) {
+    console.error('Redis getCachedForgeContextToken error:', err);
+    return null;
+  }
+}
+
+export async function setCachedForgeContextToken(
+  token: string,
+  expiresAtMs?: string,
+): Promise<void> {
+  try {
+    const redis = await getRedisClient();
+    let ttl = FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS;
+    if (expiresAtMs) {
+      const expiresAt = Number(expiresAtMs);
+      const secondsUntilExpiry = Math.floor((expiresAt - Date.now()) / 1000) - 60;
+      if (secondsUntilExpiry > 0) {
+        ttl = Math.min(secondsUntilExpiry, FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS);
+      }
+    }
+    await redis.set(FORGE_CONTEXT_TOKEN_KEY, token, { EX: ttl });
+  } catch (err) {
+    console.error('Redis setCachedForgeContextToken error:', err);
+  }
+}
