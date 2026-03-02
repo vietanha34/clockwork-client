@@ -1,10 +1,9 @@
 /**
  * Fetches timer data from Clockwork via the Atlassian Forge GraphQL Gateway.
  *
- * Replaces the old JWT-based flow:
- *   Old: Jira cookie → Servlet → JWT → GET app.clockwork.report/timers.json
- *   New: Jira full cookie → POST /rest/internal/2/forge/context/token → context token
- *        → POST gateway/api/graphql → invokeExtension
+ * Flow:
+ *   1. POST /rest/internal/2/forge/context/token → get context token
+ *   2. POST /gateway/api/graphql → invokeExtension with context token → get timers
  */
 
 import type { RawClockworkTimer } from './types';
@@ -22,14 +21,21 @@ interface ForgeTimersResponse {
   headers: Record<string, string[]>;
   status: number;
   body: {
-    timers: RawClockworkTimer[];
-    startAt: number;
-    maxResults: number;
-    total: number;
-    isLast: boolean;
-    page: number;
-    pages: number;
-    isFirst: boolean;
+    success: boolean;
+    payload: {
+      headers: Record<string, string[]>;
+      status: number;
+      body: {
+        timers: RawClockworkTimer[];
+        startAt: number;
+        maxResults: number;
+        total: number;
+        isLast: boolean;
+        page: number;
+        pages: number;
+        isFirst: boolean;
+      };
+    };
   };
 }
 
@@ -90,45 +96,29 @@ const INVOKE_EXTENSION_MUTATION = `mutation forge_ui_invokeExtension($input: Inv
       extensions {
         errorType
         statusCode
-        ... on InvokeExtensionPayloadErrorExtension {
-          fields {
-            authInfoUrl
-            __typename
-          }
-          __typename
-        }
         __typename
       }
       __typename
     }
     __typename
   }
-}
-`;
+}`;
 
 // ─── Private Helpers ─────────────────────────────────────────────────────────
 
 /**
  * Fetch a Forge context token from Atlassian internal API.
- * This token is used to authenticate GraphQL extension invocations.
- *
- * @param jiraFullCookie - The full Jira cookie string (all cookies from browser)
- * @param jiraDomain - e.g. "thudojsc.atlassian.net"
- * @param cloudId - Jira cloud ID
- * @param workspaceId - Jira workspace ID
- * @param extensionId - Clockwork Forge extension ARI
  */
 async function fetchForgeContextToken(
   jiraFullCookie: string,
   jiraDomain: string,
   cloudId: string,
-  workspaceId: string,
-  extensionId: string,
 ): Promise<{ token: string; expiresAt: number }> {
   const url = `https://${jiraDomain}/rest/internal/2/forge/context/token`;
 
   const body = JSON.stringify({
     extension: {
+      hiddenBy: null,
       scopes: [
         'access-email-addresses:connect-jira',
         'act-as-user:connect-jira',
@@ -148,33 +138,59 @@ async function fetchForgeContextToken(
         'write:connect-jira',
         'write:jira-work',
       ],
-      type: 'jira:globalBackgroundScript',
-      id: extensionId,
-      environmentId: extensionId.split('/').pop()?.split('/')[0] ?? '',
+      type: 'jira:globalPage',
+      id: 'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
+      environmentId: '725dad32-d2c5-4b58-a141-a093d70c8d34',
       environmentKey: 'production',
       environmentType: 'PRODUCTION',
       installationId: 'cef0eeca-8dc4-4811-99d1-9c841a75de87',
       appVersion: '3.7.0',
-      consentUrl: `https://id.atlassian.com/outboundAuth/start?containerId=${extensionId.replace(/:/g, '_')}&serviceKey=atlassian-token-service-key&cloudId=${cloudId}&isAccountBased=true`,
+      consentUrl: `https://id.atlassian.com/outboundAuth/start?containerId=2f4dbb6a-b1b8-4824-94b1-42a64e507a09_725dad32-d2c5-4b58-a141-a093d70c8d34&serviceKey=atlassian-token-service-key&cloudId=${cloudId}&isAccountBased=true&scopes=read%3Aapp-global-channel%3Arealtime+read%3Aconnect-jira+write%3Aconnect-jira+delete%3Aconnect-jira+act-as-user%3Aconnect-jira+project-admin%3Aconnect-jira+admin%3Aconnect-jira+access-email-addresses%3Aconnect-jira+read%3Ajira-user+read%3Ajira-work+write%3Ajira-work+manage%3Ajira-project+manage%3Ajira-configuration+read%3Aemail-address%3Ajira+read%3Apermission%3Ajira+offline_access`,
       properties: {
-        key: 'global-background-script',
+        displayConditions: { isLoggedIn: true },
+        icon: 'https://icon.cdn.prod.atlassian-dev.net/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/b5a795d6-748a-4e93-96b9-971eb084c639/assets/clockwork-icon.png',
+        key: 'global-pages',
+        layout: 'blank',
+        pages: [
+          { route: 'my-work', title: 'My Work' },
+          { route: 'timesheet', title: 'Timesheet' },
+          { route: 'reports', title: 'Reports' },
+          { route: 'teams-and-users', title: 'Teams and Users' },
+          { route: 'billing-periods', title: 'Billing Periods' },
+          { route: 'timers', title: 'Timers' },
+          { route: 'settings', title: 'Settings' },
+          { route: 'api-tokens', title: 'API Tokens' },
+          { route: 'help', title: 'Help' },
+        ],
         resolver: { endpoint: 'clockwork-endpoint' },
-        resource: 'global-bg',
-        type: 'jira:globalBackgroundScript',
+        resource: 'global-pages',
+        resourceUploadId: 'b5a795d6-748a-4e93-96b9-971eb084c639',
+        title: 'Clockwork Pro',
+        type: 'jira:globalPage',
       },
       userAccess: { hasAccess: true, enabled: false },
+      egress: [
+        { addresses: ['https://app.clockwork.report'], type: 'FETCH_BACKEND_SIDE', category: null, inScopeEUD: null },
+        { addresses: ['*.ingest.sentry.io', '*.ingest.us.sentry.io', '*.mixpanel.com', '*.sentry-cdn.com', 'cdn.mxpnl.com'], type: 'FETCH_CLIENT_SIDE', category: 'ANALYTICS', inScopeEUD: true },
+        { addresses: ['*.ingest.sentry.io'], type: 'FETCH_BACKEND_SIDE', category: 'ANALYTICS', inScopeEUD: true },
+      ],
+      installationConfig: null,
       license: {
         active: true,
         type: 'commercial',
+        supportEntitlementNumber: null,
         trialEndDate: '2026-03-26T00:00:00Z',
         subscriptionEndDate: '2026-03-26T00:00:00Z',
         isEvaluation: true,
         billingPeriod: 'MONTHLY',
+        ccpEntitlementId: '8916611a-9ba1-348f-b654-de66cc9b7ce1',
+        ccpEntitlementSlug: 'E-44E-HFS-BQS-5U5',
+        capabilitySet: null,
       },
-      moduleId: extensionId,
+      moduleId: 'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
     },
     extensionData: {
-      type: 'jira:globalBackgroundScript',
+      type: 'jira:globalPage',
       jira: { isNewNavigation: true },
     },
     useWorkspaceAri: true,
@@ -187,6 +203,7 @@ async function fetchForgeContextToken(
       Accept: 'application/json,text/javascript,*/*',
       Cookie: jiraFullCookie,
       Origin: `https://${jiraDomain}`,
+      Referer: `https://${jiraDomain}/jira/apps/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/my-work`,
     },
     body,
   });
@@ -216,25 +233,12 @@ async function fetchForgeContextToken(
 
 /**
  * Fetch timers from Clockwork via the Atlassian Forge GraphQL Gateway.
- *
- * This function:
- * 1. Fetches a context token using the Jira full cookie
- * 2. Uses the context token to invoke the Forge extension via GraphQL
- * 3. Returns active timers and the new context token for caching
- *
- * @param jiraFullCookie - The full Jira cookie string
- * @param jiraDomain - e.g. "thudojsc.atlassian.net"
- * @param cloudId - Jira cloud ID (e.g. "afde6ffd-9c34-4257-a163-36336cf8d953")
- * @param workspaceId - Jira workspace ID (e.g. "fefd8a92-e020-4606-8adf-3139353b0663")
- * @param extensionId - Clockwork Forge extension ARI
- * @param cachedContextToken - Optional cached context token to reuse
  */
 export async function fetchTimersViaForge(
   jiraFullCookie: string,
   jiraDomain: string,
   cloudId: string,
   workspaceId: string,
-  extensionId: string,
   cachedContextToken?: string,
 ): Promise<ForgeTimersResult> {
   // 1. Get context token (use cached one if available, otherwise fetch new)
@@ -244,13 +248,7 @@ export async function fetchTimersViaForge(
   if (cachedContextToken) {
     contextToken = cachedContextToken;
   } else {
-    const tokenResult = await fetchForgeContextToken(
-      jiraFullCookie,
-      jiraDomain,
-      cloudId,
-      workspaceId,
-      extensionId,
-    );
+    const tokenResult = await fetchForgeContextToken(jiraFullCookie, jiraDomain, cloudId);
     contextToken = tokenResult.token;
     contextTokenExpiresAt = String(tokenResult.expiresAt);
   }
@@ -258,6 +256,7 @@ export async function fetchTimersViaForge(
   // 2. Invoke GraphQL extension
   const url = `https://${jiraDomain}/gateway/api/graphql`;
   const contextIds = [`ari:cloud:jira:${cloudId}:workspace/${workspaceId}`];
+  const extensionId = 'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages';
 
   const payload: Record<string, unknown> = {
     call: {
@@ -268,7 +267,7 @@ export async function fetchTimersViaForge(
     context: {
       cloudId,
       localId: extensionId,
-      environmentId: extensionId.split('/').pop()?.split('/')[0] ?? '',
+      environmentId: '725dad32-d2c5-4b58-a141-a093d70c8d34',
       environmentType: 'PRODUCTION',
       moduleKey: 'global-pages',
       siteUrl: `https://${jiraDomain}`,
@@ -299,8 +298,14 @@ export async function fetchTimersViaForge(
     headers: {
       'Content-Type': 'application/json',
       Accept: '*/*',
+      Cookie: jiraFullCookie,
       Origin: `https://${jiraDomain}`,
+      Referer: `https://${jiraDomain}/jira/apps/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/timers`,
       'apollographql-client-name': 'GATEWAY',
+      'atl-attribution': JSON.stringify({
+        atlWorkspaceAri: `ari:cloud:jira:${cloudId}:workspace/${workspaceId}`,
+        service: 'forge-ui'
+      }),
     },
     body,
   });
@@ -323,17 +328,18 @@ export async function fetchTimersViaForge(
     throw new ForgeApiError(500, `Forge invocation failed: ${errorMessages}`, invocation?.errors);
   }
 
-  const responseBody = invocation.response?.body;
-  if (!responseBody || responseBody.status !== 200 || !responseBody.body?.timers) {
+  // Parse response - note the nested structure
+  const responseWrapper = invocation.response?.body;
+  if (!responseWrapper || !responseWrapper.body?.success || !responseWrapper.body.payload?.body?.timers) {
     throw new ForgeApiError(
-      responseBody?.status ?? 500,
+      responseWrapper?.body?.payload?.status ?? 500,
       'Forge response did not contain timer data',
-      responseBody,
+      responseWrapper,
     );
   }
 
-  const allTimers = responseBody.body.timers;
-  const total = responseBody.body.total;
+  const allTimers = responseWrapper.body.payload.body.timers;
+  const total = responseWrapper.body.payload.body.total;
 
   // Filter: only active timers (finished_at === null), deduplicate by id
   const seen = new Set<number>();

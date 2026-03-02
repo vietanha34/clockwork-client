@@ -56,7 +56,6 @@ export const syncActiveTimers = inngest.createFunction(
         jiraDomain,
         env.JIRA_CLOUD_ID,
         env.JIRA_WORKSPACE_ID,
-        env.FORGE_EXTENSION_ID,
         cachedContextToken,
       );
 
