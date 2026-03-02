@@ -10,10 +10,18 @@ import type { RawClockworkTimer } from './types';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface ForgeTimerPayload {
+interface ForgeTimersResponse {
+  headers: Record<string, string[]>;
   status: number;
   body: {
     timers: RawClockworkTimer[];
+    startAt: number;
+    maxResults: number;
+    total: number;
+    isLast: boolean;
+    page: number;
+    pages: number;
+    isFirst: boolean;
   };
 }
 
@@ -22,10 +30,7 @@ interface ForgeInvokeResponse {
     invokeExtension: {
       success: boolean;
       response: {
-        body: {
-          success: boolean;
-          payload: ForgeTimerPayload;
-        };
+        body: ForgeTimersResponse;
       } | null;
       contextToken: {
         jwt: string;
@@ -41,6 +46,7 @@ interface ForgeInvokeResponse {
 
 export interface ForgeTimersResult {
   timers: RawClockworkTimer[];
+  total: number;
   contextToken: string | null;
   contextTokenExpiresAt: string | null;
 }
@@ -119,7 +125,7 @@ export async function fetchTimersViaForge(
   const payload: Record<string, unknown> = {
     call: {
       method: 'GET',
-      path: '/my_recently_destroyed_timers.json',
+      path: '/timers.json?page=1',
       invokeType: 'ui-remote-fetch',
     },
     context: {
@@ -185,15 +191,16 @@ export async function fetchTimersViaForge(
   }
 
   const responseBody = invocation.response?.body;
-  if (!responseBody?.success || !responseBody.payload?.body?.timers) {
+  if (!responseBody || responseBody.status !== 200 || !responseBody.body?.timers) {
     throw new ForgeApiError(
-      responseBody?.payload?.status ?? 500,
+      responseBody?.status ?? 500,
       'Forge response did not contain timer data',
       responseBody,
     );
   }
 
-  const allTimers = responseBody.payload.body.timers;
+  const allTimers = responseBody.body.timers;
+  const total = responseBody.body.total;
 
   // Filter: only active timers (finished_at === null), deduplicate by id
   const seen = new Set<number>();
@@ -207,6 +214,7 @@ export async function fetchTimersViaForge(
 
   return {
     timers: activeTimers,
+    total,
     contextToken: invocation.contextToken?.jwt ?? null,
     contextTokenExpiresAt: invocation.contextToken?.expiresAt ?? null,
   };
