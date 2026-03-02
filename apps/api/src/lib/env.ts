@@ -51,7 +51,22 @@ export const env = {
   get JIRA_DOMAIN(): string {
     return required('JIRA_DOMAIN');
   },
+  // Atlassian / Jira
   get JIRA_FULL_COOKIE(): string {
     return required('JIRA_FULL_COOKIE');
+  },
+
+  // Atlassian Forge Gateway
+  get FORGE_EXTENSION_ID(): string {
+    return optional(
+      'FORGE_EXTENSION_ID',
+      'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
+    );
+  },
+  get JIRA_CLOUD_ID(): string {
+    return required('JIRA_CLOUD_ID');
+  },
+  get JIRA_WORKSPACE_ID(): string {
+    return required('JIRA_WORKSPACE_ID');
   },
 } as const;

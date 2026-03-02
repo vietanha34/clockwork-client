@@ -1,5 +1,5 @@
 import { getJiraUser, getJiraUsersBulk } from './atlassian-client';
-import type { ClockworkReportTimersResponse } from './clockwork-report';
+import type { RawClockworkTimer } from './types';
 import { getCachedJiraUser, setCachedJiraUser } from './redis';
 import type { ClockworkUser, Timer } from './types';
 
@@ -34,7 +34,7 @@ export async function resolveTimerAuthor(accountId: string): Promise<ClockworkUs
  * - Falls back gracefully: timers with unresolvable authors get empty email
  */
 export async function resolveTimerAuthors(
-  rawTimers: ClockworkReportTimersResponse['timers'],
+  rawTimers: RawClockworkTimer[],
 ): Promise<Timer[]> {
   // Collect unique accountIds from running_for
   const accountIds = [...new Set(rawTimers.map((t) => t.running_for).filter(Boolean))];
