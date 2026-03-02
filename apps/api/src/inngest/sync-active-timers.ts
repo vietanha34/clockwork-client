@@ -1,11 +1,13 @@
-import { fetchActiveTimers } from '../lib/clockwork-report';
-import { acquireClockworkJwt } from '../lib/jira-jwt';
+import { env } from '../lib/env';
+import { fetchTimersViaForge } from '../lib/forge-client';
 import { resolveTimerAuthors } from '../lib/jira-user-resolver';
 import {
   deleteActiveTimers,
   getActiveUserIds,
+  getCachedForgeContextToken,
   setActiveTimers,
   setActiveUserIds,
+  setCachedForgeContextToken,
 } from '../lib/redis';
 import type { Timer } from '../lib/types';
 import { inngest } from './client';
@@ -17,26 +19,17 @@ interface SyncTimersEvent {
   };
 }
 
-function getEnvRequired(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing required env var: ${name}`);
-  return value;
-}
-
 /**
  * Inngest function: sync-active-timers
  *
  * Triggered by:
  *  - event: "clockwork/timers.sync.requested"
- *  - cron: "every 5 minutes"
+ *  - cron: every minute 7:00-19:59 Mon-Sat (VN time)
  *
  * Steps:
- *   1. acquire-jwt: Exchange Jira session cookie for Clockwork JWT (admin/service account)
- *   2. fetch-timers: Fetch ALL active timers from Clockwork Report API
- *   3. cache-timers:
- *      - Group timers by runningFor (accountId)
- *      - Store per-user list in Redis (clockwork:timers:<accountId>)
- *      - Store global list in Redis (clockwork:timers:all)
+ *   1. Fetch active timers via Atlassian Forge GraphQL Gateway
+ *   2. Resolve timer authors via Jira user cache
+ *   3. Cache per-user and global timers to Redis
  */
 export const syncActiveTimers = inngest.createFunction(
   {
@@ -46,40 +39,46 @@ export const syncActiveTimers = inngest.createFunction(
   },
   [
     { event: 'clockwork/timers.sync.requested' },
-    // Every minute from 7:00 to 19:59 Mon-Sat (VN time)
     { cron: 'TZ=Asia/Ho_Chi_Minh * 7-19 * * 1-6' },
   ],
   async ({ event, step }) => {
     const eventData = (event as SyncTimersEvent).data;
-    const eventDomain = eventData?.jiraDomain;
+    const jiraDomain = eventData?.jiraDomain ?? env.JIRA_DOMAIN;
 
-    const jiraDomain = eventDomain ?? getEnvRequired('JIRA_DOMAIN');
-
-    // Single step: Sync logic (Acquire JWT -> Fetch -> Cache)
     const result = await step.run('sync-process', async () => {
       console.log(`[sync-process] Starting sync for domain: ${jiraDomain}`);
 
-      // 1. Acquire JWT
-      console.log('[sync-process] Acquiring Clockwork JWT...');
-      const jiraFullCookie = getEnvRequired('JIRA_FULL_COOKIE');
-      const jwt = await acquireClockworkJwt(jiraDomain, jiraFullCookie);
-      console.log('[sync-process] JWT acquired successfully.');
+      // 1. Fetch timers via Forge GraphQL Gateway
+      console.log('[sync-process] Fetching timers via Forge GraphQL Gateway...');
+      const cachedContextToken = await getCachedForgeContextToken() ?? undefined;
+      const forgeResult = await fetchTimersViaForge(
+        env.ATLASSIAN_SESSION_TOKEN,
+        jiraDomain,
+        env.JIRA_CLOUD_ID,
+        env.JIRA_WORKSPACE_ID,
+        env.FORGE_EXTENSION_ID,
+        cachedContextToken,
+      );
 
-      // 2. Fetch active timers
-      console.log('[sync-process] Fetching active timers from Clockwork API...');
-      const fetchResponse = await fetchActiveTimers(jwt, jiraDomain);
-      const timers = fetchResponse.timers;
-      const total = fetchResponse.total;
-      console.log(`[sync-process] Fetched ${total} timers.`);
+      // Cache the new context token for next run
+      if (forgeResult.contextToken) {
+        await setCachedForgeContextToken(
+          forgeResult.contextToken,
+          forgeResult.contextTokenExpiresAt ?? undefined,
+        );
+      }
 
-      // 3. Transform and Enrich with Jira user info
+      const timers = forgeResult.timers;
+      console.log(`[sync-process] Fetched ${timers.length} active timers.`);
+
+      // 2. Resolve timer authors via Jira user cache
       console.log('[sync-process] Resolving timer authors via Jira user cache...');
       const allEntries = await resolveTimerAuthors(timers);
       console.log(`[sync-process] Author resolution complete for ${allEntries.length} timers.`);
 
+      // 3. Group by user
       const byUser: Record<string, Timer[]> = {};
       for (const entry of allEntries) {
-        // Group by runningFor (accountId)
         const accountId = entry.runningFor;
         if (accountId) {
           if (!byUser[accountId]) byUser[accountId] = [];
@@ -93,7 +92,6 @@ export const syncActiveTimers = inngest.createFunction(
       // 4. Cache to Redis
       console.log('[sync-process] Caching to Redis...');
 
-      // Handle stopped timers: Check previously active users
       const oldActiveUsers = await getActiveUserIds();
       const currentActiveUsers = Object.keys(byUser);
 
@@ -110,24 +108,21 @@ export const syncActiveTimers = inngest.createFunction(
         );
       }
 
-      // Update active users set
       await setActiveUserIds(currentActiveUsers);
 
-      // Cache for each user by accountId
       await Promise.all(
         Object.entries(byUser).map(([accountId, userTimers]) =>
           setActiveTimers(accountId, userTimers),
         ),
       );
 
-      // Cache ALL timers (global view)
       await setActiveTimers('all', allEntries);
       console.log('[sync-process] Caching complete.');
 
       return {
         success: true,
         jiraDomain,
-        timersCount: total,
+        timersCount: timers.length,
         cachedUsers: usersCount,
       };
     });
