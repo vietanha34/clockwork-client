@@ -6,6 +6,7 @@ import { StartTimerForm } from '../components/StartTimerForm';
 import { WeeklyChart } from '../components/WeeklyChart';
 import { WorklogList } from '../components/WorklogList';
 import { type WorklogTab, WorklogTabs } from '../components/WorklogTabs';
+import { WeekSelector } from '../components/WeekSelector';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useToday } from '../hooks/useToday';
 import { useWeeklyWorklogs } from '../hooks/useWeeklyWorklogs';
@@ -32,6 +33,7 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
   const today = useToday();
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const [activeTab, setActiveTab] = useState<WorklogTab>('list');
+  const [summaryWeekOffset, setSummaryWeekOffset] = useState<0 | -1>(0);
 
   // Auto-switch date if needed when day changes
   const prevTodayRef = useRef(today);
@@ -46,7 +48,7 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
 
   const { isFetching, refetch } = useWorklogs(selectedDate);
   const { data: timerData } = useActiveTimers();
-  const { weekData } = useWeeklyWorklogs();
+  const { weekData } = useWeeklyWorklogs(summaryWeekOffset);
 
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
   const weekRange = useMemo(() => weekRangeLabel(weekData), [weekData]);
@@ -117,7 +119,10 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
               onSelectDate={setSelectedDate}
             />
           ) : (
-            <p className="text-xs text-center text-gray-400">{weekRange}</p>
+            <>
+              <WeekSelector weekOffset={summaryWeekOffset} onOffsetChange={setSummaryWeekOffset} />
+              <p className="text-xs text-center text-gray-400">{weekRange}</p>
+            </>
           )}
         </div>
 
