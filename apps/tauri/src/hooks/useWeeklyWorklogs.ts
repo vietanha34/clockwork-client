@@ -32,12 +32,17 @@ export interface WeekDay {
   isLoading: boolean;
 }
 
-export function getWeekDates(today = new Date()): Array<{
+export function getWeekDates(
+  today = new Date(),
+  weekOffset: 0 | -1 = 0,
+): Array<{
   date: string;
   dayOfWeek: string;
   isFuture: boolean;
 }> {
-  const monday = startOfCurrentWeekMonday(today);
+  const ref = new Date(today);
+  ref.setDate(ref.getDate() + weekOffset * 7);
+  const monday = startOfCurrentWeekMonday(ref);
   const todayStr = toLocalDateString(today);
   const result = [];
 
@@ -55,14 +60,14 @@ export function getWeekDates(today = new Date()): Array<{
   return result;
 }
 
-export function useWeeklyWorklogs(): {
+export function useWeeklyWorklogs(weekOffset: 0 | -1 = 0): {
   weekData: WeekDay[];
   isLoading: boolean;
 } {
   const { settings } = useSettings();
   const { jiraToken: accountId } = settings;
   const today = useToday();
-  const weekDates = useMemo(() => getWeekDates(), [today]);
+  const weekDates = useMemo(() => getWeekDates(new Date(), weekOffset), [today, weekOffset]);
 
   const worklogQueries = useQueries({
     queries: weekDates.map((day) => ({
