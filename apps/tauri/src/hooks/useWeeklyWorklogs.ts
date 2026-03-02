@@ -60,14 +60,14 @@ export function getWeekDates(
   return result;
 }
 
-export function useWeeklyWorklogs(): {
+export function useWeeklyWorklogs(weekOffset: 0 | -1 = 0): {
   weekData: WeekDay[];
   isLoading: boolean;
 } {
   const { settings } = useSettings();
   const { jiraToken: accountId } = settings;
   const today = useToday();
-  const weekDates = useMemo(() => getWeekDates(), [today]);
+  const weekDates = useMemo(() => getWeekDates(new Date(), weekOffset), [today, weekOffset]);
 
   const worklogQueries = useQueries({
     queries: weekDates.map((day) => ({
