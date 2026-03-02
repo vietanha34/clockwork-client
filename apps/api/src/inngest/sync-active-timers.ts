@@ -52,7 +52,7 @@ export const syncActiveTimers = inngest.createFunction(
       console.log('[sync-process] Fetching timers via Forge GraphQL Gateway...');
       const cachedContextToken = await getCachedForgeContextToken() ?? undefined;
       const forgeResult = await fetchTimersViaForge(
-        env.ATLASSIAN_SESSION_TOKEN,
+        env.JIRA_FULL_COOKIE,
         jiraDomain,
         env.JIRA_CLOUD_ID,
         env.JIRA_WORKSPACE_ID,
