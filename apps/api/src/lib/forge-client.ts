@@ -170,9 +170,30 @@ async function fetchForgeContextToken(
       },
       userAccess: { hasAccess: true, enabled: false },
       egress: [
-        { addresses: ['https://app.clockwork.report'], type: 'FETCH_BACKEND_SIDE', category: null, inScopeEUD: null },
-        { addresses: ['*.ingest.sentry.io', '*.ingest.us.sentry.io', '*.mixpanel.com', '*.sentry-cdn.com', 'cdn.mxpnl.com'], type: 'FETCH_CLIENT_SIDE', category: 'ANALYTICS', inScopeEUD: true },
-        { addresses: ['*.ingest.sentry.io'], type: 'FETCH_BACKEND_SIDE', category: 'ANALYTICS', inScopeEUD: true },
+        {
+          addresses: ['https://app.clockwork.report'],
+          type: 'FETCH_BACKEND_SIDE',
+          category: null,
+          inScopeEUD: null,
+        },
+        {
+          addresses: [
+            '*.ingest.sentry.io',
+            '*.ingest.us.sentry.io',
+            '*.mixpanel.com',
+            '*.sentry-cdn.com',
+            'cdn.mxpnl.com',
+          ],
+          type: 'FETCH_CLIENT_SIDE',
+          category: 'ANALYTICS',
+          inScopeEUD: true,
+        },
+        {
+          addresses: ['*.ingest.sentry.io'],
+          type: 'FETCH_BACKEND_SIDE',
+          category: 'ANALYTICS',
+          inScopeEUD: true,
+        },
       ],
       installationConfig: null,
       license: {
@@ -187,7 +208,8 @@ async function fetchForgeContextToken(
         ccpEntitlementSlug: 'E-44E-HFS-BQS-5U5',
         capabilitySet: null,
       },
-      moduleId: 'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
+      moduleId:
+        'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
     },
     extensionData: {
       type: 'jira:globalPage',
@@ -241,22 +263,30 @@ export async function fetchTimersViaForge(
   workspaceId: string,
   cachedContextToken?: string,
 ): Promise<ForgeTimersResult> {
-  // 1. Get context token (use cached one if available, otherwise fetch new)
-  let contextToken: string;
+  // 1. Resolve context token: use cached if available, otherwise bootstrap via internal API
+  let contextToken: string | undefined;
   let contextTokenExpiresAt: string | null = null;
 
   if (cachedContextToken) {
     contextToken = cachedContextToken;
   } else {
-    const tokenResult = await fetchForgeContextToken(jiraFullCookie, jiraDomain, cloudId);
-    contextToken = tokenResult.token;
-    contextTokenExpiresAt = String(tokenResult.expiresAt);
+    // Bootstrap: fetch initial context token from Atlassian internal API
+    try {
+      const tokenResult = await fetchForgeContextToken(jiraFullCookie, jiraDomain, cloudId);
+      contextToken = tokenResult.token;
+      contextTokenExpiresAt = String(tokenResult.expiresAt);
+    } catch (err) {
+      // If internal API fails, proceed without contextToken —
+      // the invokeExtension mutation may still work with cookie auth alone
+      console.warn('Failed to fetch Forge context token, proceeding without:', err);
+    }
   }
 
   // 2. Invoke GraphQL extension
   const url = `https://${jiraDomain}/gateway/api/graphql`;
   const contextIds = [`ari:cloud:jira:${cloudId}:workspace/${workspaceId}`];
-  const extensionId = 'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages';
+  const extensionId =
+    'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages';
 
   const payload: Record<string, unknown> = {
     call: {
@@ -277,9 +307,13 @@ export async function fetchTimersViaForge(
         jira: { isNewNavigation: true },
       },
     },
-    contextToken,
     entryPoint: 'resolver',
   };
+
+  // Only include contextToken in payload if we have one
+  if (contextToken) {
+    payload.contextToken = contextToken;
+  }
 
   const body = JSON.stringify({
     operationName: 'forge_ui_invokeExtension',
@@ -301,11 +335,6 @@ export async function fetchTimersViaForge(
       Cookie: jiraFullCookie,
       Origin: `https://${jiraDomain}`,
       Referer: `https://${jiraDomain}/jira/apps/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/timers`,
-      'apollographql-client-name': 'GATEWAY',
-      'atl-attribution': JSON.stringify({
-        atlWorkspaceAri: `ari:cloud:jira:${cloudId}:workspace/${workspaceId}`,
-        service: 'forge-ui'
-      }),
     },
     body,
   });
@@ -325,12 +354,21 @@ export async function fetchTimersViaForge(
   if (!invocation?.success) {
     const errorMessages =
       invocation?.errors?.map((e) => e.message).join('; ') ?? 'Unknown Forge error';
+    console.error('Forge invocation failed:', {
+      errors: invocation?.errors,
+      hadContextToken: !!contextToken,
+      contextTokenPrefix: contextToken?.substring(0, 40),
+    });
     throw new ForgeApiError(500, `Forge invocation failed: ${errorMessages}`, invocation?.errors);
   }
 
   // Parse response - note the nested structure
   const responseWrapper = invocation.response?.body;
-  if (!responseWrapper || !responseWrapper.body?.success || !responseWrapper.body.payload?.body?.timers) {
+  if (
+    !responseWrapper ||
+    !responseWrapper.body?.success ||
+    !responseWrapper.body.payload?.body?.timers
+  ) {
     throw new ForgeApiError(
       responseWrapper?.body?.payload?.status ?? 500,
       'Forge response did not contain timer data',
