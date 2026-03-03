@@ -124,7 +124,10 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
+            #[cfg(desktop)]
+            app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
             let window = app
                 .get_webview_window("main")
                 .expect("main window not found");
