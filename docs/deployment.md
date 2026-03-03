@@ -26,7 +26,7 @@ This guide covers deploying `apps/api` and `apps/inngest` to Vercel.
 | `JIRA_CLOUD_ID` | Jira Cloud ID | See [Getting Jira Cloud ID](#getting-jira-cloud-id) below | ✅ |
 | `JIRA_WORKSPACE_ID` | Jira Workspace ID | See [Getting Jira Workspace ID](#getting-jira-workspace-id) below | ✅ |
 | `FORGE_EXTENSION_ID` | Clockwork Forge Extension ID | Fixed value, already has default | ❌ |
-| `JIRA_FULL_COOKIE` | Full Cookie from Jira session | Browser DevTools → Network → any Jira request | ✅ |
+| `JIRA_TENANT_SESSION_TOKEN` | Jira Tenant Session Token | Browser DevTools → Network → Cookie: `tenant.session.token=...` (value only) | ✅ |
 
 ### `apps/inngest`
 
@@ -34,7 +34,7 @@ This guide covers deploying `apps/api` and `apps/inngest` to Vercel.
 |---|---|---|---|
 | `UPSTASH_REDIS_REST_URL` | Same Redis instance as `apps/api` | Upstash dashboard | ✅ |
 | `UPSTASH_REDIS_REST_TOKEN` | Same Redis instance as `apps/api` | Upstash dashboard | ✅ |
-| `JIRA_FULL_COOKIE` | Full Cookie header from a Jira browser session | Browser DevTools → Network tab → any Jira request → `Cookie` header | ✅ |
+| `JIRA_TENANT_SESSION_TOKEN` | Jira Tenant Session Token | Browser DevTools → Network → Cookie: `tenant.session.token=...` (value only) | ✅ |
 | `JIRA_DOMAIN` | Jira instance domain | e.g. `your-org.atlassian.net` | ✅ |
 | `JIRA_CLOUD_ID` | Jira Cloud ID | Same as above | ✅ |
 | `JIRA_WORKSPACE_ID` | Jira Workspace ID | Same as above | ✅ |
@@ -47,7 +47,7 @@ This guide covers deploying `apps/api` and `apps/inngest` to Vercel.
 |---|---|---|
 | `UPSTASH_REDIS_REST_URL` | Same Redis instance as `apps/api` | Upstash dashboard |
 | `UPSTASH_REDIS_REST_TOKEN` | Same Redis instance as `apps/api` | Upstash dashboard |
-| `JIRA_FULL_COOKIE` | Full Cookie header from a Jira browser session | Browser DevTools → Network tab → any Jira request → `Cookie` header |
+| `JIRA_TENANT_SESSION_TOKEN` | Jira Tenant Session Token | Browser DevTools → Network → Cookie: `tenant.session.token=...` (value only) |
 | `JIRA_DOMAIN` | Jira instance domain | e.g. `your-org.atlassian.net` |
 | `INNGEST_EVENT_KEY` | Inngest event key | [app.inngest.com](https://app.inngest.com) → Your App → Manage → Event Keys |
 | `INNGEST_SIGNING_KEY` | Inngest signing key | [app.inngest.com](https://app.inngest.com) → Your App → Manage → Signing Key |

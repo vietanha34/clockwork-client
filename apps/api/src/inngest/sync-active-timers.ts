@@ -37,10 +37,7 @@ export const syncActiveTimers = inngest.createFunction(
     name: 'Sync Active Clockwork Timers',
     retries: 2,
   },
-  [
-    { event: 'clockwork/timers.sync.requested' },
-    { cron: 'TZ=Asia/Ho_Chi_Minh * 7-19 * * 1-6' },
-  ],
+  [{ event: 'clockwork/timers.sync.requested' }, { cron: 'TZ=Asia/Ho_Chi_Minh * 7-19 * * 1-6' }],
   async ({ event, step }) => {
     const eventData = (event as SyncTimersEvent).data;
     const jiraDomain = eventData?.jiraDomain ?? env.JIRA_DOMAIN;
@@ -50,9 +47,9 @@ export const syncActiveTimers = inngest.createFunction(
 
       // 1. Fetch timers via Forge GraphQL Gateway
       console.log('[sync-process] Fetching timers via Forge GraphQL Gateway...');
-      const cachedContextToken = await getCachedForgeContextToken() ?? undefined;
+      const cachedContextToken = (await getCachedForgeContextToken()) ?? undefined;
       const forgeResult = await fetchTimersViaForge(
-        env.ATLASSIAN_SESSION_TOKEN,
+        env.JIRA_TENANT_SESSION_TOKEN,
         jiraDomain,
         env.JIRA_CLOUD_ID,
         env.JIRA_WORKSPACE_ID,
@@ -95,17 +92,13 @@ export const syncActiveTimers = inngest.createFunction(
       const oldActiveUsers = await getActiveUserIds();
       const currentActiveUsers = Object.keys(byUser);
 
-      const usersToClear = oldActiveUsers.filter(
-        (userId) => !currentActiveUsers.includes(userId),
-      );
+      const usersToClear = oldActiveUsers.filter((userId) => !currentActiveUsers.includes(userId));
 
       if (usersToClear.length > 0) {
         console.log(
           `[sync-process] Clearing cache for ${usersToClear.length} users with stopped timers...`,
         );
-        await Promise.all(
-          usersToClear.map((userId) => deleteActiveTimers(userId)),
-        );
+        await Promise.all(usersToClear.map((userId) => deleteActiveTimers(userId)));
       }
 
       await setActiveUserIds(currentActiveUsers);

@@ -134,7 +134,7 @@ const DEFAULT_FORGE_CONFIG: ForgeConfig = {
  * Fetch a Forge context token from Atlassian internal API.
  */
 export async function fetchForgeContextToken(
-  jiraFullCookie: string,
+  jiraTenantSessionToken: string,
   jiraDomain: string,
   cloudId: string,
   config: Partial<ForgeConfig> = {},
@@ -253,7 +253,7 @@ export async function fetchForgeContextToken(
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json,text/javascript,*/*',
-      Cookie: jiraFullCookie,
+      Cookie: `tenant.session.token=${jiraTenantSessionToken}`,
       Origin: `https://${jiraDomain}`,
       'User-Agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
@@ -288,7 +288,7 @@ export async function fetchForgeContextToken(
  * Fetch timers from Clockwork via the Atlassian Forge GraphQL Gateway.
  */
 export async function fetchTimersViaForge(
-  jiraFullCookie: string,
+  jiraTenantSessionToken: string,
   jiraDomain: string,
   cloudId: string,
   workspaceId: string,
@@ -306,7 +306,12 @@ export async function fetchTimersViaForge(
   } else {
     // Bootstrap: fetch initial context token from Atlassian internal API
     try {
-      const tokenResult = await fetchForgeContextToken(jiraFullCookie, jiraDomain, cloudId, config);
+      const tokenResult = await fetchForgeContextToken(
+        jiraTenantSessionToken,
+        jiraDomain,
+        cloudId,
+        config,
+      );
       contextToken = tokenResult.token;
       contextTokenExpiresAt = String(tokenResult.expiresAt);
     } catch (err) {
@@ -368,7 +373,7 @@ export async function fetchTimersViaForge(
     headers: {
       'Content-Type': 'application/json',
       Accept: '*/*',
-      Cookie: jiraFullCookie,
+      Cookie: `tenant.session.token=${jiraTenantSessionToken}`,
       Origin: `https://${jiraDomain}`,
       'User-Agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',

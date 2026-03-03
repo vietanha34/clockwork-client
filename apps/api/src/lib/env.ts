@@ -52,8 +52,8 @@ export const env = {
     return required('JIRA_DOMAIN');
   },
   // Atlassian / Jira
-  get JIRA_FULL_COOKIE(): string {
-    return required('JIRA_FULL_COOKIE');
+  get JIRA_TENANT_SESSION_TOKEN(): string {
+    return required('JIRA_TENANT_SESSION_TOKEN');
   },
 
   // Atlassian Forge Gateway
