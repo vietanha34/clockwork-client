@@ -9,15 +9,17 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  publish-tauri:
     strategy:
       fail-fast: false
       matrix:
         include:
+          - platform: macos-latest
+            args: '--target aarch64-apple-darwin'
           - platform: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
+            args: '--target x86_64-unknown-linux-gnu'
           - platform: windows-latest
-            target: x86_64-pc-windows-msvc
+            args: '--target x86_64-pc-windows-msvc'
 
     runs-on: ${{ matrix.platform }}
 
@@ -28,11 +30,15 @@ jobs:
         with:
           node-version: 20
 
+      - uses: pnpm/action-setup@v4
+
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: 'apps/tauri/src-tauri -> target'
 
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
@@ -49,37 +55,18 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Build Tauri
-        working-directory: apps/tauri
-        run: pnpm tauri build --target ${{ matrix.target }}
-
-      - name: Wait for GitHub Release to exist
-        shell: bash
-        run: |
-          for i in $(seq 1 30); do
-            if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
-              echo "Release ${{ github.ref_name }} found"
-              exit 0
-            fi
-            echo "Waiting for release... attempt $i/30"
-            sleep 10
-          done
-          echo "Release not found after 5 minutes, uploading will create it"
+      - uses: tauri-apps/tauri-action@v0
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload release assets (Ubuntu)
-        if: matrix.platform == 'ubuntu-22.04'
-        uses: softprops/action-gh-release@v2
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          files: |
-            target/${{ matrix.target }}/release/bundle/deb/*.deb
-            target/${{ matrix.target }}/release/bundle/rpm/*.rpm
-            target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
-
-      - name: Upload release assets (Windows)
-        if: matrix.platform == 'windows-latest'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            target/${{ matrix.target }}/release/bundle/nsis/*.exe
+          projectPath: apps/tauri
+          tauriScript: pnpm tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: ${{ github.ref_name }}
+          releaseBody: 'See the assets to download and install this version.'
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+          args: ${{ matrix.args }}

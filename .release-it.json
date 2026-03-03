@@ -9,8 +9,7 @@
     "pushArgs": ["--follow-tags"]
   },
   "github": {
-    "release": true,
-    "releaseName": "v${version}"
+    "release": false
   },
   "plugins": {
     "@release-it/bumper": {
@@ -35,7 +34,6 @@
     }
   },
   "hooks": {
-    "after:bump": "cargo check && git add Cargo.lock",
-    "after:release": "bash scripts/release-macos.sh v${version}"
+    "after:bump": "cargo check && git add Cargo.lock"
   }
 }
