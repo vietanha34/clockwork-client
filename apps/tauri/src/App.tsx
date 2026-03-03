@@ -7,6 +7,7 @@ import { useToday } from './hooks/useToday';
 import { useTrayTimer } from './hooks/useTrayTimer';
 import { useUnloggedDays } from './hooks/useUnloggedDays';
 import { useWorklogNotification } from './hooks/useWorklogNotification';
+import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { useWorklogs } from './hooks/useWorklogs';
 import { totalWorklogSeconds } from './lib/api-client';
 import { isSquareTrayPlatform } from './lib/platform';
@@ -19,6 +20,7 @@ type View = 'main' | 'settings';
 function AppContent() {
   const [view, setView] = useState<View>('main');
   const { settings, isLoaded } = useSettings();
+  useAutoUpdate(settings.autoUpdate);
   const { data } = useActiveTimers();
   const today = useToday();
   const { data: worklogs, isSuccess: worklogsLoaded } = useWorklogs(today);
