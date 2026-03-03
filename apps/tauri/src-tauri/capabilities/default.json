@@ -9,6 +9,8 @@
     "os:default",
     "autostart:default",
     "notification:default",
+    "updater:default",
+    "process:default",
     {
       "identifier": "http:default",
       "allow": [{ "url": "https://clockwork-client.vercel.app/*" }],
