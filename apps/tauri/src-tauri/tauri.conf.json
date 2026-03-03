@@ -51,7 +51,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "PASTE_PUBLIC_KEY_FROM_TASK_1_HERE",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDBFNDY2Nzg4RThEQTFFNTQKUldSVUh0cm9pR2RHRG16QlJ6aU1xdnVJS09PYXR5UXJiMTVRcjJJN0UyV0p6aU5kV3RSc0VsM2IK",
       "endpoints": [
         "https://github.com/vietanha34/clockwork-client/releases/latest/download/latest.json"
       ],
