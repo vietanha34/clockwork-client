@@ -25,6 +25,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [launchAtStartup, setLaunchAtStartup] = useState(settings.launchAtStartup);
+  const [autoUpdate, setAutoUpdate] = useState(settings.autoUpdate);
 
   const showPinGuide = isDesktop && !settings.pinIconDismissed;
 
@@ -40,6 +41,16 @@ export function SettingsView({ onClose }: SettingsViewProps) {
     } catch (err) {
       console.error('Failed to toggle autostart:', err);
       setLaunchAtStartup(!checked);
+    }
+  }
+
+  async function handleAutoUpdateToggle(checked: boolean) {
+    setAutoUpdate(checked);
+    try {
+      await updateSettings({ ...settings, autoUpdate: checked });
+    } catch (err) {
+      console.error('Failed to toggle auto-update:', err);
+      setAutoUpdate(!checked);
     }
   }
 
@@ -63,6 +74,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
         jiraUser: validation.user,
         pinIconDismissed: settings.pinIconDismissed,
         launchAtStartup,
+        autoUpdate,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -166,6 +178,27 @@ export function SettingsView({ onClose }: SettingsViewProps) {
           <span
             className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
               launchAtStartup ? 'translate-x-4.5' : 'translate-x-0.5'
+            }`}
+          />
+        </button>
+      </div>
+      <div className="flex items-center justify-between py-2 mb-4">
+        <label htmlFor="auto-update" className="text-xs font-medium text-gray-700">
+          Auto update
+        </label>
+        <button
+          id="auto-update"
+          type="button"
+          role="switch"
+          aria-checked={autoUpdate}
+          onClick={() => handleAutoUpdateToggle(!autoUpdate)}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+            autoUpdate ? 'bg-blue-600' : 'bg-gray-300'
+          }`}
+        >
+          <span
+            className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+              autoUpdate ? 'translate-x-4.5' : 'translate-x-0.5'
             }`}
           />
         </button>

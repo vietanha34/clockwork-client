@@ -101,4 +101,5 @@ export interface AppSettings {
   jiraUser: ClockworkUser | null;
   pinIconDismissed?: boolean;
   launchAtStartup: boolean;
+  autoUpdate: boolean;
 }

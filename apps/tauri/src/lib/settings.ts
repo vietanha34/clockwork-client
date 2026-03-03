@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   jiraUser: null,
   pinIconDismissed: false,
   launchAtStartup: true,
+  autoUpdate: true,
 };
 
 export async function loadSettings(): Promise<AppSettings> {

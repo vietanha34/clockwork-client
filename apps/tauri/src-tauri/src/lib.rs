@@ -43,6 +43,8 @@ pub struct AppSettings {
     pub pin_icon_dismissed: bool,
     #[serde(rename = "launchAtStartup", default = "default_true")]
     pub launch_at_startup: bool,
+    #[serde(rename = "autoUpdate", default = "default_true")]
+    pub auto_update: bool,
 }
 
 fn settings_path(app: &AppHandle) -> PathBuf {
