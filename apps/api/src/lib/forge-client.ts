@@ -18,44 +18,44 @@ interface ForgeContextTokenResponse {
 }
 
 interface ForgeTimersResponse {
-  headers: Record<string, string[]>;
-  status: number;
-  body: {
-    success: boolean;
-    payload: {
-      headers: Record<string, string[]>;
-      status: number;
-      body: {
-        timers: RawClockworkTimer[];
-        startAt: number;
-        maxResults: number;
-        total: number;
-        isLast: boolean;
-        page: number;
-        pages: number;
-        isFirst: boolean;
-      };
+  success: boolean;
+  payload: {
+    headers: Record<string, string[]>;
+    status: number;
+    body: {
+      timers: RawClockworkTimer[];
+      startAt: number;
+      maxResults: number;
+      total: number;
+      isLast: boolean;
+      page: number;
+      pages: number;
+      isFirst: boolean;
     };
   };
 }
 
 interface ForgeInvokeResponse {
-  data: {
+  data?: {
     invokeExtension: {
       success: boolean;
-      response: {
+      response?: {
         body: ForgeTimersResponse;
-      } | null;
-      contextToken: {
+      };
+      contextToken?: {
         jwt: string;
         expiresAt: string;
-      } | null;
-      errors: Array<{
+      };
+      errors?: Array<{
         message: string;
-        extensions?: { errorType?: string; statusCode?: number };
-      }> | null;
+        extensions?: unknown;
+      }>;
     };
   };
+  errors?: Array<{
+    message: string;
+    extensions?: unknown;
+  }>;
 }
 
 export interface ForgeTimersResult {
@@ -96,6 +96,13 @@ const INVOKE_EXTENSION_MUTATION = `mutation forge_ui_invokeExtension($input: Inv
       extensions {
         errorType
         statusCode
+        ... on InvokeExtensionPayloadErrorExtension {
+          fields {
+            authInfoUrl
+            __typename
+          }
+          __typename
+        }
         __typename
       }
       __typename
@@ -104,16 +111,39 @@ const INVOKE_EXTENSION_MUTATION = `mutation forge_ui_invokeExtension($input: Inv
   }
 }`;
 
+export interface ForgeConfig {
+  extensionId: string;
+  environmentId: string;
+  installationId: string;
+  appVersion: string;
+  resourceUploadId: string;
+}
+
+const DEFAULT_FORGE_CONFIG: ForgeConfig = {
+  extensionId:
+    'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
+  environmentId: '725dad32-d2c5-4b58-a141-a093d70c8d34',
+  installationId: 'cef0eeca-8dc4-4811-99d1-9c841a75de87',
+  appVersion: '3.10.0',
+  resourceUploadId: 'b5a795d6-748a-4e93-96b9-971eb084c639',
+};
+
 // ─── Private Helpers ─────────────────────────────────────────────────────────
 
 /**
  * Fetch a Forge context token from Atlassian internal API.
  */
-async function fetchForgeContextToken(
+export async function fetchForgeContextToken(
   jiraFullCookie: string,
   jiraDomain: string,
   cloudId: string,
+  config: Partial<ForgeConfig> = {},
 ): Promise<{ token: string; expiresAt: number }> {
+  const { extensionId, environmentId, installationId, appVersion, resourceUploadId } = {
+    ...DEFAULT_FORGE_CONFIG,
+    ...config,
+  };
+
   const url = `https://${jiraDomain}/rest/internal/2/forge/context/token`;
 
   const body = JSON.stringify({
@@ -139,16 +169,16 @@ async function fetchForgeContextToken(
         'write:jira-work',
       ],
       type: 'jira:globalPage',
-      id: 'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages',
-      environmentId: '725dad32-d2c5-4b58-a141-a093d70c8d34',
+      id: extensionId,
+      environmentId,
       environmentKey: 'production',
       environmentType: 'PRODUCTION',
-      installationId: 'cef0eeca-8dc4-4811-99d1-9c841a75de87',
-      appVersion: '3.7.0',
-      consentUrl: `https://id.atlassian.com/outboundAuth/start?containerId=2f4dbb6a-b1b8-4824-94b1-42a64e507a09_725dad32-d2c5-4b58-a141-a093d70c8d34&serviceKey=atlassian-token-service-key&cloudId=${cloudId}&isAccountBased=true&scopes=read%3Aapp-global-channel%3Arealtime+read%3Aconnect-jira+write%3Aconnect-jira+delete%3Aconnect-jira+act-as-user%3Aconnect-jira+project-admin%3Aconnect-jira+admin%3Aconnect-jira+access-email-addresses%3Aconnect-jira+read%3Ajira-user+read%3Ajira-work+write%3Ajira-work+manage%3Ajira-project+manage%3Ajira-configuration+read%3Aemail-address%3Ajira+read%3Apermission%3Ajira+offline_access`,
+      installationId,
+      appVersion,
+      consentUrl: `https://id.atlassian.com/outboundAuth/start?containerId=${extensionId.split('/')[4]}_${environmentId}&serviceKey=atlassian-token-service-key&cloudId=${cloudId}&isAccountBased=true&scopes=read%3Aapp-global-channel%3Arealtime+read%3Aconnect-jira+write%3Aconnect-jira+delete%3Aconnect-jira+act-as-user%3Aconnect-jira+project-admin%3Aconnect-jira+admin%3Aconnect-jira+access-email-addresses%3Aconnect-jira+read%3Ajira-user+read%3Ajira-work+write%3Ajira-work+manage%3Ajira-project+manage%3Ajira-configuration+read%3Aemail-address%3Ajira+read%3Apermission%3Ajira+offline_access`,
       properties: {
         displayConditions: { isLoggedIn: true },
-        icon: 'https://icon.cdn.prod.atlassian-dev.net/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/b5a795d6-748a-4e93-96b9-971eb084c639/assets/clockwork-icon.png',
+        icon: `https://icon.cdn.prod.atlassian-dev.net/${extensionId.split('/')[4]}/${environmentId}/${resourceUploadId}/assets/clockwork-icon.png`,
         key: 'global-pages',
         layout: 'blank',
         pages: [
@@ -164,7 +194,7 @@ async function fetchForgeContextToken(
         ],
         resolver: { endpoint: 'clockwork-endpoint' },
         resource: 'global-pages',
-        resourceUploadId: 'b5a795d6-748a-4e93-96b9-971eb084c639',
+        resourceUploadId,
         title: 'Clockwork Pro',
         type: 'jira:globalPage',
       },
@@ -225,7 +255,8 @@ async function fetchForgeContextToken(
       Accept: 'application/json,text/javascript,*/*',
       Cookie: jiraFullCookie,
       Origin: `https://${jiraDomain}`,
-      Referer: `https://${jiraDomain}/jira/apps/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/my-work`,
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
     },
     body,
   });
@@ -262,7 +293,10 @@ export async function fetchTimersViaForge(
   cloudId: string,
   workspaceId: string,
   cachedContextToken?: string,
+  config: Partial<ForgeConfig> = {},
 ): Promise<ForgeTimersResult> {
+  const { extensionId, environmentId, appVersion } = { ...DEFAULT_FORGE_CONFIG, ...config };
+
   // 1. Resolve context token: use cached if available, otherwise bootstrap via internal API
   let contextToken: string | undefined;
   let contextTokenExpiresAt: string | null = null;
@@ -272,7 +306,7 @@ export async function fetchTimersViaForge(
   } else {
     // Bootstrap: fetch initial context token from Atlassian internal API
     try {
-      const tokenResult = await fetchForgeContextToken(jiraFullCookie, jiraDomain, cloudId);
+      const tokenResult = await fetchForgeContextToken(jiraFullCookie, jiraDomain, cloudId, config);
       contextToken = tokenResult.token;
       contextTokenExpiresAt = String(tokenResult.expiresAt);
     } catch (err) {
@@ -285,10 +319,9 @@ export async function fetchTimersViaForge(
   // 2. Invoke GraphQL extension
   const url = `https://${jiraDomain}/gateway/api/graphql`;
   const contextIds = [`ari:cloud:jira:${cloudId}:workspace/${workspaceId}`];
-  const extensionId =
-    'ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/static/global-pages';
 
-  const payload: Record<string, unknown> = {
+  // Construct the payload object (inside 'input.payload')
+  const extensionPayload: Record<string, unknown> = {
     call: {
       method: 'GET',
       path: '/timers.json?page=1',
@@ -297,32 +330,35 @@ export async function fetchTimersViaForge(
     context: {
       cloudId,
       localId: extensionId,
-      environmentId: '725dad32-d2c5-4b58-a141-a093d70c8d34',
+      environmentId,
       environmentType: 'PRODUCTION',
       moduleKey: 'global-pages',
       siteUrl: `https://${jiraDomain}`,
-      appVersion: '3.7.0',
+      appVersion,
       extension: {
         type: 'jira:globalPage',
         jira: { isNewNavigation: true },
       },
     },
-    entryPoint: 'resolver',
   };
 
   // Only include contextToken in payload if we have one
   if (contextToken) {
-    payload.contextToken = contextToken;
+    extensionPayload.contextToken = contextToken;
   }
+
+  // Construct the input object (inside 'variables.input')
+  const inputVariables: Record<string, unknown> = {
+    contextIds,
+    extensionId,
+    payload: extensionPayload,
+    entryPoint: 'resolver',
+  };
 
   const body = JSON.stringify({
     operationName: 'forge_ui_invokeExtension',
     variables: {
-      input: {
-        contextIds,
-        extensionId,
-        payload,
-      },
+      input: inputVariables,
     },
     query: INVOKE_EXTENSION_MUTATION,
   });
@@ -334,7 +370,8 @@ export async function fetchTimersViaForge(
       Accept: '*/*',
       Cookie: jiraFullCookie,
       Origin: `https://${jiraDomain}`,
-      Referer: `https://${jiraDomain}/jira/apps/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c5-4b58-a141-a093d70c8d34/timers`,
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
     },
     body,
   });
@@ -350,12 +387,21 @@ export async function fetchTimersViaForge(
 
   const json = (await res.json()) as ForgeInvokeResponse;
 
+  if (json.errors && json.errors.length > 0) {
+    const errorMessages = json.errors.map((e) => e.message).join('; ');
+    console.error('Forge invocation failed (GraphQL errors):', {
+      json,
+      hadContextToken: !!contextToken,
+    });
+    throw new ForgeApiError(500, `Forge GraphQL error: ${errorMessages}`, json.errors);
+  }
+
   const invocation = json.data?.invokeExtension;
   if (!invocation?.success) {
     const errorMessages =
       invocation?.errors?.map((e) => e.message).join('; ') ?? 'Unknown Forge error';
-    console.error('Forge invocation failed:', {
-      errors: invocation?.errors,
+    console.error('Forge invocation failed (Extension errors):', {
+      json,
       hadContextToken: !!contextToken,
       contextTokenPrefix: contextToken?.substring(0, 40),
     });
@@ -364,20 +410,17 @@ export async function fetchTimersViaForge(
 
   // Parse response - note the nested structure
   const responseWrapper = invocation.response?.body;
-  if (
-    !responseWrapper ||
-    !responseWrapper.body?.success ||
-    !responseWrapper.body.payload?.body?.timers
-  ) {
+
+  if (!responseWrapper || !responseWrapper.success || !responseWrapper.payload?.body?.timers) {
     throw new ForgeApiError(
-      responseWrapper?.body?.payload?.status ?? 500,
+      responseWrapper?.payload?.status ?? 500,
       'Forge response did not contain timer data',
       responseWrapper,
     );
   }
 
-  const allTimers = responseWrapper.body.payload.body.timers;
-  const total = responseWrapper.body.payload.body.total;
+  const allTimers = responseWrapper.payload.body.timers;
+  const total = responseWrapper.payload.body.total;
 
   // Filter: only active timers (finished_at === null), deduplicate by id
   const seen = new Set<number>();
