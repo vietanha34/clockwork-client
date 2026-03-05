@@ -17,7 +17,7 @@ function optional(name: string, fallback = ''): string {
 }
 
 export const env = {
-  // Upstash Redis
+  // Upstash Redis (or any Redis with REST API)
   get UPSTASH_REDIS_REST_URL(): string {
     return (
       process.env.UPSTASH_REDIS_REST_URL ||
@@ -31,6 +31,11 @@ export const env = {
       process.env.KV_REST_API_TOKEN ||
       required('UPSTASH_REDIS_REST_TOKEN')
     );
+  },
+
+  // Standard Redis (redis:// protocol) - used by redis client
+  get REDIS_URL(): string {
+    return process.env.REDIS_URL || required('REDIS_URL');
   },
 
   // Clockwork Pro API

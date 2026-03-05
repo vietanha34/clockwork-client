@@ -1,4 +1,5 @@
 import { type RedisClientType, createClient } from 'redis';
+import { env } from './env';
 import type { CachedTimerData, ClockworkUser, Issue, Timer } from './types';
 
 const TIMER_CACHE_TTL_SECONDS = 600; // 1 minute
@@ -18,11 +19,7 @@ async function getRedisClient(): Promise<RedisClientType> {
     return redisClient;
   }
 
-  const url = process.env.REDIS_URL;
-
-  if (!url) {
-    throw new Error('Missing REDIS_URL env var');
-  }
+  const url = env.REDIS_URL;
 
   redisClient = createClient({
     url,
