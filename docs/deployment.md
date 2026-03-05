@@ -16,6 +16,7 @@ This guide covers deploying `apps/api` and `apps/inngest` to Vercel.
 
 | Variable | Description | Where to get it | Required |
 |---|---|---|---|
+| `REDIS_URL` | Redis connection URL (standard Redis protocol) | `redis://default:PASSWORD@HOST:6379` (Upstash or self-hosted) | ✅ |
 | `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL | Upstash dashboard → Database → REST API | ✅ |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token | Upstash dashboard → Database → REST API | ✅ |
 | `CLOCKWORK_API_BASE_URL` | Clockwork Pro API base URL | `https://api.clockwork.report/v1` | ✅ |
@@ -25,32 +26,24 @@ This guide covers deploying `apps/api` and `apps/inngest` to Vercel.
 | `JIRA_DOMAIN` | Jira instance domain | e.g. `your-org.atlassian.net` | ✅ |
 | `JIRA_CLOUD_ID` | Jira Cloud ID | See [Getting Jira Cloud ID](#getting-jira-cloud-id) below | ✅ |
 | `JIRA_WORKSPACE_ID` | Jira Workspace ID | See [Getting Jira Workspace ID](#getting-jira-workspace-id) below | ✅ |
-| `FORGE_EXTENSION_ID` | Clockwork Forge Extension ID | Fixed value, already has default | ❌ |
 | `JIRA_TENANT_SESSION_TOKEN` | Jira Tenant Session Token | Browser DevTools → Network → Cookie: `tenant.session.token=...` (value only) | ✅ |
+| `JIRA_ACCOUNT_ID` | Your Atlassian Account ID | Optional. See [About JIRA_ACCOUNT_ID](#about-jira_account_id) | ❌ |
+| `FORGE_EXTENSION_ID` | Clockwork Forge Extension ID | Fixed value, already has default | ❌ |
 
 ### `apps/inngest`
 
 | Variable | Description | Where to get it | Required |
 |---|---|---|---|
+| `REDIS_URL` | Same Redis instance as `apps/api` | Upstash dashboard | ✅ |
 | `UPSTASH_REDIS_REST_URL` | Same Redis instance as `apps/api` | Upstash dashboard | ✅ |
 | `UPSTASH_REDIS_REST_TOKEN` | Same Redis instance as `apps/api` | Upstash dashboard | ✅ |
 | `JIRA_TENANT_SESSION_TOKEN` | Jira Tenant Session Token | Browser DevTools → Network → Cookie: `tenant.session.token=...` (value only) | ✅ |
 | `JIRA_DOMAIN` | Jira instance domain | e.g. `your-org.atlassian.net` | ✅ |
 | `JIRA_CLOUD_ID` | Jira Cloud ID | Same as above | ✅ |
 | `JIRA_WORKSPACE_ID` | Jira Workspace ID | Same as above | ✅ |
+| `JIRA_ACCOUNT_ID` | Your Atlassian Account ID | Optional. See [About JIRA_ACCOUNT_ID](#about-jira_account_id) | ❌ |
 | `INNGEST_EVENT_KEY` | Inngest event key | [app.inngest.com](https://app.inngest.com) → Your App → Manage → Event Keys | ✅ |
 | `INNGEST_SIGNING_KEY` | Inngest signing key | [app.inngest.com](https://app.inngest.com) → Your App → Manage → Signing Key | ✅ |
-
-### `apps/inngest`
-
-| Variable | Description | Where to get it |
-|---|---|---|
-| `UPSTASH_REDIS_REST_URL` | Same Redis instance as `apps/api` | Upstash dashboard |
-| `UPSTASH_REDIS_REST_TOKEN` | Same Redis instance as `apps/api` | Upstash dashboard |
-| `JIRA_TENANT_SESSION_TOKEN` | Jira Tenant Session Token | Browser DevTools → Network → Cookie: `tenant.session.token=...` (value only) |
-| `JIRA_DOMAIN` | Jira instance domain | e.g. `your-org.atlassian.net` |
-| `INNGEST_EVENT_KEY` | Inngest event key | [app.inngest.com](https://app.inngest.com) → Your App → Manage → Event Keys |
-| `INNGEST_SIGNING_KEY` | Inngest signing key | [app.inngest.com](https://app.inngest.com) → Your App → Manage → Signing Key |
 
 ---
 
@@ -68,6 +61,7 @@ When prompted, select or create a new project. Set the **Root Directory** to `ap
 ### 2. Set environment variables
 
 ```bash
+vercel env add REDIS_URL
 vercel env add UPSTASH_REDIS_REST_URL
 vercel env add UPSTASH_REDIS_REST_TOKEN
 vercel env add CLOCKWORK_API_BASE_URL
@@ -75,6 +69,9 @@ vercel env add CLOCKWORK_API_TOKEN
 vercel env add ATLASSIAN_EMAIL
 vercel env add ATLASSIAN_API_TOKEN
 vercel env add JIRA_DOMAIN
+vercel env add JIRA_CLOUD_ID
+vercel env add JIRA_WORKSPACE_ID
+vercel env add JIRA_TENANT_SESSION_TOKEN
 ```
 
 Set each for `production`, `preview`, and `development` as needed.
@@ -108,10 +105,13 @@ Create a separate Vercel project for the Inngest app. Set the **Root Directory**
 ### 2. Set environment variables
 
 ```bash
+vercel env add REDIS_URL
 vercel env add UPSTASH_REDIS_REST_URL
 vercel env add UPSTASH_REDIS_REST_TOKEN
-vercel env add JIRA_FULL_COOKIE
+vercel env add JIRA_TENANT_SESSION_TOKEN
 vercel env add JIRA_DOMAIN
+vercel env add JIRA_CLOUD_ID
+vercel env add JIRA_WORKSPACE_ID
 vercel env add INNGEST_EVENT_KEY
 vercel env add INNGEST_SIGNING_KEY
 ```
@@ -136,7 +136,9 @@ Or navigate to [app.inngest.com](https://app.inngest.com) → Apps → Sync → 
 ### 5. Verify
 
 - **Inngest dashboard** → Apps → should show `clockwork-menubar` app registered
-- **Functions** → should show `sync-active-timers` function listed
+- **Functions** → should show:
+  - `sync-active-timers` - Syncs active timers from Clockwork
+  - `adjust-lunch-worklogs` - Adjusts worklogs for lunch break (runs at 17:10 Mon-Fri)
 
 ---
 
@@ -146,9 +148,17 @@ Or navigate to [app.inngest.com](https://app.inngest.com) → Apps → Sync → 
 |---|---|---|
 | `clockwork:timers:<email>` | 10 min | Active timers cached per user email |
 | `clockwork:timers:all` | 10 min | Global active timers list |
+| `clockwork:active_users` | - | SET of user IDs with active timers |
+| `clockwork:jwt` | ~14 min | Cached Clockwork JWT token for API calls |
+| `clockwork:adjusted-worklogs` | 15 days | SET of worklog IDs already adjusted for lunch break |
 | `jira:user:<accountId>` | 2 days | Jira user info (email, display name, avatar) keyed by Atlassian accountId |
+| `jira:email:<email>` | 2 days | Email → Account ID mapping cache |
+| `jira:issue:<idOrKey>` | 1 day | Jira issue details cache |
+| `clockwork:forge:context-token` | ~14 min | Cached Forge context token |
 
 The `jira:user:*` keys are populated automatically during each `sync-active-timers` run. They cache the result of `GET /rest/api/3/user?accountId=<id>` to avoid redundant Jira API calls across sync cycles.
+
+The `clockwork:adjusted-worklogs` key tracks which worklogs have already been processed by the lunch break adjustment cron job to prevent double-adjustment.
 
 ---
 
@@ -231,6 +241,59 @@ ari:cloud:ecosystem::extension/2f4dbb6a-b1b8-4824-94b1-42a64e507a09/725dad32-d2c
 - `global-pages` = Module key (Jira Global Pages)
 
 This value is **optional** — if not provided, the app will use the default Clockwork Pro extension ID.
+
+---
+
+## About JIRA_ACCOUNT_ID
+
+The `JIRA_ACCOUNT_ID` is your Atlassian Account ID. It is **optional** and only used when acquiring a Clockwork Pro JWT token from the Atlassian Connect servlet.
+
+### When do you need it?
+
+| Use Case | Required? | Description |
+|---|---|---|
+| **Clockwork JWT Acquisition** | Optional | Used in the JWT request to Clockwork servlet. If not set, an empty value is sent (usually still works with tenant session token). |
+| **Lunch Break Worklog Adjustment** | Not Required | The adjustment cron job (`adjust-lunch-worklogs`) processes worklogs for **ALL users** by default, not just one specific user. |
+
+### How to get your Account ID
+
+1. Open Jira in your browser
+2. Click your **Profile** (avatar) → **Manage account**
+3. Look at the URL: `https://id.atlassian.com/manage-profile/account`
+4. The Account ID is shown in the profile or in the page content
+   - Example: `61dfaa6949f1950069b0f94a`
+
+Alternatively, check any Jira API response - the `accountId` field appears in user objects.
+
+---
+
+## Lunch Break Worklog Adjustment
+
+The system includes an automated Inngest cron job (`adjust-lunch-worklogs`) that runs at **17:10 (5:10 PM) Monday-Friday** (VN time, UTC+7) to automatically subtract the lunch break period (12:00-13:30) from worklogs.
+
+### How it works
+
+1. **Trigger**: Cron job runs at `TZ=Asia/Ho_Chi_Minh 10 17 * * 1-5`
+2. **Scope**: Processes worklogs for **ALL users** (not filtered by account)
+3. **Target**: Worklogs from today and yesterday (as a safety net)
+4. **Logic**: 
+   - Calculates overlap between worklog time and lunch period (12:00-13:30)
+   - Subtracts overlapping time from `timeSpent`
+   - Uses Clockwork Pro API to update worklogs
+   - Tracks adjusted worklogs in Redis to prevent double-adjustment
+
+### Required Configuration
+
+The feature requires these environment variables:
+- `JIRA_TENANT_SESSION_TOKEN` - For Clockwork JWT acquisition
+- `REDIS_URL` - For tracking already-adjusted worklogs
+
+### Redis Keys Used
+
+| Key | TTL | Description |
+|---|---|---|
+| `clockwork:adjusted-worklogs` | 15 days | SET of worklog IDs that have been adjusted |
+| `clockwork:jwt` | ~14 min | Cached Clockwork JWT token |
 
 ---
 
