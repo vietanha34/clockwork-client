@@ -37,7 +37,7 @@ export const syncActiveTimers = inngest.createFunction(
     name: 'Sync Active Clockwork Timers',
     retries: 2,
   },
-  [{ event: 'clockwork/timers.sync.requested' }, { cron: 'TZ=Asia/Ho_Chi_Minh * 8-16 * * 1-6' }],
+  [{ event: 'clockwork/timers.sync.requested' }, { cron: 'TZ=Asia/Ho_Chi_Minh * 8-18 * * 1-6' }],
   async ({ event, step }) => {
     const eventData = (event as SyncTimersEvent).data;
     const jiraDomain = eventData?.jiraDomain ?? env.JIRA_DOMAIN;
@@ -47,7 +47,12 @@ export const syncActiveTimers = inngest.createFunction(
 
       // 1. Fetch timers via Forge GraphQL Gateway
       console.log('[sync-process] Fetching timers via Forge GraphQL Gateway...');
-      const cachedContextToken = (await getCachedForgeContextToken()) ?? undefined;
+      const tokenScope = {
+        jiraDomain,
+        cloudId: env.JIRA_CLOUD_ID,
+        workspaceId: env.JIRA_WORKSPACE_ID,
+      };
+      const cachedContextToken = (await getCachedForgeContextToken(tokenScope)) ?? undefined;
       const forgeResult = await fetchTimersViaForge(
         env.JIRA_TENANT_SESSION_TOKEN,
         jiraDomain,
@@ -62,6 +67,7 @@ export const syncActiveTimers = inngest.createFunction(
         await setCachedForgeContextToken(
           forgeResult.contextToken,
           forgeResult.contextTokenExpiresAt ?? undefined,
+          tokenScope,
         );
       }
 

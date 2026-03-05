@@ -9,7 +9,7 @@ import { inngest } from './client';
  * Runs at 17:10 VN time (10:10 UTC), Monday-Friday.
  * Scans worklogs updated today and yesterday, subtracts lunch break
  * overlap (12:00-13:30) from affected worklogs.
- * 
+ *
  * Note: Processes worklogs for ALL users. To filter by specific user,
  * modify the accountId parameter in adjustWorklogs call.
  */
@@ -19,7 +19,7 @@ export const adjustLunchWorklogs = inngest.createFunction(
     name: 'Adjust Lunch Break Worklogs',
     retries: 2,
   },
-  [{ cron: 'TZ=Asia/Ho_Chi_Minh 10 17 * * 1-5' }],
+  [{ cron: 'TZ=Asia/Ho_Chi_Minh 17 17 * * 1-5' }],
   async ({ step }) => {
     const result = await step.run('adjust-worklogs', async () => {
       // Set to specific accountId to filter by user, or null for all users
@@ -43,7 +43,9 @@ export const adjustLunchWorklogs = inngest.createFunction(
       // Adjust to UTC: VN is UTC+7, so subtract 7 hours
       const sinceMs = sinceDate.getTime() - 7 * 60 * 60 * 1000;
 
-      console.log(`[adjust-lunch] Fetching worklogs updated since ${new Date(sinceMs).toISOString()}`);
+      console.log(
+        `[adjust-lunch] Fetching worklogs updated since ${new Date(sinceMs).toISOString()}`,
+      );
 
       // 1. Get updated worklog IDs
       const worklogIds = await getUpdatedWorklogIds(sinceMs);

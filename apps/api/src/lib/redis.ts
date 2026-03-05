@@ -191,11 +191,67 @@ export async function setCachedIssue(
 
 const FORGE_CONTEXT_TOKEN_KEY = 'clockwork:forge:context-token';
 const FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS = 840; // 14 minutes
+const FORGE_CONTEXT_TOKEN_SAFETY_BUFFER_SECONDS = 60;
 
-export async function getCachedForgeContextToken(): Promise<string | null> {
+interface ForgeContextTokenScope {
+  jiraDomain?: string;
+  cloudId?: string;
+  workspaceId?: string;
+}
+
+function buildForgeContextTokenKey(scope?: ForgeContextTokenScope): string {
+  const jiraDomain = scope?.jiraDomain?.trim().toLowerCase();
+  const cloudId = scope?.cloudId?.trim();
+  const workspaceId = scope?.workspaceId?.trim();
+
+  if (!jiraDomain || !cloudId || !workspaceId) {
+    return FORGE_CONTEXT_TOKEN_KEY;
+  }
+
+  return `${FORGE_CONTEXT_TOKEN_KEY}:${jiraDomain}:${cloudId}:${workspaceId}`;
+}
+
+export function calculateForgeContextTokenTtl(
+  expiresAt: string | number | undefined,
+  options?: {
+    nowMs?: number;
+    maxTtlSeconds?: number;
+    safetyBufferSeconds?: number;
+  },
+): number {
+  const nowMs = options?.nowMs ?? Date.now();
+  const maxTtlSeconds = options?.maxTtlSeconds ?? FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS;
+  const safetyBufferSeconds =
+    options?.safetyBufferSeconds ?? FORGE_CONTEXT_TOKEN_SAFETY_BUFFER_SECONDS;
+
+  if (expiresAt === undefined || expiresAt === null) {
+    return maxTtlSeconds;
+  }
+
+  let expiresAtMs: number;
+  if (typeof expiresAt === 'number') {
+    expiresAtMs = expiresAt;
+  } else {
+    const numericExpiresAt = Number(expiresAt);
+    expiresAtMs = Number.isFinite(numericExpiresAt) ? numericExpiresAt : Date.parse(expiresAt);
+  }
+
+  if (!Number.isFinite(expiresAtMs)) {
+    return maxTtlSeconds;
+  }
+
+  const secondsUntilExpiry = Math.floor((expiresAtMs - nowMs) / 1000) - safetyBufferSeconds;
+  if (secondsUntilExpiry <= 0) {
+    return 1;
+  }
+
+  return Math.min(secondsUntilExpiry, maxTtlSeconds);
+}
+
+export async function getCachedForgeContextToken(scope?: ForgeContextTokenScope): Promise<string | null> {
   try {
     const redis = await getRedisClient();
-    return await redis.get(FORGE_CONTEXT_TOKEN_KEY);
+    return await redis.get(buildForgeContextTokenKey(scope));
   } catch (err) {
     console.error('Redis getCachedForgeContextToken error:', err);
     return null;
@@ -205,18 +261,12 @@ export async function getCachedForgeContextToken(): Promise<string | null> {
 export async function setCachedForgeContextToken(
   token: string,
   expiresAtMs?: string,
+  scope?: ForgeContextTokenScope,
 ): Promise<void> {
   try {
     const redis = await getRedisClient();
-    let ttl = FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS;
-    if (expiresAtMs) {
-      const expiresAt = Number(expiresAtMs);
-      const secondsUntilExpiry = Math.floor((expiresAt - Date.now()) / 1000) - 60;
-      if (secondsUntilExpiry > 0) {
-        ttl = Math.min(secondsUntilExpiry, FORGE_CONTEXT_TOKEN_MAX_TTL_SECONDS);
-      }
-    }
-    await redis.set(FORGE_CONTEXT_TOKEN_KEY, token, { EX: ttl });
+    const ttl = calculateForgeContextTokenTtl(expiresAtMs);
+    await redis.set(buildForgeContextTokenKey(scope), token, { EX: ttl });
   } catch (err) {
     console.error('Redis setCachedForgeContextToken error:', err);
   }

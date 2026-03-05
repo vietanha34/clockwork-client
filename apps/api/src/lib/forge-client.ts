@@ -77,6 +77,19 @@ export class ForgeApiError extends Error {
   }
 }
 
+function isForgeAccessError(err: unknown): boolean {
+  if (!(err instanceof ForgeApiError)) {
+    return false;
+  }
+
+  const details = JSON.stringify(err.details ?? '').toLowerCase();
+  const message = err.message.toLowerCase();
+  return (
+    message.includes('user did not have access to specified resource') ||
+    details.includes('user did not have access to specified resource')
+  );
+}
+
 // ─── GraphQL Query ───────────────────────────────────────────────────────────
 
 const INVOKE_EXTENSION_MUTATION = `mutation forge_ui_invokeExtension($input: InvokeExtensionInput!) {
@@ -299,7 +312,6 @@ export async function fetchTimersViaForge(
 
   // 1. Resolve context token: use cached if available, otherwise bootstrap via internal API
   let contextToken: string | undefined;
-  let contextTokenExpiresAt: string | null = null;
 
   if (cachedContextToken) {
     contextToken = cachedContextToken;
@@ -313,7 +325,6 @@ export async function fetchTimersViaForge(
         config,
       );
       contextToken = tokenResult.token;
-      contextTokenExpiresAt = String(tokenResult.expiresAt);
     } catch (err) {
       // If internal API fails, proceed without contextToken —
       // the invokeExtension mutation may still work with cookie auth alone
@@ -321,126 +332,134 @@ export async function fetchTimersViaForge(
     }
   }
 
-  // 2. Invoke GraphQL extension
-  const url = `https://${jiraDomain}/gateway/api/graphql`;
-  const contextIds = [`ari:cloud:jira:${cloudId}:workspace/${workspaceId}`];
+  const invokeWithToken = async (token?: string): Promise<ForgeTimersResult> => {
+    const url = `https://${jiraDomain}/gateway/api/graphql`;
+    const contextIds = [`ari:cloud:jira:${cloudId}:workspace/${workspaceId}`];
 
-  // Construct the payload object (inside 'input.payload')
-  const extensionPayload: Record<string, unknown> = {
-    call: {
-      method: 'GET',
-      path: '/timers.json?page=1',
-      invokeType: 'ui-remote-fetch',
-    },
-    context: {
-      cloudId,
-      localId: extensionId,
-      environmentId,
-      environmentType: 'PRODUCTION',
-      moduleKey: 'global-pages',
-      siteUrl: `https://${jiraDomain}`,
-      appVersion,
-      extension: {
-        type: 'jira:globalPage',
-        jira: { isNewNavigation: true },
+    const extensionPayload: Record<string, unknown> = {
+      call: {
+        method: 'GET',
+        path: '/timers.json?page=1',
+        invokeType: 'ui-remote-fetch',
       },
-    },
-  };
+      context: {
+        cloudId,
+        localId: extensionId,
+        environmentId,
+        environmentType: 'PRODUCTION',
+        moduleKey: 'global-pages',
+        siteUrl: `https://${jiraDomain}`,
+        appVersion,
+        extension: {
+          type: 'jira:globalPage',
+          jira: { isNewNavigation: true },
+        },
+      },
+    };
 
-  // Only include contextToken in payload if we have one
-  if (contextToken) {
-    extensionPayload.contextToken = contextToken;
-  }
-
-  // Construct the input object (inside 'variables.input')
-  const inputVariables: Record<string, unknown> = {
-    contextIds,
-    extensionId,
-    payload: extensionPayload,
-    entryPoint: 'resolver',
-  };
-
-  const body = JSON.stringify({
-    operationName: 'forge_ui_invokeExtension',
-    variables: {
-      input: inputVariables,
-    },
-    query: INVOKE_EXTENSION_MUTATION,
-  });
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: '*/*',
-      Cookie: `tenant.session.token=${jiraTenantSessionToken}`,
-      Origin: `https://${jiraDomain}`,
-      'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
-    },
-    body,
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new ForgeApiError(
-      res.status,
-      `Forge GraphQL gateway returned ${res.status}: ${text}`,
-      text,
-    );
-  }
-
-  const json = (await res.json()) as ForgeInvokeResponse;
-
-  if (json.errors && json.errors.length > 0) {
-    const errorMessages = json.errors.map((e) => e.message).join('; ');
-    console.error('Forge invocation failed (GraphQL errors):', {
-      json,
-      hadContextToken: !!contextToken,
-    });
-    throw new ForgeApiError(500, `Forge GraphQL error: ${errorMessages}`, json.errors);
-  }
-
-  const invocation = json.data?.invokeExtension;
-  if (!invocation?.success) {
-    const errorMessages =
-      invocation?.errors?.map((e) => e.message).join('; ') ?? 'Unknown Forge error';
-    console.error('Forge invocation failed (Extension errors):', {
-      json,
-      hadContextToken: !!contextToken,
-      contextTokenPrefix: contextToken?.substring(0, 40),
-    });
-    throw new ForgeApiError(500, `Forge invocation failed: ${errorMessages}`, invocation?.errors);
-  }
-
-  // Parse response - note the nested structure
-  const responseWrapper = invocation.response?.body;
-
-  if (!responseWrapper || !responseWrapper.success || !responseWrapper.payload?.body?.timers) {
-    throw new ForgeApiError(
-      responseWrapper?.payload?.status ?? 500,
-      'Forge response did not contain timer data',
-      responseWrapper,
-    );
-  }
-
-  const allTimers = responseWrapper.payload.body.timers;
-  const total = responseWrapper.payload.body.total;
-
-  // Filter: only active timers (finished_at === null), deduplicate by id
-  const seen = new Set<number>();
-  const activeTimers: RawClockworkTimer[] = [];
-  for (const timer of allTimers) {
-    if (timer.finished_at === null && !seen.has(timer.id)) {
-      seen.add(timer.id);
-      activeTimers.push(timer);
+    if (token) {
+      extensionPayload.contextToken = token;
     }
-  }
 
-  return {
-    timers: activeTimers,
-    total,
-    contextToken: invocation.contextToken?.jwt ?? null,
-    contextTokenExpiresAt: invocation.contextToken?.expiresAt ?? contextTokenExpiresAt,
+    const inputVariables: Record<string, unknown> = {
+      contextIds,
+      extensionId,
+      payload: extensionPayload,
+      entryPoint: 'resolver',
+    };
+
+    const body = JSON.stringify({
+      operationName: 'forge_ui_invokeExtension',
+      variables: {
+        input: inputVariables,
+      },
+      query: INVOKE_EXTENSION_MUTATION,
+    });
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: '*/*',
+        Cookie: `tenant.session.token=${jiraTenantSessionToken}`,
+        Origin: `https://${jiraDomain}`,
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+      },
+      body,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new ForgeApiError(
+        res.status,
+        `Forge GraphQL gateway returned ${res.status}: ${text}`,
+        text,
+      );
+    }
+
+    const json = (await res.json()) as ForgeInvokeResponse;
+
+    if (json.errors && json.errors.length > 0) {
+      const errorMessages = json.errors.map((e) => e.message).join('; ');
+      console.error('Forge invocation failed (GraphQL errors):', {
+        json,
+        hadContextToken: !!token,
+      });
+      throw new ForgeApiError(500, `Forge GraphQL error: ${errorMessages}`, json.errors);
+    }
+
+    const invocation = json.data?.invokeExtension;
+    if (!invocation?.success) {
+      const errorMessages =
+        invocation?.errors?.map((e) => e.message).join('; ') ?? 'Unknown Forge error';
+      console.error('Forge invocation failed (Extension errors):', {
+        json,
+        hadContextToken: !!token,
+        contextTokenPrefix: token?.substring(0, 40),
+      });
+      throw new ForgeApiError(500, `Forge invocation failed: ${errorMessages}`, invocation?.errors);
+    }
+
+    const responseWrapper = invocation.response?.body;
+    if (!responseWrapper || !responseWrapper.success || !responseWrapper.payload?.body?.timers) {
+      throw new ForgeApiError(
+        responseWrapper?.payload?.status ?? 500,
+        'Forge response did not contain timer data',
+        responseWrapper,
+      );
+    }
+
+    const allTimers = responseWrapper.payload.body.timers;
+    const total = responseWrapper.payload.body.total;
+
+    const seen = new Set<number>();
+    const activeTimers: RawClockworkTimer[] = [];
+    for (const timer of allTimers) {
+      if (timer.finished_at === null && !seen.has(timer.id)) {
+        seen.add(timer.id);
+        activeTimers.push(timer);
+      }
+    }
+
+    return {
+      timers: activeTimers,
+      total,
+      contextToken: invocation.contextToken?.jwt ?? null,
+      contextTokenExpiresAt: invocation.contextToken?.expiresAt ?? null,
+    };
   };
+
+  try {
+    return await invokeWithToken(contextToken);
+  } catch (err) {
+    if (contextToken && isForgeAccessError(err)) {
+      console.warn(
+        'Forge access error with cached context token, retrying once without contextToken.',
+      );
+      return await invokeWithToken(undefined);
+    }
+
+    throw err;
+  }
 }
