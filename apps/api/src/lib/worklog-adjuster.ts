@@ -1,14 +1,13 @@
+import { getClockworkJwt } from './clockwork-jwt';
 // apps/api/src/lib/worklog-adjuster.ts
 import { env } from './env';
-import { getClockworkJwt } from './clockwork-jwt';
-import { isWorklogAdjusted, markWorklogAdjusted } from './redis';
 import type { JiraWorklogDetail } from './jira-worklog-client';
+import { isWorklogAdjusted, markWorklogAdjusted } from './redis';
 
 const LUNCH_START_HOUR = 12;
 const LUNCH_START_MINUTE = 0;
 const LUNCH_END_HOUR = 13;
-const LUNCH_END_MINUTE = 30;
-const LUNCH_DURATION_SECONDS = 90 * 60; // 1.5h
+const LUNCH_END_MINUTE = 15;
 const VN_TIMEZONE = 'Asia/Ho_Chi_Minh';
 
 interface AdjustResult {
@@ -91,10 +90,10 @@ async function updateWorklogTime(
   const res = await fetch(url, {
     method: 'PUT',
     headers: {
-      'Authorization': `JWT ${jwt}`,
+      Authorization: `JWT ${jwt}`,
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Origin': 'https://app.clockwork.report',
+      Accept: 'application/json',
+      Origin: 'https://app.clockwork.report',
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
     },
     body: JSON.stringify({
@@ -119,7 +118,7 @@ async function updateWorklogTime(
 /**
  * Process a list of worklogs: filter by accountId (optional) and date range,
  * calculate lunch overlap, and adjust via Clockwork API.
- * 
+ *
  * @param worklogs - List of worklogs to process
  * @param accountId - Optional: filter by specific user. If not provided, processes all users.
  * @param targetDates - Array of dates (YYYY-MM-DD) to filter by

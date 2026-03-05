@@ -6,7 +6,7 @@ import { inngest } from './client';
 /**
  * Inngest cron function: adjust-lunch-worklogs
  *
- * Runs at 17:10 VN time (10:10 UTC), Monday-Friday.
+ * Runs at 17:17 VN time (10:10 UTC), Monday-Friday.
  * Scans worklogs updated today and yesterday, subtracts lunch break
  * overlap (12:00-13:30) from affected worklogs.
  *
