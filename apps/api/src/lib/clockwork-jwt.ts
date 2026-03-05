@@ -49,7 +49,7 @@ export async function getClockworkJwt(context: {
     'ac.pluginKey': 'clockwork-cloud',
     'ac.hostBaseUrl': `https://${env.JIRA_DOMAIN}`,
     'ac.projectId': context.projectId,
-    'ac.currentAccountId': env.JIRA_ACCOUNT_ID,
+    'ac.currentAccountId': env.JIRA_ACCOUNT_ID || '',
     'ac.type': 'EDIT_WORKLOG',
   });
 

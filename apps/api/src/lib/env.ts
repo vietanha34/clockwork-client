@@ -74,7 +74,9 @@ export const env = {
   get JIRA_WORKSPACE_ID(): string {
     return required('JIRA_WORKSPACE_ID');
   },
-  get JIRA_ACCOUNT_ID(): string {
-    return required('JIRA_ACCOUNT_ID');
+
+  // Optional: For Clockwork JWT servlet (if not set, uses default)
+  get JIRA_ACCOUNT_ID(): string | undefined {
+    return process.env.JIRA_ACCOUNT_ID;
   },
 } as const;

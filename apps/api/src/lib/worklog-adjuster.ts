@@ -117,19 +117,24 @@ async function updateWorklogTime(
 }
 
 /**
- * Process a list of worklogs: filter by accountId and date range,
+ * Process a list of worklogs: filter by accountId (optional) and date range,
  * calculate lunch overlap, and adjust via Clockwork API.
+ * 
+ * @param worklogs - List of worklogs to process
+ * @param accountId - Optional: filter by specific user. If not provided, processes all users.
+ * @param targetDates - Array of dates (YYYY-MM-DD) to filter by
  */
 export async function adjustWorklogs(
   worklogs: JiraWorklogDetail[],
-  accountId: string,
+  accountId: string | null,
   targetDates: string[], // YYYY-MM-DD array
 ): Promise<AdjustResult[]> {
   const results: AdjustResult[] = [];
 
-  // Filter worklogs for target user and dates
+  // Filter worklogs for target user (if specified) and dates
   const candidates = worklogs.filter((w) => {
-    if (w.author.accountId !== accountId) return false;
+    // If accountId specified, filter by user
+    if (accountId && w.author.accountId !== accountId) return false;
 
     // Extract date in VN timezone
     const startDate = new Date(w.started);

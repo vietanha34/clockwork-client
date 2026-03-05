@@ -1,5 +1,4 @@
 // apps/api/src/inngest/adjust-lunch-worklogs.ts
-import { env } from '../lib/env';
 import { getUpdatedWorklogIds, getWorklogsByIds } from '../lib/jira-worklog-client';
 import { adjustWorklogs } from '../lib/worklog-adjuster';
 import { inngest } from './client';
@@ -10,6 +9,9 @@ import { inngest } from './client';
  * Runs at 17:10 VN time (10:10 UTC), Monday-Friday.
  * Scans worklogs updated today and yesterday, subtracts lunch break
  * overlap (12:00-13:30) from affected worklogs.
+ * 
+ * Note: Processes worklogs for ALL users. To filter by specific user,
+ * modify the accountId parameter in adjustWorklogs call.
  */
 export const adjustLunchWorklogs = inngest.createFunction(
   {
@@ -20,7 +22,8 @@ export const adjustLunchWorklogs = inngest.createFunction(
   [{ cron: 'TZ=Asia/Ho_Chi_Minh 10 17 * * 1-5' }],
   async ({ step }) => {
     const result = await step.run('adjust-worklogs', async () => {
-      const accountId = env.JIRA_ACCOUNT_ID;
+      // Set to specific accountId to filter by user, or null for all users
+      const accountId: string | null = null; // null = all users
 
       // Calculate target dates (today + yesterday in VN timezone)
       const now = new Date();
