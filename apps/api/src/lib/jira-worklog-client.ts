@@ -17,9 +17,8 @@ interface JiraWorklogDetail {
   comment?: { content?: Array<{ content?: Array<{ text?: string }> }> };
 }
 
-interface WorklogListResponse {
-  values: JiraWorklogDetail[];
-}
+// Note: Jira /worklog/list returns array directly, not { values: [...] }
+type WorklogListResponse = JiraWorklogDetail[];
 
 // ─── HTTP helper ─────────────────────────────────────────────────────────────
 
@@ -84,11 +83,11 @@ export async function getWorklogsByIds(ids: number[]): Promise<JiraWorklogDetail
 
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize);
-    const data = await jiraFetch<WorklogListResponse>('/worklog/list', {
+    const data: WorklogListResponse = await jiraFetch<WorklogListResponse>('/worklog/list', {
       method: 'POST',
       body: JSON.stringify({ ids: chunk }),
     });
-    results.push(...data.values);
+    results.push(...data);
   }
 
   console.log(`[jira-worklog] Fetched ${results.length} worklog details`);
