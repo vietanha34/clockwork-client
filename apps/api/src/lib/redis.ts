@@ -258,3 +258,30 @@ export async function setCachedClockworkJwt(
     console.error('Redis setCachedClockworkJwt error:', err);
   }
 }
+
+// ─── Adjusted Worklog Tracking ───────────────────────────────────────────────
+
+const ADJUSTED_WORKLOGS_KEY = 'clockwork:adjusted-worklogs';
+const ADJUSTED_WORKLOGS_TTL_SECONDS = 15 * 24 * 60 * 60; // 15 days
+
+export async function isWorklogAdjusted(worklogId: number): Promise<boolean> {
+  try {
+    const redis = await getRedisClient();
+    const result = await redis.sIsMember(ADJUSTED_WORKLOGS_KEY, String(worklogId));
+    return Boolean(result);
+  } catch (err) {
+    console.error('Redis isWorklogAdjusted error:', err);
+    return false;
+  }
+}
+
+export async function markWorklogAdjusted(worklogId: number): Promise<void> {
+  try {
+    const redis = await getRedisClient();
+    await redis.sAdd(ADJUSTED_WORKLOGS_KEY, String(worklogId));
+    // Refresh TTL on each addition
+    await redis.expire(ADJUSTED_WORKLOGS_KEY, ADJUSTED_WORKLOGS_TTL_SECONDS);
+  } catch (err) {
+    console.error('Redis markWorklogAdjusted error:', err);
+  }
+}
