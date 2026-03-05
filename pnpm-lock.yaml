@@ -51,6 +51,9 @@ importers:
       inngest-cli:
         specifier: ^1.16.3
         version: 1.16.3
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
 
   apps/tauri:
     dependencies:

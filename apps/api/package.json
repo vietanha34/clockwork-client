@@ -18,6 +18,7 @@
     "@clockwork-menubar/typescript-config": "workspace:*",
     "@types/node": "^20.0.0",
     "@vercel/node": "^5.0.0",
-    "inngest-cli": "^1.16.3"
+    "inngest-cli": "^1.16.3",
+    "tsx": "^4.21.0"
   }
 }

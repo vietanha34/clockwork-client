@@ -36,6 +36,8 @@ Inngest cron (17:10 Mon-Fri)
      - PUT /worklogs/{id}.json → timeSpent minus overlap
      - Add worklogId to Redis adjusted set
   6. Log results (adjusted count, skipped count)
+
+note: using context7 mcp to get api document for jira worklog updated and list endpoints  
 ```
 
 ## Overlap Calculation

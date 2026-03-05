@@ -127,7 +127,7 @@ export async function searchJiraUser(query: string): Promise<ClockworkUser | nul
   console.log('searchJiraUser: ', JSON.stringify(query), JSON.stringify(data));
   const exactMatch = data.find((u) => u.emailAddress === query);
   const user = exactMatch ?? data[0] ?? null;
-  
+
   if (!user) return null;
   return {
     accountId: user.accountId,
@@ -171,7 +171,7 @@ export async function getJiraUsersBulk(accountIds: string[]): Promise<ClockworkU
   // Jira bulk API might have limits, so chunking is good practice
   const chunkSize = 50;
   const chunks = [];
-  
+
   for (let i = 0; i < accountIds.length; i += chunkSize) {
     chunks.push(accountIds.slice(i, i + chunkSize));
   }
@@ -180,13 +180,15 @@ export async function getJiraUsersBulk(accountIds: string[]): Promise<ClockworkU
 
   for (const chunk of chunks) {
     const params = new URLSearchParams();
-    chunk.forEach((id) => params.append('accountId', id));
+    for (const id of chunk) {
+      params.append('accountId', id);
+    }
     params.append('maxResults', chunk.length.toString());
 
     const response = await atlassianFetch<{ values: RawJiraUser[] }>(
       `/user/bulk?${params.toString()}`,
     );
-    
+
     if (response.values) {
       results.push(
         ...response.values.map((u) => ({
@@ -194,7 +196,7 @@ export async function getJiraUsersBulk(accountIds: string[]): Promise<ClockworkU
           emailAddress: u.emailAddress,
           displayName: u.displayName,
           avatarUrl: u.avatarUrls?.['48x48'],
-        }))
+        })),
       );
     }
   }
