@@ -62,7 +62,7 @@ export async function getUpdatedWorklogIds(sinceMs: number): Promise<number[]> {
   let url: string | null = `/worklog/updated?since=${sinceMs}`;
 
   while (url) {
-    const data = await jiraFetch<WorklogUpdatedResponse>(url);
+    const data: WorklogUpdatedResponse = await jiraFetch<WorklogUpdatedResponse>(url);
     for (const entry of data.values) {
       ids.push(entry.worklogId);
     }
