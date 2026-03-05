@@ -69,4 +69,7 @@ export const env = {
   get JIRA_WORKSPACE_ID(): string {
     return required('JIRA_WORKSPACE_ID');
   },
+  get JIRA_ACCOUNT_ID(): string {
+    return required('JIRA_ACCOUNT_ID');
+  },
 } as const;

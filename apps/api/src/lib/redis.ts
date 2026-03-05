@@ -224,3 +224,37 @@ export async function setCachedForgeContextToken(
     console.error('Redis setCachedForgeContextToken error:', err);
   }
 }
+
+// ─── Clockwork JWT Cache ─────────────────────────────────────────────────────
+
+const CLOCKWORK_JWT_KEY = 'clockwork:jwt';
+const CLOCKWORK_JWT_MAX_TTL_SECONDS = 840; // 14 minutes
+
+export async function getCachedClockworkJwt(): Promise<string | null> {
+  try {
+    const redis = await getRedisClient();
+    return await redis.get(CLOCKWORK_JWT_KEY);
+  } catch (err) {
+    console.error('Redis getCachedClockworkJwt error:', err);
+    return null;
+  }
+}
+
+export async function setCachedClockworkJwt(
+  token: string,
+  expiresAt?: number,
+): Promise<void> {
+  try {
+    const redis = await getRedisClient();
+    let ttl = CLOCKWORK_JWT_MAX_TTL_SECONDS;
+    if (expiresAt) {
+      const secondsUntilExpiry = Math.floor((expiresAt * 1000 - Date.now()) / 1000) - 60;
+      if (secondsUntilExpiry > 0) {
+        ttl = Math.min(secondsUntilExpiry, CLOCKWORK_JWT_MAX_TTL_SECONDS);
+      }
+    }
+    await redis.set(CLOCKWORK_JWT_KEY, token, { EX: ttl });
+  } catch (err) {
+    console.error('Redis setCachedClockworkJwt error:', err);
+  }
+}
