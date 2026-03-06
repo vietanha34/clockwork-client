@@ -1,7 +1,8 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import settingsIcon from '../assets/settings.png';
 import shutdownIcon from '../assets/shutdown.png';
+import { useAdaptiveWindow } from '../hooks/useAdaptiveWindow';
 
 interface AppShellProps {
   children: ReactNode;
@@ -18,8 +19,11 @@ export function AppShell({
   onBackClick,
   userDisplayName,
 }: AppShellProps) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  useAdaptiveWindow(frameRef);
+
   return (
-    <div className="menubar-popover-frame w-full p-2 pt-2">
+    <div ref={frameRef} className="menubar-popover-frame w-full p-2 pt-2">
       <div className="menubar-popover w-full">
         <div className="menubar-popover-content flex w-full flex-col bg-gray-50/96 text-gray-900">
           {/* Header */}
