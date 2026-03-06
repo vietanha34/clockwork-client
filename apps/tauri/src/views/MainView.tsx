@@ -55,7 +55,7 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
   const showProgressBar = isSquareTrayPlatform();
 
   return (
-    <div className="relative h-full min-h-0 flex flex-col divide-y divide-gray-100">
+    <div className="relative flex flex-col divide-y divide-gray-100">
       {showProgressBar && typeof todayProgressSeconds === 'number' && (
         <DailyProgressBar loggedSeconds={todayProgressSeconds} />
       )}
@@ -80,7 +80,7 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
       )}
 
       {/* Worklogs section with tabs + date strip */}
-      <section className="flex min-h-0 flex-1 flex-col">
+      <section className="flex flex-col">
         {/* Header row */}
         <div className="px-4 pt-3 pb-0 flex items-center gap-1.5">
           <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide">Worklogs</h3>
@@ -127,7 +127,7 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
         </div>
 
         {/* Tab content */}
-        <div className="worklogs-scroll min-h-0 flex-1 overflow-y-auto">
+        <div className="worklogs-scroll max-h-[280px] overflow-y-auto">
           {activeTab === 'list' ? (
             <WorklogList date={selectedDate} />
           ) : (
