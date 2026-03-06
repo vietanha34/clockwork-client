@@ -61,7 +61,6 @@ html, body {
 }
 
 .menubar-popover-content {
-  height: 100%;
   border-radius: 20px;
   overflow: hidden;
   backdrop-filter: blur(18px);
