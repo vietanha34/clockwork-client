@@ -19,9 +19,9 @@ export function AppShell({
   userDisplayName,
 }: AppShellProps) {
   return (
-    <div className="menubar-popover-frame h-full w-full p-2 pt-2">
-      <div className="menubar-popover h-full w-full">
-        <div className="menubar-popover-content flex h-full w-full flex-col bg-gray-50/96 text-gray-900">
+    <div className="menubar-popover-frame w-full p-2 pt-2">
+      <div className="menubar-popover w-full">
+        <div className="menubar-popover-content flex w-full flex-col bg-gray-50/96 text-gray-900">
           {/* Header */}
           <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200/60 shrink-0 bg-white/70">
             <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export function AppShell({
           </header>
 
           {/* Scrollable content */}
-          <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+          <main className="overflow-hidden">{children}</main>
         </div>
       </div>
     </div>
