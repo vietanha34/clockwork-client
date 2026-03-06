@@ -10,8 +10,6 @@ use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt as AutostartManagerExt;
 
 const WINDOW_WIDTH: i32 = 302;
-#[allow(dead_code)]
-const WINDOW_HEIGHT: i32 = 540;
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
@@ -203,7 +201,10 @@ pub fn run() {
                             
                             // Windows and Linux: window appears above tray icon
                             #[cfg(any(target_os = "windows", target_os = "linux"))]
-                            let y = (position.y as i32) - WINDOW_HEIGHT;
+                            let y = {
+                                let height = win.outer_size().map(|s| s.height as i32).unwrap_or(400);
+                                (position.y as i32) - height
+                            };
                             
                             // macOS: window appears below menu bar
                             #[cfg(target_os = "macos")]
