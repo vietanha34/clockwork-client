@@ -13,10 +13,7 @@ async function resolveIssueById(issueId: number): Promise<Issue | null> {
   try {
     // Jira API accepts issue key or numeric issue id.
     const issue = await getIssue(cacheKey);
-    await Promise.all([
-      setCachedIssue(cacheKey, issue),
-      setCachedIssue(issue.key, issue),
-    ]);
+    await Promise.all([setCachedIssue(cacheKey, issue), setCachedIssue(issue.key, issue)]);
     return issue;
   } catch (err) {
     console.error(`[worklogs] Failed to resolve issue ${cacheKey}:`, err);

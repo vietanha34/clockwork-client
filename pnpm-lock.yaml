@@ -14,6 +14,9 @@ importers:
       '@release-it/bumper':
         specifier: ^7.0.5
         version: 7.0.5(release-it@19.2.4(@types/node@22.19.10))
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260309.1
+        version: 7.0.0-dev.20260309.1
       release-it:
         specifier: ^19.2.4
         version: 19.2.4(@types/node@22.19.10)
@@ -23,9 +26,6 @@ importers:
       turbo:
         specifier: ^2.3.0
         version: 2.8.3
-      typescript:
-        specifier: ^5.5.4
-        version: 5.9.3
 
   apps/api:
     dependencies:
@@ -59,7 +59,7 @@ importers:
     dependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.18
-        version: 4.1.18(vite@5.4.21(@types/node@20.19.33)(lightningcss@1.30.2))
+        version: 4.1.18(vite@5.4.21(@types/node@22.19.10)(lightningcss@1.30.2))
       '@tanstack/react-query':
         specifier: ^5.90.20
         version: 5.90.20(react@18.3.1)
@@ -114,10 +114,10 @@ importers:
         version: 18.3.7(@types/react@18.3.28)
       '@vitejs/plugin-react':
         specifier: ^4.3.1
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.33)(lightningcss@1.30.2))
+        version: 4.7.0(vite@5.4.21(@types/node@22.19.10)(lightningcss@1.30.2))
       vite:
         specifier: ^5.4.10
-        version: 5.4.21(@types/node@20.19.33)(lightningcss@1.30.2)
+        version: 5.4.21(@types/node@22.19.10)(lightningcss@1.30.2)
 
   packages/typescript-config: {}
 
@@ -1822,6 +1822,45 @@ packages:
   '@types/tedious@4.0.14':
     resolution: {integrity: sha512-KHPsfX/FoVbUGbyYvk1q9MMQHLPeRZhRJZdO45Q4YjvFkv4hMNghCWTvy7rdKessBsmtz4euWCWAB6/tVpI1Iw==}
 
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-Vszk6vbONyyT47mUTEFNAXk+bJisM8F0pI+MyNPM8i2oorex7Gbp7ivFUGzdZHRFPDXMrlw6AXmgx1U2tZxiHw==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-UmmW/L1fW6URMILx5HqxcL2kElOyTYbY6M8yRMQK7gmBzsbkGj37JYN+WZgPkz/PQCVsxwIFcot6WmKRRXeBxQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-sN5rQRvqre8JHUISJhybUQ1e4a+mb/Ifa+uWHJawJ2tojTXWkU1rJTZBnAN3/XeoIJgeSdaZQAZRDlW9B7zbvw==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-G5zgoOZP2NjZ1kga9mend2in1e3C+Mm3XufelVZ9RwWRka744s6KxAsen853LizCrxBh58foj9pPVnH6gKUJvg==}
+    cpu: [arm]
+    os: [linux]
+
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-ZuHu9Sg4/akGSrO49hKLNKwrFXx7AZ2CS3PcTd85cC4nKudqB1aGD9rHxZZZyClj++e0qcNQ+4eTMn1sxDA9VQ==}
+    cpu: [x64]
+    os: [linux]
+
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-RNIidoGPsRaALc1znXiWfNARkGptm9e55qYnaz11YPvMrqbRKP9Y6Ipx4Oh/diIeF7y9UYiikeyk7EsyKe//sw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-/rEvAKowcoEdL2VeNju8apkGHEmbat10jIn1Sncny1zIaWvaMFw6bhmny+kKwX+9deitMfo9ihLlo5GCPJuMPQ==}
+    cpu: [x64]
+    os: [win32]
+
+  '@typescript/native-preview@7.0.0-dev.20260309.1':
+    resolution: {integrity: sha512-ZK+ExK7scBzUCAXCTtAwUm6QENJ+l3tCDQXNCly4WcGUvbIAWdaiNns4brganGN9nrxxRkC9Rx0CrxvIsn9zHA==}
+    hasBin: true
+
   '@vercel/build-utils@13.3.3':
     resolution: {integrity: sha512-OwnEj1OOVXq2UMo1Mrr8/Klt5BuWTo1GCWDYkrTbcm1b8cgRx3Hp0CnHGqMx8p3WpY4Jw6NkkreQETPg9gTEHQ==}
 
@@ -3378,6 +3417,7 @@ packages:
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   temporal-polyfill@0.2.5:
     resolution: {integrity: sha512-ye47xp8Cb0nDguAhrrDS1JT1SzwEV9e26sSsrWzVu+yPZ7LzceEcH0i2gci9jWfOfSCCgM3Qv5nOYShVUUFUXA==}
@@ -5156,12 +5196,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.18
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.18
 
-  '@tailwindcss/vite@4.1.18(vite@5.4.21(@types/node@20.19.33)(lightningcss@1.30.2))':
+  '@tailwindcss/vite@4.1.18(vite@5.4.21(@types/node@22.19.10)(lightningcss@1.30.2))':
     dependencies:
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
-      vite: 5.4.21(@types/node@20.19.33)(lightningcss@1.30.2)
+      vite: 5.4.21(@types/node@22.19.10)(lightningcss@1.30.2)
 
   '@tanstack/query-core@5.90.20': {}
 
@@ -5373,6 +5413,37 @@ snapshots:
     dependencies:
       '@types/node': 20.19.33
 
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260309.1':
+    optional: true
+
+  '@typescript/native-preview@7.0.0-dev.20260309.1':
+    optionalDependencies:
+      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20260309.1
+      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20260309.1
+      '@typescript/native-preview-linux-arm': 7.0.0-dev.20260309.1
+      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20260309.1
+      '@typescript/native-preview-linux-x64': 7.0.0-dev.20260309.1
+      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260309.1
+      '@typescript/native-preview-win32-x64': 7.0.0-dev.20260309.1
+
   '@vercel/build-utils@13.3.3':
     dependencies:
       '@vercel/python-analysis': 0.3.2
@@ -5444,7 +5515,7 @@ snapshots:
       json-schema-to-ts: 1.6.4
       ts-morph: 12.0.0
 
-  '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@20.19.33)(lightningcss@1.30.2))':
+  '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@22.19.10)(lightningcss@1.30.2))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -5452,7 +5523,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 5.4.21(@types/node@20.19.33)(lightningcss@1.30.2)
+      vite: 5.4.21(@types/node@22.19.10)(lightningcss@1.30.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -7244,13 +7315,13 @@ snapshots:
   vary@1.1.2:
     optional: true
 
-  vite@5.4.21(@types/node@20.19.33)(lightningcss@1.30.2):
+  vite@5.4.21(@types/node@22.19.10)(lightningcss@1.30.2):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.6
       rollup: 4.57.1
     optionalDependencies:
-      '@types/node': 20.19.33
+      '@types/node': 22.19.10
       fsevents: 2.3.3
       lightningcss: 1.30.2
 

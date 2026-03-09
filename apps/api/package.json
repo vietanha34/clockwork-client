@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "vercel dev --listen 3000",
-    "build": "tsc",
+    "build": "tsgo",
     "lint": "biome check .",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsgo --noEmit",
     "inngest:dev": "inngest-cli dev"
   },
   "dependencies": {
