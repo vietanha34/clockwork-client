@@ -16,6 +16,14 @@ function optional(name: string, fallback = ''): string {
   return process.env[name] ?? fallback;
 }
 
+function optionalBoolean(name: string, fallback: boolean): boolean {
+  const value = process.env[name];
+  if (value == null) return fallback;
+
+  const normalized = value.trim().toLowerCase();
+  return ['1', 'true', 'yes', 'on'].includes(normalized);
+}
+
 export const env = {
   // Upstash Redis (or any Redis with REST API)
   get UPSTASH_REDIS_REST_URL(): string {
@@ -78,5 +86,23 @@ export const env = {
   // Optional: For Clockwork JWT servlet (if not set, uses default)
   get JIRA_ACCOUNT_ID(): string | undefined {
     return process.env.JIRA_ACCOUNT_ID;
+  },
+
+  // Off-Saturday cleanup policy
+  get SATURDAY_OFF_CLEANUP_ENABLED(): boolean {
+    return optionalBoolean('SATURDAY_OFF_CLEANUP_ENABLED', false);
+  },
+  get SATURDAY_OFF_WEEK_PARITY(): 'even' | 'odd' {
+    const value = optional('SATURDAY_OFF_WEEK_PARITY', 'even').toLowerCase();
+    if (value !== 'even' && value !== 'odd') {
+      throw new Error(`Invalid SATURDAY_OFF_WEEK_PARITY: ${value}. Expected "even" or "odd".`);
+    }
+    return value;
+  },
+  get SATURDAY_OFF_CLEANUP_TIME_START(): string {
+    return optional('SATURDAY_OFF_CLEANUP_TIME_START', '08:00');
+  },
+  get SATURDAY_OFF_CLEANUP_TIME_END(): string {
+    return optional('SATURDAY_OFF_CLEANUP_TIME_END', '12:00');
   },
 } as const;

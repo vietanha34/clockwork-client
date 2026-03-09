@@ -1,0 +1,31 @@
+{{- if .Values.traefik.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "clockwork-api.fullname" . }}
+  labels:
+    {{- include "clockwork-api.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    {{- range .Values.traefik.entryPoints }}
+    - {{ . }}
+    {{- end }}
+  routes:
+    - match: >-
+        Host(`{{ required "traefik.host is required when traefik.enabled=true" .Values.traefik.host }}`)
+        {{- if and .Values.traefik.pathPrefix (ne .Values.traefik.pathPrefix "/") }}
+        && PathPrefix(`{{ .Values.traefik.pathPrefix }}`)
+        {{- end }}
+      kind: Rule
+      services:
+        - name: {{ include "clockwork-api.fullname" . }}
+          port: {{ .Values.service.port }}
+  {{- if .Values.traefik.tls.enabled }}
+  tls:
+    {{- if .Values.traefik.tls.secretName }}
+    secretName: {{ .Values.traefik.tls.secretName }}
+    {{- else }}
+    {}
+    {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "clockwork-api.fullname" . }}
+  labels:
+    {{- include "clockwork-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "clockwork-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "clockwork-api.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "clockwork-api.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api
+          {{- $hasEnvRedis := hasKey .Values.env "REDIS_URL" }}
+          {{- $hasSecretRedis := hasKey .Values.secretEnv "REDIS_URL" }}
+          {{- $hasAutoRedis := and (not $hasEnvRedis) (not $hasSecretRedis) }}
+          {{- $hasConfigEnv := gt (len .Values.env) 0 }}
+          {{- $hasSecretEnv := gt (len .Values.secretEnv) 0 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          {{- if $hasAutoRedis }}
+          env:
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "clockwork-api.fullname" . }}-redis
+                  key: REDIS_URL
+            {{- else }}
+            - name: REDIS_URL
+              value: {{ required "externalRedis.url is required when redis.enabled=false and REDIS_URL is not provided in env/secretEnv" .Values.externalRedis.url | quote }}
+            {{- end }}
+          {{- end }}
+          {{- if or $hasConfigEnv $hasSecretEnv }}
+          {{- if gt (len .Values.env) 0 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "clockwork-api.fullname" . }}-env
+          {{- end }}
+          {{- if $hasSecretEnv }}
+          {{- if $hasConfigEnv }}
+            - secretRef:
+                name: {{ include "clockwork-api.fullname" . }}-secret
+          {{- else }}
+          envFrom:
+            - secretRef:
+                name: {{ include "clockwork-api.fullname" . }}-secret
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

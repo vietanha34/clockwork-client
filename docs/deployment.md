@@ -1,6 +1,55 @@
 # Deployment Guide
 
-This guide covers deploying `apps/api` and `apps/inngest` to Vercel.
+This guide covers deploying `apps/api` and `apps/inngest` to Vercel, and deploying `apps/api` to Kubernetes with Helm.
+
+## Deploy `apps/api` to Kubernetes (Helm + Traefik)
+
+Helm chart path: `deploy/helm/clockwork-api`
+
+### Quick install
+
+```bash
+helm upgrade --install clockwork-api deploy/helm/clockwork-api \
+  --namespace clockwork --create-namespace \
+  --set image.repository=ghcr.io/your-org/clockwork-api \
+  --set image.tag=latest \
+  --set traefik.host=api.internal.example.com
+```
+
+### Redis modes
+
+- Internal Redis (default): `redis.enabled=true`
+- External Redis: set `redis.enabled=false` and set `externalRedis.url`
+
+Example external Redis:
+
+```bash
+helm upgrade --install clockwork-api deploy/helm/clockwork-api \
+  --namespace clockwork --create-namespace \
+  --set image.repository=ghcr.io/your-org/clockwork-api \
+  --set image.tag=latest \
+  --set redis.enabled=false \
+  --set externalRedis.url='redis://default:password@redis.example:6379' \
+  --set traefik.host=api.internal.example.com
+```
+
+### Traefik IngressRoute
+
+- Toggle: `traefik.enabled=true`
+- Domain route: `traefik.host`
+- TLS: `traefik.tls.enabled`, `traefik.tls.secretName`
+
+### Required API secrets
+
+Set these in `secretEnv` (values file or secret pipeline):
+
+- `CLOCKWORK_API_TOKEN`
+- `ATLASSIAN_EMAIL`
+- `ATLASSIAN_API_TOKEN`
+- `JIRA_DOMAIN`
+- `JIRA_TENANT_SESSION_TOKEN`
+- `JIRA_CLOUD_ID`
+- `JIRA_WORKSPACE_ID`
 
 ## Prerequisites
 
@@ -139,6 +188,7 @@ Or navigate to [app.inngest.com](https://app.inngest.com) → Apps → Sync → 
 - **Functions** → should show:
   - `sync-active-timers` - Syncs active timers from Clockwork
   - `adjust-lunch-worklogs` - Adjusts worklogs for lunch break (runs at 17:10 Mon-Fri)
+  - `cleanup-off-saturday-worklogs` - Deletes worklogs in off-Saturday window (runs at 12:10 Sat, gated by env)
 
 ---
 
@@ -294,6 +344,35 @@ The feature requires these environment variables:
 |---|---|---|
 | `clockwork:adjusted-worklogs` | 15 days | SET of worklog IDs that have been adjusted |
 | `clockwork:jwt` | ~14 min | Cached Clockwork JWT token |
+
+---
+
+## Off-Saturday Worklog Cleanup
+
+The system can optionally run an automated Inngest cron job (`cleanup-off-saturday-worklogs`) to remove worklogs created during off Saturdays when your organization works every other Saturday.
+
+### How it works
+
+1. **Trigger**: Cron runs at `TZ=Asia/Ho_Chi_Minh 10 12 * * 6` (12:10 PM every Saturday)
+2. **Hard gate**: Runs only when `SATURDAY_OFF_CLEANUP_ENABLED=true`
+3. **Policy check**: Uses ISO week parity (`SATURDAY_OFF_WEEK_PARITY=even|odd`) to decide whether this Saturday is off
+4. **Scope**: All users
+5. **Action**: Deletes worklogs started in configured time window (`SATURDAY_OFF_CLEANUP_TIME_START` → `SATURDAY_OFF_CLEANUP_TIME_END`, default `08:00-12:00`)
+
+### Configuration
+
+- `SATURDAY_OFF_CLEANUP_ENABLED` (default: `false`)
+- `SATURDAY_OFF_WEEK_PARITY` (default: `even`)
+- `SATURDAY_OFF_CLEANUP_TIME_START` (default: `08:00`)
+- `SATURDAY_OFF_CLEANUP_TIME_END` (default: `12:00`)
+
+Example:
+```bash
+SATURDAY_OFF_CLEANUP_ENABLED=true
+SATURDAY_OFF_WEEK_PARITY=even
+SATURDAY_OFF_CLEANUP_TIME_START=08:00
+SATURDAY_OFF_CLEANUP_TIME_END=12:00
+```
 
 ---
 

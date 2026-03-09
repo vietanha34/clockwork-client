@@ -1,0 +1,76 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/your-org/clockwork-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: false
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+env:
+  CLOCKWORK_API_BASE_URL: "https://api.clockwork.report/v1"
+
+secretEnv: {}
+
+probes:
+  path: /api/health
+  liveness:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+externalRedis:
+  url: ""
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: 7.2-alpine
+    pullPolicy: IfNotPresent
+  service:
+    port: 6379
+  auth:
+    enabled: false
+    password: ""
+  resources: {}
+
+traefik:
+  enabled: true
+  host: api.internal.example.com
+  pathPrefix: /
+  entryPoints:
+    - web
+  tls:
+    enabled: false
+    secretName: ""

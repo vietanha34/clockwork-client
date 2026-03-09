@@ -12,7 +12,7 @@ interface JiraWorklogDetail {
   id: string;
   issueId: string;
   author: { accountId: string };
-  started: string;           // e.g. "2026-03-05T09:00:00.000+0700"
+  started: string; // e.g. "2026-03-05T09:00:00.000+0700"
   timeSpentSeconds: number;
   comment?: { content?: Array<{ content?: Array<{ text?: string }> }> };
 }
@@ -28,9 +28,7 @@ function getBasicAuthHeader(): string {
 }
 
 async function jiraFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const url = path.startsWith('http')
-    ? path
-    : `https://${env.JIRA_DOMAIN}/rest/api/3${path}`;
+  const url = path.startsWith('http') ? path : `https://${env.JIRA_DOMAIN}/rest/api/3${path}`;
 
   const res = await fetch(url, {
     ...options,
@@ -47,7 +45,12 @@ async function jiraFetch<T>(path: string, options: RequestInit = {}): Promise<T>
     throw new Error(`Jira API error ${res.status} on ${path}: ${text}`);
   }
 
-  return res.json() as Promise<T>;
+  const text = await res.text();
+  if (!text) {
+    return undefined as T;
+  }
+
+  return JSON.parse(text) as T;
 }
 
 // ─── Public API ──────────────────────────────────────────────────────────────
@@ -92,6 +95,15 @@ export async function getWorklogsByIds(ids: number[]): Promise<JiraWorklogDetail
 
   console.log(`[jira-worklog] Fetched ${results.length} worklog details`);
   return results;
+}
+
+/**
+ * Delete a Jira worklog by issue ID and worklog ID.
+ */
+export async function deleteWorklog(issueId: string, worklogId: number): Promise<void> {
+  await jiraFetch<void>(`/issue/${issueId}/worklog/${worklogId}?adjustEstimate=auto`, {
+    method: 'DELETE',
+  });
 }
 
 export type { JiraWorklogDetail };

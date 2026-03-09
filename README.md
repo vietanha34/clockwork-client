@@ -266,7 +266,29 @@ Tóm tắt:
 4. lặp lại cho `apps/inngest`
 5. đăng ký endpoint Inngest: `https://<inngest-url>/api/inngest`
 
-## 13. Troubleshooting nhanh
+## 13. Triển khai API lên Kubernetes (Helm + Traefik)
+
+Repo có Helm chart cho API tại:
+
+- `deploy/helm/clockwork-api`
+
+Ví dụ:
+
+```bash
+helm upgrade --install clockwork-api deploy/helm/clockwork-api \
+  --namespace clockwork --create-namespace \
+  --set image.repository=ghcr.io/your-org/clockwork-api \
+  --set image.tag=latest \
+  --set traefik.host=api.internal.example.com
+```
+
+Ghi chú:
+
+- Redis nội bộ bật/tắt qua `redis.enabled` trong values.
+- Route domain Traefik đặt qua `traefik.host`.
+- Xem thêm trong `docs/deployment.md` và `deploy/helm/clockwork-api/README.md`.
+
+## 14. Troubleshooting nhanh
 
 ### Lỗi pnpm version
 
