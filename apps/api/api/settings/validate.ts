@@ -51,11 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       await validateClockworkToken(accountId, clockworkApiToken);
     } catch (error) {
       if (error instanceof ClockworkApiError && (error.status === 401 || error.status === 403)) {
-        sendValidationError(
-          res,
-          'Clockwork API token is invalid or expired',
-          'clockworkApiToken',
-        );
+        sendValidationError(res, 'Clockwork API token is invalid or expired', 'clockworkApiToken');
         return;
       }
       sendValidationError(
@@ -81,11 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     const statusMatch = message.match(/Atlassian API error (\d+)/);
     const statusCode = statusMatch ? Number(statusMatch[1]) : 0;
     if (statusCode === 400 || statusCode === 401 || statusCode === 403 || statusCode === 404) {
-      sendValidationError(
-        res,
-        'Jira accountId is invalid or could not be resolved',
-        'accountId',
-      );
+      sendValidationError(res, 'Jira accountId is invalid or could not be resolved', 'accountId');
       return;
     }
     sendValidationError(

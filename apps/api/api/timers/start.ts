@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { startTimer } from '../../src/lib/clockwork-client';
 import { inngest } from '../../src/inngest/client';
+import { startTimer } from '../../src/lib/clockwork-client';
 import { sendBadRequest, sendInternalError, sendSuccess } from '../../src/lib/response';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {

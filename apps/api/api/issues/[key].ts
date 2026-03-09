@@ -19,12 +19,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   try {
     const cachedIssue = await getCachedIssue(key);
-    const issue = cachedIssue ?? await getIssue(key);
+    const issue = cachedIssue ?? (await getIssue(key));
     if (!cachedIssue) {
-      await Promise.all([
-        setCachedIssue(key, issue),
-        setCachedIssue(issue.id, issue),
-      ]);
+      await Promise.all([setCachedIssue(key, issue), setCachedIssue(issue.id, issue)]);
     }
     sendSuccess(res, { issue });
   } catch (err) {

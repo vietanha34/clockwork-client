@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { searchIssues } from '../../src/lib/atlassian-client';
-import type { SearchIssuesResponse } from '../../src/lib/types';
 import { sendBadRequest, sendInternalError, sendSuccess } from '../../src/lib/response';
+import type { SearchIssuesResponse } from '../../src/lib/types';
 
 const DEFAULT_MAX_RESULTS = 10;
 const MAX_RESULTS_LIMIT = 10;

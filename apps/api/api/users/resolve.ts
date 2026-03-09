@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getJiraUser, searchJiraUser } from '../../src/lib/atlassian-client';
-import { getCachedEmailToAccountId, getCachedJiraUser, setCachedEmailToAccountId, setCachedJiraUser } from '../../src/lib/redis';
+import {
+  getCachedEmailToAccountId,
+  getCachedJiraUser,
+  setCachedEmailToAccountId,
+  setCachedJiraUser,
+} from '../../src/lib/redis';
 import { sendBadRequest, sendError, sendInternalError, sendSuccess } from '../../src/lib/response';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -10,8 +15,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const query = typeof req.query.query === 'string' ? req.query.query.trim() : 
-                typeof req.query.email === 'string' ? req.query.email.trim() : '';
+  const query =
+    typeof req.query.query === 'string'
+      ? req.query.query.trim()
+      : typeof req.query.email === 'string'
+        ? req.query.email.trim()
+        : '';
 
   if (!query) {
     sendBadRequest(res, 'Missing required query parameter: query or email');
@@ -30,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
           sendSuccess(res, cachedUser);
           return;
         }
-        
+
         // If not in user cache, fetch by ID
         try {
           const user = await getJiraUser(cachedAccountId);
@@ -39,7 +48,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
           return;
         } catch (e) {
           // If fetch by ID fails, fall through to search
-          console.warn(`[resolve] Failed to fetch user by cached accountId ${cachedAccountId}, falling back to search.`);
+          console.warn(
+            `[resolve] Failed to fetch user by cached accountId ${cachedAccountId}, falling back to search.`,
+          );
         }
       }
     }
