@@ -1,4 +1,4 @@
-import { type RedisClientType, createClient } from 'redis';
+import { createClient, type RedisClientType } from 'redis';
 import { env } from './env';
 import type { CachedTimerData, ClockworkUser, Issue, Timer } from './types';
 
@@ -248,7 +248,9 @@ export function calculateForgeContextTokenTtl(
   return Math.min(secondsUntilExpiry, maxTtlSeconds);
 }
 
-export async function getCachedForgeContextToken(scope?: ForgeContextTokenScope): Promise<string | null> {
+export async function getCachedForgeContextToken(
+  scope?: ForgeContextTokenScope,
+): Promise<string | null> {
   try {
     const redis = await getRedisClient();
     return await redis.get(buildForgeContextTokenKey(scope));
@@ -287,10 +289,7 @@ export async function getCachedClockworkJwt(): Promise<string | null> {
   }
 }
 
-export async function setCachedClockworkJwt(
-  token: string,
-  expiresAt?: number,
-): Promise<void> {
+export async function setCachedClockworkJwt(token: string, expiresAt?: number): Promise<void> {
   try {
     const redis = await getRedisClient();
     let ttl = CLOCKWORK_JWT_MAX_TTL_SECONDS;

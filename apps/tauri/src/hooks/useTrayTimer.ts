@@ -22,20 +22,18 @@ export function useTrayTimer(
   hasUnloggedDays?: boolean,
   withinWorkingHours?: boolean,
 ) {
-  // Determine tray icon state
-  const getTrayState = (): string => {
-    if (!startedAt) return 'idle';
-    if (withinWorkingHours === false) return 'onhold';
-    return 'active';
-  };
-
   // Update desktop tray icon state (active/onhold/idle) when timer state changes
   useEffect(() => {
+    const getTrayState = (): string => {
+      if (!startedAt) return 'idle';
+      if (withinWorkingHours === false) return 'onhold';
+      return 'active';
+    };
+
     if (isSquareTrayPlatform()) {
       const state = getTrayState();
       invoke('update_tray_icon_state', { state }).catch(console.error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startedAt, withinWorkingHours]);
 
   useEffect(() => {

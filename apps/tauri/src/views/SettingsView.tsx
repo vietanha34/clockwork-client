@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { getVersion } from '@tauri-apps/api/app';
+import { disable, enable } from '@tauri-apps/plugin-autostart';
+import { useEffect, useState } from 'react';
 import { ApiValidationError, validateSettings } from '../lib/api-client';
 import { API_BASE_URL } from '../lib/constants';
 import { getPlatform, isSquareTrayPlatform } from '../lib/platform';
 import { useSettings } from '../lib/settings-context';
-import { enable, disable } from '@tauri-apps/plugin-autostart';
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -26,6 +27,13 @@ export function SettingsView({ onClose }: SettingsViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [launchAtStartup, setLaunchAtStartup] = useState(settings.launchAtStartup);
   const [autoUpdate, setAutoUpdate] = useState(settings.autoUpdate);
+  const [version, setVersion] = useState<string>('');
+
+  useEffect(() => {
+    if (isTauri) {
+      getVersion().then(setVersion);
+    }
+  }, [isTauri]);
 
   const showPinGuide = isDesktop && !settings.pinIconDismissed;
 
@@ -117,6 +125,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
               fill="currentColor"
               className="w-4 h-4"
             >
+              <title>Dismiss tip</title>
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
           </button>
@@ -246,11 +255,16 @@ export function SettingsView({ onClose }: SettingsViewProps) {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-2 px-4 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-2 px-4 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
         >
           {saving ? 'Saving…' : saved ? 'Saved!' : 'Save Settings'}
         </button>
       </form>
+
+      <div className="mt-8 pt-4 border-t border-gray-100 flex flex-col items-center">
+        <p className="text-[10px] text-gray-400 font-medium tracking-tight">CLOCKWORK MENUBAR</p>
+        <p className="text-[10px] text-gray-400 mt-0.5">Version {version || 'v0.1.7'}</p>
+      </div>
     </div>
   );
 }

@@ -4,14 +4,13 @@ import { DailyProgressBar } from '../components/DailyProgressBar';
 import { DateStrip } from '../components/DateStrip';
 import { StartTimerForm } from '../components/StartTimerForm';
 import { WeeklyChart } from '../components/WeeklyChart';
+import { WeekSelector } from '../components/WeekSelector';
 import { WorklogList } from '../components/WorklogList';
 import { type WorklogTab, WorklogTabs } from '../components/WorklogTabs';
-import { WeekSelector } from '../components/WeekSelector';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useToday } from '../hooks/useToday';
 import { useWeeklyWorklogs } from '../hooks/useWeeklyWorklogs';
 import { useWorklogs } from '../hooks/useWorklogs';
-import { todayDate } from '../lib/api-client';
 import { isSquareTrayPlatform } from '../lib/platform';
 
 const rangeFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
@@ -53,6 +52,34 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
   const hasActiveTimer = timerData?.timers && timerData.timers.length > 0;
   const weekRange = useMemo(() => weekRangeLabel(weekData), [weekData]);
   const showProgressBar = isSquareTrayPlatform();
+
+  useEffect(() => {
+    const emit = () => {
+      window.dispatchEvent(new Event('clockwork:layout-change'));
+    };
+    const resetScroll = () => {
+      document.querySelectorAll<HTMLElement>('.worklogs-scroll').forEach((node) => {
+        node.scrollTop = 0;
+      });
+      const shellMain = document.querySelector<HTMLElement>('.menubar-popover-content > main');
+      if (shellMain) shellMain.scrollTop = 0;
+    };
+
+    resetScroll();
+    emit();
+    const rafId = requestAnimationFrame(() => {
+      resetScroll();
+      emit();
+    });
+    const timeoutId = setTimeout(() => {
+      resetScroll();
+      emit();
+    }, 80);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
+  }, [activeTab, summaryWeekOffset, selectedDate, hasActiveTimer]);
 
   return (
     <div className="relative flex flex-col divide-y divide-gray-100">
@@ -127,13 +154,15 @@ export function MainView({ todayProgressSeconds }: MainViewProps) {
         </div>
 
         {/* Tab content */}
-        <div className="worklogs-scroll max-h-[280px] overflow-y-auto">
-          {activeTab === 'list' ? (
+        {activeTab === 'list' ? (
+          <div key="list" className="worklogs-scroll max-h-[280px] overflow-y-auto">
             <WorklogList date={selectedDate} />
-          ) : (
+          </div>
+        ) : (
+          <div key="summary" className="overflow-visible">
             <WeeklyChart weekData={weekData} />
-          )}
-        </div>
+          </div>
+        )}
       </section>
     </div>
   );

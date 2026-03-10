@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useSettings } from '../lib/settings-context';
 import { useActiveTimers } from '../hooks/useActiveTimers';
 import { useStartTimer } from '../hooks/useTimerActions';
+import { useSettings } from '../lib/settings-context';
 import { IssueCombobox } from './IssueCombobox';
 
 export function StartTimerForm() {

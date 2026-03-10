@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { DEFAULT_SETTINGS, loadSettings, persistSettings } from './settings';
 import type { AppSettings } from './types';
 

@@ -1,6 +1,6 @@
+import { searchIssues } from './atlassian-client';
 import { getWorklogs } from './clockwork-client';
 import { getActiveTimers } from './redis';
-import { searchIssues } from './atlassian-client';
 import type { Issue, Worklog } from './types';
 
 interface JsonRpcRequest {
@@ -197,7 +197,9 @@ async function callGetWorklogs(
   if (!accountId || !fromDate || !toDate) {
     return {
       isError: true,
-      content: [{ type: 'text', text: 'Missing required arguments: account_id, from_date, to_date' }],
+      content: [
+        { type: 'text', text: 'Missing required arguments: account_id, from_date, to_date' },
+      ],
     };
   }
 
@@ -227,7 +229,11 @@ async function callGetWorklogs(
   }
 
   const allWorklogs: Worklog[] = [];
-  for (let cursor = new Date(from); cursor.getTime() <= to.getTime(); cursor.setUTCDate(cursor.getUTCDate() + 1)) {
+  for (
+    let cursor = new Date(from);
+    cursor.getTime() <= to.getTime();
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  ) {
     const targetDate = formatDate(cursor);
     const worklogs = await deps.getWorklogs(accountId, targetDate);
     allWorklogs.push(...worklogs);
@@ -248,9 +254,7 @@ async function callGetWorklogs(
   };
 }
 
-async function callGetAllActiveTimers(
-  deps: McpDependencies,
-): Promise<McpToolResult> {
+async function callGetAllActiveTimers(deps: McpDependencies): Promise<McpToolResult> {
   const cached = await deps.getActiveTimers('all');
   const timers = cached?.timers ?? [];
 
@@ -301,7 +305,9 @@ async function callSearchIssues(
   const parsedMaxResults =
     typeof rawMaxResults === 'number'
       ? rawMaxResults
-      : (typeof rawMaxResults === 'string' ? Number.parseInt(rawMaxResults, 10) : Number.NaN);
+      : typeof rawMaxResults === 'string'
+        ? Number.parseInt(rawMaxResults, 10)
+        : Number.NaN;
 
   const maxResults = Number.isFinite(parsedMaxResults)
     ? Math.min(Math.max(Number(parsedMaxResults), 1), 10)
@@ -346,9 +352,8 @@ export function createMcpMethodHandler(deps: McpDependencies = DEFAULT_DEPENDENC
     try {
       switch (payload.method) {
         case 'initialize': {
-          const requestedVersion = typeof params.protocolVersion === 'string'
-            ? params.protocolVersion
-            : '2025-06-18';
+          const requestedVersion =
+            typeof params.protocolVersion === 'string' ? params.protocolVersion : '2025-06-18';
           const protocolVersion = SUPPORTED_PROTOCOL_VERSIONS.has(requestedVersion)
             ? requestedVersion
             : '2025-06-18';
@@ -373,8 +378,10 @@ export function createMcpMethodHandler(deps: McpDependencies = DEFAULT_DEPENDENC
         case 'tools/call': {
           const toolName = typeof params.name === 'string' ? params.name : '';
           const args =
-            params.arguments && typeof params.arguments === 'object' && !Array.isArray(params.arguments)
-              ? params.arguments as Record<string, unknown>
+            params.arguments &&
+            typeof params.arguments === 'object' &&
+            !Array.isArray(params.arguments)
+              ? (params.arguments as Record<string, unknown>)
               : {};
 
           let toolResult: McpToolResult;
@@ -400,12 +407,9 @@ export function createMcpMethodHandler(deps: McpDependencies = DEFAULT_DEPENDENC
           return createError(id, -32601, `Method not found: ${payload.method}`);
       }
     } catch (error) {
-      return createError(
-        id,
-        -32603,
-        'Internal error',
-        { detail: error instanceof Error ? error.message : String(error) },
-      );
+      return createError(id, -32603, 'Internal error', {
+        detail: error instanceof Error ? error.message : String(error),
+      });
     }
   };
 }

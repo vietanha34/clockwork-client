@@ -14,13 +14,8 @@ export function useStartTimer() {
   const clockworkApiToken = settings.clockworkApiToken;
 
   return useMutation({
-    mutationFn: ({
-      issueKey,
-      comment,
-    }: {
-      issueKey: string;
-      comment?: string;
-    }) => startTimer(API_BASE_URL, issueKey, comment, clockworkApiToken),
+    mutationFn: ({ issueKey, comment }: { issueKey: string; comment?: string }) =>
+      startTimer(API_BASE_URL, issueKey, comment, clockworkApiToken),
     onSuccess: () => {
       activateFastPolling();
       void queryClient.invalidateQueries({ queryKey: [ACTIVE_TIMERS_KEY] });

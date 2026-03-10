@@ -39,10 +39,10 @@ export async function getClockworkJwt(context: {
       'issue.key': context.issueKey,
       'issuetype.id': '10006',
     }),
-    'key': 'log-work-dialog',
-    'width': '100%',
-    'height': '100%',
-    'classifier': 'json',
+    key: 'log-work-dialog',
+    width: '100%',
+    height: '100%',
+    classifier: 'json',
     'ac.issueId': context.issueId,
     'ac.isDescriptionRequired': 'false',
     'ac.isClockworkActive': 'false',
@@ -58,10 +58,10 @@ export async function getClockworkJwt(context: {
   const res = await fetch(url, {
     method: 'POST',
     headers: {
-      'Accept': '*/*',
+      Accept: '*/*',
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Cookie': `tenant.session.token=${env.JIRA_TENANT_SESSION_TOKEN}`,
-      'Origin': `https://${env.JIRA_DOMAIN}`,
+      Cookie: `tenant.session.token=${env.JIRA_TENANT_SESSION_TOKEN}`,
+      Origin: `https://${env.JIRA_DOMAIN}`,
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
     },
     body: body.toString(),
@@ -80,7 +80,11 @@ export async function getClockworkJwt(context: {
   }
 
   // Parse JWT exp claim for cache TTL
-  const payload = JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64').toString());
+  const payloadStr = jwt.split('.')[1];
+  if (!payloadStr) {
+    throw new Error('Invalid JWT structure: missing payload');
+  }
+  const payload = JSON.parse(Buffer.from(payloadStr, 'base64').toString());
   const exp = payload.exp as number | undefined;
 
   await setCachedClockworkJwt(jwt, exp);

@@ -50,7 +50,7 @@ async function clockworkFetch<T>(
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Token ${resolvedToken}`,
+      Authorization: `Token ${resolvedToken}`,
       ...options.headers,
     },
   });
@@ -58,13 +58,16 @@ async function clockworkFetch<T>(
   // Print full curl for the current request
   const curlCmd = [
     'curl',
-    '-X', options.method || 'GET',
-    '-H', 'Content-Type: application/json',
-    '-H', `Authorization: Token ${resolvedToken}`,
+    '-X',
+    options.method || 'GET',
+    '-H',
+    'Content-Type: application/json',
+    '-H',
+    `Authorization: Token ${resolvedToken}`,
     ...(options.body ? ['-d', options.body as string] : []),
     `"${url}"`,
   ].join(' ');
-  
+
   console.log(curlCmd);
 
   if (!res.ok) {
@@ -122,31 +125,42 @@ export async function validateClockworkToken(
     ['ending_at', targetDate],
   ]);
 
-  await clockworkFetch<RawWorklog[]>(
-    `/worklogs?${params.toString()}`,
-    undefined,
-    { token, allowEnvFallback: false },
-  );
+  await clockworkFetch<RawWorklog[]>(`/worklogs?${params.toString()}`, undefined, {
+    token,
+    allowEnvFallback: false,
+  });
 }
 
 /**
  * Start a new timer for the given issue.
  */
-export async function startTimer(issueKey: string, comment?: string, token?: string): Promise<void> {
+export async function startTimer(
+  issueKey: string,
+  comment?: string,
+  token?: string,
+): Promise<void> {
   const payload = { issue_key: issueKey, ...(comment ? { comment } : {}) };
 
-  await clockworkFetch<unknown>('/start_timer', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  }, { token });
+  await clockworkFetch<unknown>(
+    '/start_timer',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+    { token },
+  );
 }
 
 /**
  * Stop a running timer by issue key.
  */
 export async function stopTimer(issueKey: string, token?: string): Promise<void> {
-  await clockworkFetch<unknown>('/stop_timer', {
-    method: 'POST',
-    body: JSON.stringify({ issue_key: issueKey }),
-  }, { token });
+  await clockworkFetch<unknown>(
+    '/stop_timer',
+    {
+      method: 'POST',
+      body: JSON.stringify({ issue_key: issueKey }),
+    },
+    { token },
+  );
 }

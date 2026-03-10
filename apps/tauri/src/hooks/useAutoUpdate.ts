@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react';
-import { check } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
 import {
   isPermissionGranted,
   requestPermission,
   sendNotification,
 } from '@tauri-apps/plugin-notification';
+import { relaunch } from '@tauri-apps/plugin-process';
+import { check } from '@tauri-apps/plugin-updater';
+import { useEffect, useRef } from 'react';
 
-const CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000; // 4 hours
+const CHECK_INTERVAL_MS = 1 * 60 * 60 * 1000; // 1 hour
 
 async function checkAndInstallUpdate() {
   try {

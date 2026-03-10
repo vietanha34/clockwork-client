@@ -21,7 +21,7 @@ export async function loadSettings(): Promise<AppSettings> {
 
 export async function persistSettings(settings: AppSettings): Promise<void> {
   console.log('persistSettings called with:', settings);
-  // @ts-ignore
+  // @ts-expect-error
   if (typeof window !== 'undefined' && !window.__TAURI_INTERNALS__) {
     console.error('Tauri API not found. If you are in a browser, this is expected.');
     throw new Error('Tauri API not found. Please use the application window, not a browser.');

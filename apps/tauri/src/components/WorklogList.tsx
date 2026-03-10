@@ -1,7 +1,7 @@
 import { useWorklogs } from '../hooks/useWorklogs';
 import { formatSeconds, todayDate, totalWorklogSeconds } from '../lib/api-client';
-import { ErrorCard } from './ErrorCard';
 import { openIssueInBrowser } from '../lib/utils';
+import { ErrorCard } from './ErrorCard';
 import { WorklogSkeleton } from './Skeleton';
 
 interface WorklogListProps {

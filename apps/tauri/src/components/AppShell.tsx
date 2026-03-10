@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useRef, type ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 import settingsIcon from '../assets/settings.png';
 import shutdownIcon from '../assets/shutdown.png';
 import { useAdaptiveWindow } from '../hooks/useAdaptiveWindow';
@@ -82,7 +82,7 @@ export function AppShell({
           </header>
 
           {/* Scrollable content */}
-          <main className="overflow-hidden">{children}</main>
+          <main>{children}</main>
         </div>
       </div>
     </div>

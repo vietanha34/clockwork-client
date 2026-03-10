@@ -1,9 +1,9 @@
 import { env } from '../lib/env';
 import {
-  type JiraWorklogDetail,
   deleteWorklog,
   getUpdatedWorklogIds,
   getWorklogsByIds,
+  type JiraWorklogDetail,
 } from '../lib/jira-worklog-client';
 import {
   getStartOfVnDayEpochMs,

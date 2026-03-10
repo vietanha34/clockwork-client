@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
           await setCachedJiraUser(cachedAccountId, user);
           sendSuccess(res, user);
           return;
-        } catch (e) {
+        } catch (_e) {
           // If fetch by ID fails, fall through to search
           console.warn(
             `[resolve] Failed to fetch user by cached accountId ${cachedAccountId}, falling back to search.`,

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getActiveTimers } from '../../src/lib/redis';
-import { sendBadRequest, sendError, sendInternalError, sendSuccess } from '../../src/lib/response';
+import { sendError, sendInternalError, sendSuccess } from '../../src/lib/response';
 import type { ActiveTimersResponse } from '../../src/lib/types';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {

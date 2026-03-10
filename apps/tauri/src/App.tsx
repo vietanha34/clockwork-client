@@ -3,11 +3,11 @@ import { AppShell } from './components/AppShell';
 import { TimerSkeleton, WorklogSkeleton } from './components/Skeleton';
 import { UnifiedWarning } from './components/UnifiedWarning';
 import { useActiveTimers } from './hooks/useActiveTimers';
+import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { useToday } from './hooks/useToday';
 import { useTrayTimer } from './hooks/useTrayTimer';
 import { useUnloggedDays } from './hooks/useUnloggedDays';
 import { useWorklogNotification } from './hooks/useWorklogNotification';
-import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { useWorklogs } from './hooks/useWorklogs';
 import { totalWorklogSeconds } from './lib/api-client';
 import { isSquareTrayPlatform } from './lib/platform';
@@ -50,7 +50,7 @@ function AppContent() {
     return Math.floor((nowMs - effectiveStartMs) / 1000);
   })();
   const effectiveStartedAt = activeTimer
-    ? new Date(new Date().getTime() - activeTimer.tillNow * 1000).toISOString()
+    ? new Date(Date.now() - activeTimer.tillNow * 1000).toISOString()
     : undefined;
 
   // Always compute from worklog items so progress still works even when API `total` is stale/missing.

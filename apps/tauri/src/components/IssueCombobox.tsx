@@ -102,7 +102,12 @@ export function IssueCombobox({
             return;
           }
 
-          if (e.key === 'Enter' && isOpen && highlightedIndex >= 0 && highlightedIndex < issues.length) {
+          if (
+            e.key === 'Enter' &&
+            isOpen &&
+            highlightedIndex >= 0 &&
+            highlightedIndex < issues.length
+          ) {
             e.preventDefault();
             const selected = issues[highlightedIndex];
             if (selected) {
@@ -112,7 +117,6 @@ export function IssueCombobox({
         }}
         placeholder={placeholder}
         className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-        autoFocus={autoFocus}
         role="combobox"
         aria-expanded={isOpen}
         aria-controls="issue-combobox-listbox"
@@ -138,7 +142,9 @@ export function IssueCombobox({
                 role="option"
                 aria-selected={highlightedIndex === index}
                 className={`block w-full px-3 py-2 text-left text-xs ${
-                  highlightedIndex === index ? 'bg-blue-50 text-blue-900' : 'text-gray-700 hover:bg-gray-50'
+                  highlightedIndex === index
+                    ? 'bg-blue-50 text-blue-900'
+                    : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -146,8 +152,12 @@ export function IssueCombobox({
                 onMouseEnter={() => setHighlightedIndex(index)}
                 onClick={() => handleSelectIssue(issue)}
               >
-                <div className="font-medium">[{issue.key}] {issue.summary} ({issue.status})</div>
-                <div className="text-[11px] text-gray-500">{issue.project.key} - {issue.project.name}</div>
+                <div className="font-medium">
+                  [{issue.key}] {issue.summary} ({issue.status})
+                </div>
+                <div className="text-[11px] text-gray-500">
+                  {issue.project.key} - {issue.project.name}
+                </div>
               </button>
             ))
           )}

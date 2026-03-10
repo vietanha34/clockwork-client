@@ -73,14 +73,11 @@ export function WeeklyChart({ weekData }: WeeklyChartProps) {
             );
           }
 
-          const barH = day.totalSeconds > 0
-            ? Math.max(4, (day.totalSeconds / maxSeconds) * MAX_BAR_H)
-            : 4;
+          const barH =
+            day.totalSeconds > 0 ? Math.max(4, (day.totalSeconds / maxSeconds) * MAX_BAR_H) : 4;
           const barY = TOP_PAD + MAX_BAR_H - barH;
           const barColor = day.totalSeconds >= TARGET_SECONDS ? '#3b82f6' : '#f59e0b';
-          const hoursLabel = day.totalSeconds > 0
-            ? `${(day.totalSeconds / 3600).toFixed(1)}h`
-            : '';
+          const hoursLabel = day.totalSeconds > 0 ? `${(day.totalSeconds / 3600).toFixed(1)}h` : '';
 
           return (
             <g key={day.date}>

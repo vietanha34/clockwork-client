@@ -44,7 +44,12 @@ test('tools/list returns all expected tools', async () => {
   const response = await handler(makeRequest('tools/list'));
   const names = response.result.tools.map((tool) => tool.name).sort();
 
-  assert.deepEqual(names, ['get_active_timers', 'get_all_active_timers', 'get_worklogs', 'search_issues']);
+  assert.deepEqual(names, [
+    'get_active_timers',
+    'get_all_active_timers',
+    'get_worklogs',
+    'search_issues',
+  ]);
 });
 
 test('get_all_active_timers groups timers by account id', async () => {

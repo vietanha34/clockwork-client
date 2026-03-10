@@ -1,7 +1,6 @@
 import { getJiraUser, getJiraUsersBulk } from './atlassian-client';
-import type { RawClockworkTimer } from './types';
 import { getCachedJiraUser, setCachedJiraUser } from './redis';
-import type { ClockworkUser, Timer } from './types';
+import type { ClockworkUser, RawClockworkTimer, Timer } from './types';
 
 /**
  * Resolve a Jira user by accountId using a Redis cache-first strategy.
@@ -33,9 +32,7 @@ export async function resolveTimerAuthor(accountId: string): Promise<ClockworkUs
  * - Uses BULK API for efficiency
  * - Falls back gracefully: timers with unresolvable authors get empty email
  */
-export async function resolveTimerAuthors(
-  rawTimers: RawClockworkTimer[],
-): Promise<Timer[]> {
+export async function resolveTimerAuthors(rawTimers: RawClockworkTimer[]): Promise<Timer[]> {
   // Collect unique accountIds from running_for
   const accountIds = [...new Set(rawTimers.map((t) => t.running_for).filter(Boolean))];
 
@@ -52,15 +49,17 @@ export async function resolveTimerAuthors(
       } else {
         missingAccountIds.push(accountId);
       }
-    })
+    }),
   );
 
   // 2. Fetch Missing from Jira Bulk API
   if (missingAccountIds.length > 0) {
     try {
-      console.log(`[resolveTimerAuthors] Bulk fetching ${missingAccountIds.length} users from Jira...`);
+      console.log(
+        `[resolveTimerAuthors] Bulk fetching ${missingAccountIds.length} users from Jira...`,
+      );
       const fetchedUsers = await getJiraUsersBulk(missingAccountIds);
-      
+
       for (const user of fetchedUsers) {
         await setCachedJiraUser(user.accountId, user);
         userMap.set(user.accountId, user);

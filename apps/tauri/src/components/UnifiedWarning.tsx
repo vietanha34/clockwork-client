@@ -44,7 +44,9 @@ export function UnifiedWarning({
         <section className="border-b border-amber-200 bg-amber-100/70 px-4 py-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">Warning</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">
+                Warning
+              </p>
               <p className="text-xs font-medium text-amber-900">{previousTitle}</p>
             </div>
 
@@ -86,9 +88,7 @@ export function UnifiedWarning({
             <span className="text-sm font-medium text-red-800">
               Worklog: {formatSeconds(todayLogged)} / {formatSeconds(todayTarget)}
             </span>
-            <span className="text-sm text-red-600">
-              — {formatSeconds(todayDeficit)} remaining
-            </span>
+            <span className="text-sm text-red-600">— {formatSeconds(todayDeficit)} remaining</span>
           </div>
         </div>
       )}
