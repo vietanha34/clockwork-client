@@ -57,7 +57,9 @@
       "Bash(gh auth:*)",
       "Bash(xargs basename:*)",
       "WebFetch(domain:v2.tauri.app)",
-      "WebFetch(domain:thatgurjot.com)"
+      "WebFetch(domain:thatgurjot.com)",
+      "mcp__mcp-atlassian__jira_search",
+      "mcp__mcp-atlassian__jira_add_worklog"
     ],
     "additionalDirectories": [
       "/Users/vietanha34/Documents/workspace/personal-projects/clockwork-client/docs/plans"

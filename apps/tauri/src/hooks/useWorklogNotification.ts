@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
 import {
   isPermissionGranted,
   requestPermission,
   sendNotification,
 } from '@tauri-apps/plugin-notification';
+import { useEffect, useRef, useState } from 'react';
 import { formatSeconds } from '../lib/api-client';
 
 const NOTIFICATION_HOUR = 17;
-const WORKLOG_TARGET_SECONDS = 7.5 * 3600; // 27,000 seconds
+const NOTIFICATION_MINUTE = 15;
+const WORKLOG_TARGET_SECONDS = 7 * 3600; // 25,200 seconds
 const LOCAL_STORAGE_KEY = 'worklog-notification-last-date';
 
 function todayDateKey(): string {
@@ -53,11 +54,15 @@ export function useWorklogNotification({
       }
 
       const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
       const todayKey = todayDateKey();
 
-      // Only check at or after 17:00, and only once per day
-      if (currentHour < NOTIFICATION_HOUR) {
-        // Before 17:00 — hide any stale banner from yesterday
+      // Only check at or after 17:15, and only once per day
+      if (
+        currentHour < NOTIFICATION_HOUR ||
+        (currentHour === NOTIFICATION_HOUR && currentMinute < NOTIFICATION_MINUTE)
+      ) {
+        // Before 17:15 — hide any stale banner from yesterday
         setShowBanner(false);
         setDeficit(0);
         return;

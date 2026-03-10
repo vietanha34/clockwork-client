@@ -6,7 +6,7 @@ import { useSettings } from '../lib/settings-context';
 import type { UnloggedDay } from '../lib/types';
 import { WORKLOGS_KEY } from './useWorklogs';
 
-const REQUIRED_SECONDS = 8 * 3600;
+const REQUIRED_SECONDS = 7 * 3600;
 const weekdayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
 
 function toLocalDateString(date: Date): string {
